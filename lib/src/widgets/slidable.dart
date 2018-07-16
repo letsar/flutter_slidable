@@ -61,40 +61,42 @@ class Slidable extends StatefulWidget {
   _SlidableState createState() => _SlidableState();
 }
 
-class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
+class _SlidableState extends State<Slidable> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable> {
   @override
   void initState() {
     super.initState();
-    _moveController =
-        new AnimationController(duration: widget.movementDuration, vsync: this)
-          ..addStatusListener(_handleShowAllActionsStatusChanged);
-    //_updateMoveAnimation();
+    _controller = new AnimationController(duration: widget.movementDuration, vsync: this)
+      ..addStatusListener(_handleShowAllActionsStatusChanged);
   }
 
-  AnimationController _moveController;
-  Animation<Offset> _moveAnimation;
+  void _handleShowAllActionsStatusChanged(AnimationStatus status) {
+    if (status == AnimationStatus.completed && !_dragUnderway &&!_opening) {
+              _dragExtent =.0;
+    }
+  }
 
-  AnimationController _resizeController;
-  Animation<double> _resizeAnimation;
+  AnimationController _controller;
+  Animation<Offset> _animation;
 
   double _dragExtent = 0.0;
   bool _dragUnderway = false;
-  Size _sizePriorToCollapse;
+  bool _opening = false;
+  double _actionExtent;
 
   bool get _isActive {
-    return _dragUnderway || _moveController.isAnimating;
+    return _dragUnderway || _controller.isAnimating;
+  }
+
+  bool get _showLeftActions {
+    return _dragExtent > 0;
   }
 
   double get _overallDragAxisExtent {
     return context.size.width;
   }
 
-  double get _actionExtent {
-    return widget.actionExtent ?? context.size.height;
-  }
-
   List<SlideAction> get _slideActions {
-    return _dragExtent > 0 ? widget.leftActions : widget.rightActions;
+    return _showLeftActions ? widget.leftActions : widget.rightActions;
   }
 
   double get _slideActionsExtent {
@@ -104,121 +106,170 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _moveController.dispose();
-    _resizeController?.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   void _handleDragStart(DragStartDetails details) {
+    final double overallDragAxisExtent = context.size.width;
     _dragUnderway = true;
-    if (_moveController.isAnimating) {
+    _actionExtent = widget.actionExtent ?? overallDragAxisExtent;
+
+    if (_controller.isAnimating) {
       _dragExtent =
-          _moveController.value * _overallDragAxisExtent * _dragExtent.sign;
-      _moveController.stop();
+          _controller.value * overallDragAxisExtent * _dragExtent.sign;
+      _controller.stop();
     } else {
-      _dragExtent = 0.0;
-      _moveController.value = 0.0;
+     // _dragExtent = 0.0;
+      _controller.value = 0.0;
     }
-    setState(() {
-      _updateMoveAnimation();
-    });
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    if (!_isActive || _moveController.isAnimating) return;
     final double delta = details.primaryDelta;
-    final double oldDragExtent = _dragExtent;
     _dragExtent += delta;
-    if (oldDragExtent.sign != _dragExtent.sign) {
-      setState(() {
-        _updateMoveAnimation();
-      });
-    }
-    if (!_moveController.isAnimating) {
-      _moveController.value = _dragExtent.abs() / _overallDragAxisExtent;
-    }
+    setState(() {
+      _controller.value = _dragExtent.abs() / context.size.width;
+    });
+//    if (!_isActive || _controller.isAnimating) return;
+//    final double delta = details.primaryDelta;
+//    final double oldDragExtent = _dragExtent;
+//    _dragExtent += delta;
+//    if (oldDragExtent.sign != _dragExtent.sign) {
+//      setState(() {
+//        _updateMoveAnimation();
+//      });
+//    }
+//    if (!_controller.isAnimating) {
+//      _controller.value = _dragExtent.abs() / _overallDragAxisExtent;
+//    }
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    if (!_isActive || _moveController.isAnimating) return;
     _dragUnderway = false;
-
-    final double flingVelocity = details.primaryVelocity;
-    final double dragRatio = _dragExtent / _slideActionsExtent;
-
-    if(dragRatio >= widget.showAllActionsThreshold){
-      _moveController.fling();
+    final double velocity = details.primaryVelocity;
+    final bool open = velocity.sign == _dragExtent.sign;
+    final bool fast = velocity.abs() > 2500;
+    if(!open && fast) {
+      _opening = false;
+      _controller.animateTo(0.0);
+    }else if(_controller.value >= widget.showAllActionsThreshold || (open && fast)){
+      _opening = true;
+      _controller.animateTo(1.0);
     }else{
-      _moveController.reverse();
+      _opening = false;
+      _controller.animateTo(0.0);
     }
-
   }
 
   void _updateMoveAnimation() {
     final double end = _dragExtent.sign * _slideActionsExtent / _overallDragAxisExtent;
-    _moveAnimation = new Tween<Offset>(
+    _animation = new Tween<Offset>(
       begin: Offset.zero,
       end: new Offset(end, 0.0),
-    ).animate(_moveController);
-  }
-
-  void _startResizeAnimation() {
-    assert(_moveController != null);
-    assert(_moveController.isCompleted);
-    assert(_resizeController == null);
-    assert(_sizePriorToCollapse == null);
-
-    // TODO.
-  }
-
-  void _handleShowAllActionsStatusChanged(AnimationStatus status) {
-    if (status == AnimationStatus.completed && !_dragUnderway)
-      _startResizeAnimation();
+    ).animate(_controller);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.leftActions == null &&
-        widget.rightActions == null){
+    super.build(context); // See AutomaticKeepAliveClientMixin.
+
+    if (widget.leftActions == null && widget.rightActions == null) {
       return widget.child;
     }
 
+    final animation =
+        new Tween(
+            begin: Offset.zero,
+            end: Offset(0.3 * _dragExtent.sign, 0.0),
+        ).animate(new CurveTween(curve: Curves.decelerate).animate(_controller));
+
     Widget content = widget.child;
 
-    if(_dragExtent != 0.0) {
-      content = new SlideTransition(
-        position: _moveAnimation,
-        child: content,
+    if(animation.value.dx != .0 && _dragExtent != .0) {
+      content = new Stack(
+        children: <Widget>[
+          new SlideTransition(
+            position: animation,
+            child: widget.child,
+          ),
+          new Positioned.fill(child: new LayoutBuilder(builder: (context, constraints) {
+            return new AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return new Stack(
+                    children: <Widget>[
+                      new Positioned(
+                        left: _showLeftActions ? .0 : null,
+                        right: _showLeftActions ? null : .0,
+                        top: .0,
+                        bottom: .0,
+                        width: constraints.maxWidth * animation.value.dx * _dragExtent.sign,
+                        child: new Row(
+                          children: _slideActions
+                              .map(
+                                (slideAction) =>
+                                Expanded(
+                                  child: new Container(
+                                    //width: _actionExtent,
+                                    color: slideAction.background,
+                                    child: slideAction,
+                                  ),
+                                ),
+                          )
+                              .toList(),
+                        ),
+                      )
+                    ],
+                  );
+                });
+          })),
+        ],
       );
-
-      if (!_moveAnimation.isDismissed) {
-        final List<Widget> children = <Widget>[];
-        final List<SlideAction> slideActions =
-        _dragExtent < 0 ? widget.rightActions : widget.leftActions;
-        if (slideActions != null && slideActions.isNotEmpty) {
-          children.add(new Positioned.fill(
-              child: new ClipRect(
-                clipper: new _SlidableClipper(
-                  moveAnimation: _moveAnimation,
-                ),
-                child: new Row(
-                  children: slideActions
-                      .map(
-                        (slideAction) =>
-                    new Container(
-                      color: slideAction.background,
-                      child: slideAction,
-                    ),
-                  )
-                      .toList(),
-                ),
-              )));
-        }
-
-        children.add(content);
-        content = new Stack(children: children);
-      }
     }
+
+//    if(_dragExtent != 0.0) {
+//      content = new SlideTransition(
+//        position: _animation,
+//        child: content,
+//      );
+//
+//      final bool showLeftActions = _showLeftActions;
+//
+//      if (!_animation.isDismissed) {
+//        final List<Widget> children = <Widget>[];
+//        final List<SlideAction> slideActions =
+//        _dragExtent < 0 ? widget.rightActions : widget.leftActions;
+//        if (slideActions != null && slideActions.isNotEmpty) {
+//          children.add(new Positioned(
+//              left: showLeftActions ? 0.0 : null,
+//              right: showLeftActions ? null : 0.0,
+//              width: _slideActionsExtent,
+//              top: 0.0,
+//              bottom: 0.0,
+//              child: new ClipRect(
+//                clipper: new _SlidableClipper(
+//                  moveAnimation: _animation,
+//                ),
+//                child: new Row(
+//                  children: slideActions
+//                      .map(
+//                        (slideAction) =>
+//                    new Container(
+//                      width: _actionExtent,
+//                      color: slideAction.background,
+//                      child: slideAction,
+//                    ),
+//                  )
+//                      .toList(),
+//                ),
+//              )));
+//        }
+//
+//        children.add(content);
+//        content = new Stack(children: children);
+//      }
+//    }
 
     return new GestureDetector(
       onHorizontalDragStart: _handleDragStart,
@@ -228,6 +279,9 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
       child: content,
     );
   }
+
+  @override
+  bool get wantKeepAlive => _opening;
 }
 
 class _SlidableClipper extends CustomClipper<Rect> {
@@ -241,9 +295,7 @@ class _SlidableClipper extends CustomClipper<Rect> {
   @override
   Rect getClip(Size size) {
     final double offset = moveAnimation.value.dx * size.width;
-    if (offset < 0)
-      return new Rect.fromLTRB(
-          size.width + offset, 0.0, size.width, size.height);
+    if (offset < 0) return new Rect.fromLTRB(size.width + offset, 0.0, size.width, size.height);
     return new Rect.fromLTRB(0.0, 0.0, offset, size.height);
   }
 

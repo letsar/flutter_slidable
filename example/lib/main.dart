@@ -65,30 +65,41 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (context, index) {
             return new Slidable(
               key: Key('$index'),
-              child: Card(
-                color: index.isEven ? Colors.blue : Colors.orange,
+              delegate: _getDelegate(index),
+              child: new Container(
+                color: Colors.white,
                 child: new ListTile(
+                  leading: new CircleAvatar(
+                    backgroundColor: _getAvatarColor(index),
+                    child: new Text('$index'),
+                    foregroundColor: Colors.white,
+                  ),
                   title: new Text('Tile n°$index'),
+                  subtitle: new Text(_getSubtitle(index)),
                 ),
               ),
-              leftActions: <SlideAction>[
-                new SlideAction(
-                  child: Text('DELETE'),
-                  background: Colors.red,
+              leftActions: <Widget>[
+                new _HomePageSlideAction(
+                  text: 'Archive',
+                  color: Colors.blue,
+                  icon: Icons.archive,
                 ),
-                new SlideAction(
-                  child: Text('ADD'),
-                  background: Colors.green,
+                new _HomePageSlideAction(
+                  text: 'Share',
+                  color: Colors.indigo,
+                  icon: Icons.share,
                 ),
               ],
-              rightActions: <SlideAction>[
-                new SlideAction(
-                  child: Text('RIGHT 1'),
-                  background: Colors.purple,
+              rightActions: <Widget>[
+                new _HomePageSlideAction(
+                  text: 'More',
+                  color: Colors.black45,
+                  icon: Icons.more_horiz,
                 ),
-                new SlideAction(
-                  child: Text('RIGHT 2'),
-                  background: Colors.blue,
+                new _HomePageSlideAction(
+                  text: 'Delete',
+                  color: Colors.red,
+                  icon: Icons.delete,
                 ),
               ],
             );
@@ -96,6 +107,63 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: 20,
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  SlidableDelegate _getDelegate(int index){
+    switch(index % 3){
+      case 0 : return const SlidableBehindDelegate();
+      case 1 : return const SlidableStrechDelegate();
+      case 2 : return const SlidableScrollDelegate();
+    }
+  }
+
+  Color _getAvatarColor(int index){
+    switch(index % 3){
+      case 0 : return Colors.red;
+      case 1 : return Colors.green;
+      case 2 : return Colors.blue;
+    }
+  }
+
+  String _getSubtitle(int index){
+    switch(index % 3){
+      case 0 : return 'SlidableBehindDelegate';
+      case 1 : return 'SlidableStrechDelegate';
+      case 2 : return 'SlidableScrollDelegate';
+    }
+  }
+}
+
+class _HomePageSlideAction extends StatelessWidget {
+  _HomePageSlideAction({this.text,this.icon,this.color,});
+
+  final String text;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color foregroundColor = ThemeData.estimateBrightnessForColor(color) == Brightness.light ? Colors.black : Colors.white;
+    final Text textWidget = new Text(
+      text,
+      overflow: TextOverflow.ellipsis,
+      style: Theme.of(context).primaryTextTheme.caption.copyWith(color: foregroundColor),
+    );
+    return GestureDetector(
+      onTap: () => Scaffold.of(context).showSnackBar(SnackBar(content:textWidget)),
+      child: Container(
+        color: color,
+        child: new Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new Icon(icon, color: foregroundColor,),
+              textWidget,
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

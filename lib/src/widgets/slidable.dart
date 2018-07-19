@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 const double _kActionsExtentRatio = 0.3;
+const double _kFastThreshold = 2500.0;
 
-class SlidableDelegateBuildContext {
-  const SlidableDelegateBuildContext(
+/// A handle to various properties useful while calling [SlidableDelegate.buildActions].
+///
+/// See also:
+///
+///  * [SlidableState], which create this object.
+///  * [SlidableDelegate] and other delegates inheriting it, which uses this object in [SlidableDelegate.buildActions].
+class SlidableDelegateContext {
+  const SlidableDelegateContext(
     this.slidable,
     this.showLeftActions,
     this.dragExtent,
@@ -13,37 +20,59 @@ class SlidableDelegateBuildContext {
 
   final Slidable slidable;
 
+  /// The current actions that have to be shown.
   List<Widget> get actions =>
       showLeftActions ? slidable.leftActions : slidable.rightActions;
 
+  /// Whether the left actions have to be shown.
   final bool showLeftActions;
 
   final double dragExtent;
 
+  /// The animation controller which value depends on  `dragExtent`.
   final AnimationController controller;
 }
 
+/// A delegate that controls how the slide actions are displayed.
+///
+/// See also:
+///
+///  * [SlidableStrechDelegate], which creates slide actions that stretched
+///  while the item is sliding.
+///  * [SlidableBehindDelegate], which creates slide actions that stay behind the item
+///  while is sliding.
+///  * [SlidableScrollDelegate], which creates slide actions that follow the item
+///  while is sliding.
+///  * [SlidableDrawerDelegate], which creates slide actions that are displayed like drawers
+///  while the item is sliding.
 abstract class SlidableDelegate {
-  const SlidableDelegate();
+  const SlidableDelegate({
+    double fastThreshold,
+  })  : fastThreshold = fastThreshold ?? _kFastThreshold,
+        assert(fastThreshold == null || fastThreshold >= .0,
+            'fastThreshold must be greater than 0.0');
 
-  double get fastThreshold => 2500.0;
+  /// The threshold used to know if a movement was fast and request to open/close the actions.
+  final double fastThreshold;
 
-  Widget buildActions(BuildContext context, SlidableDelegateBuildContext ctx);
+  Widget buildActions(BuildContext context, SlidableDelegateContext ctx);
 }
 
 abstract class SlidableStackDelegate extends SlidableDelegate {
   const SlidableStackDelegate({
-    this.actionsExtentRatio = _kActionsExtentRatio,
-  }) : assert(
-            actionsExtentRatio != null &&
-                actionsExtentRatio >= .0 &&
-                actionsExtentRatio <= 1.0,
-            'actionsExtentRatio must not be null and must be between 0.0 and 1.0');
+    double actionsExtentRatio,
+    double fastThreshold,
+  })  : assert(
+            fastThreshold == null ||
+                actionsExtentRatio >= .0 && actionsExtentRatio <= 1.0,
+            'actionsExtentRatio must be between 0.0 and 1.0'),
+        actionsExtentRatio = actionsExtentRatio ?? _kActionsExtentRatio,
+        super(fastThreshold: fastThreshold);
 
   final double actionsExtentRatio;
 
   @override
-  Widget buildActions(BuildContext context, SlidableDelegateBuildContext ctx) {
+  Widget buildActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
       end: new Offset(actionsExtentRatio * ctx.dragExtent.sign, 0.0),
@@ -69,18 +98,21 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
     }
   }
 
-  Widget buildStackActions(
-      BuildContext context, SlidableDelegateBuildContext ctx);
+  Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx);
 }
 
+/// A delegate that creates slide actions which stretch while the item is sliding.
 class SlidableStrechDelegate extends SlidableStackDelegate {
   const SlidableStrechDelegate({
-    actionsExtentRatio = _kActionsExtentRatio,
-  }) : super(actionsExtentRatio: actionsExtentRatio);
+    double actionsExtentRatio,
+    double fastThreshold,
+  }) : super(
+          actionsExtentRatio: actionsExtentRatio,
+          fastThreshold: fastThreshold,
+        );
 
   @override
-  Widget buildStackActions(
-      BuildContext context, SlidableDelegateBuildContext ctx) {
+  Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
       end: new Offset(actionsExtentRatio * ctx.dragExtent.sign, 0.0),
@@ -112,14 +144,18 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
   }
 }
 
+/// A delegate that creates slide actions which stay behind the item while is sliding.
 class SlidableBehindDelegate extends SlidableStackDelegate {
   const SlidableBehindDelegate({
-    actionsExtentRatio = _kActionsExtentRatio,
-  }) : super(actionsExtentRatio: actionsExtentRatio);
+    double actionsExtentRatio,
+    double fastThreshold,
+  }) : super(
+          actionsExtentRatio: actionsExtentRatio,
+          fastThreshold: fastThreshold,
+        );
 
   @override
-  Widget buildStackActions(
-      BuildContext context, SlidableDelegateBuildContext ctx) {
+  Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         return new Stack(
@@ -141,14 +177,18 @@ class SlidableBehindDelegate extends SlidableStackDelegate {
   }
 }
 
+/// A delegate that creates slide actions which follow the item while is sliding.
 class SlidableScrollDelegate extends SlidableStackDelegate {
   const SlidableScrollDelegate({
-    actionsExtentRatio = _kActionsExtentRatio,
-  }) : super(actionsExtentRatio: actionsExtentRatio);
+    double actionsExtentRatio,
+    double fastThreshold,
+  }) : super(
+          actionsExtentRatio: actionsExtentRatio,
+          fastThreshold: fastThreshold,
+        );
 
   @override
-  Widget buildStackActions(
-      BuildContext context, SlidableDelegateBuildContext ctx) {
+  Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         final double totalWidth = constraints.maxWidth * actionsExtentRatio;
@@ -182,14 +222,18 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
   }
 }
 
+/// A delegate that creates slide actions which animate like drawers while the item is sliding.
 class SlidableDrawerDelegate extends SlidableStackDelegate {
   const SlidableDrawerDelegate({
-    actionsExtentRatio = _kActionsExtentRatio,
-  }) : super(actionsExtentRatio: actionsExtentRatio);
+    double actionsExtentRatio,
+    double fastThreshold,
+  }) : super(
+          actionsExtentRatio: actionsExtentRatio,
+          fastThreshold: fastThreshold,
+        );
 
   @override
-  Widget buildStackActions(
-      BuildContext context, SlidableDelegateBuildContext ctx) {
+  Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         final count = ctx.actions.length;
@@ -254,6 +298,8 @@ class Slidable extends StatefulWidget {
   /// which means the item after the dismissed item would be synced with the
   /// state of the dismissed item. Using keys causes the widgets to sync
   /// according to their keys and avoids this pitfall.
+  ///
+  /// The delegate argument must not be null.
   Slidable({
     @required Key key,
     @required this.child,
@@ -285,10 +331,10 @@ class Slidable extends StatefulWidget {
   final Duration movementDuration;
 
   @override
-  _SlidableState createState() => _SlidableState();
+  SlidableState createState() => SlidableState();
 }
 
-class _SlidableState extends State<Slidable>
+class SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable> {
   @override
   void initState() {
@@ -373,7 +419,7 @@ class _SlidableState extends State<Slidable>
         !_showLeftActions && widget.rightActions != null) {
       content = widget.delegate.buildActions(
         context,
-        new SlidableDelegateBuildContext(
+        new SlidableDelegateContext(
           widget,
           _showLeftActions,
           _dragExtent,

@@ -86,13 +86,13 @@ class _MyHomePageState extends State<MyHomePage> {
   SlidableDelegate _getDelegate(int index) {
     switch (index % 4) {
       case 0:
-        return const SlidableBehindDelegate();
+        return new SlidableBehindDelegate();
       case 1:
-        return const SlidableStrechDelegate();
+        return new SlidableStrechDelegate();
       case 2:
-        return const SlidableScrollDelegate();
+        return new SlidableScrollDelegate();
       case 3:
-        return const SlidableDrawerDelegate();
+        return new SlidableDrawerDelegate();
       default:
         return null;
     }

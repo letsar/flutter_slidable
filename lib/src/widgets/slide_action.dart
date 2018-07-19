@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+/// A basic slide action with a background color and a child that will
+/// be center inside its area.
 class SlideAction extends StatelessWidget {
   SlideAction({
     Key key,

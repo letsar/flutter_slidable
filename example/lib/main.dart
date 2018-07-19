@@ -111,26 +111,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   SlidableDelegate _getDelegate(int index){
-    switch(index % 3){
+    switch(index % 4){
       case 0 : return const SlidableBehindDelegate();
       case 1 : return const SlidableStrechDelegate();
       case 2 : return const SlidableScrollDelegate();
+      case 3 : return const SlidableDrawerDelegate();
     }
   }
 
   Color _getAvatarColor(int index){
-    switch(index % 3){
+    switch(index % 4){
       case 0 : return Colors.red;
       case 1 : return Colors.green;
       case 2 : return Colors.blue;
+      case 3 : return Colors.indigoAccent;
     }
   }
 
   String _getSubtitle(int index){
-    switch(index % 3){
+    switch(index % 4){
       case 0 : return 'SlidableBehindDelegate';
       case 1 : return 'SlidableStrechDelegate';
       case 2 : return 'SlidableScrollDelegate';
+      case 3 : return 'SlidableDrawerDelegate';
     }
   }
 }

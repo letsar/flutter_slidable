@@ -23,23 +23,6 @@ class SlidableDelegateBuildContext {
   final AnimationController controller;
 }
 
-class SlidableStackDelegateBuildContext extends SlidableDelegateBuildContext {
-  const SlidableStackDelegateBuildContext(
-    Widget slidable,
-    bool showLeftActions,
-    double dragExtent,
-    AnimationController controller,
-    this.animation,
-  ) : super(
-          slidable,
-          showLeftActions,
-          dragExtent,
-          controller,
-        );
-
-  final Animation animation;
-}
-
 abstract class SlidableDelegate {
   const SlidableDelegate();
 
@@ -62,22 +45,17 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
   Widget buildActions(BuildContext context, SlidableDelegateBuildContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: Offset(actionsExtentRatio * ctx.dragExtent.sign, 0.0),
+      end: new Offset(actionsExtentRatio * ctx.dragExtent.sign, 0.0),
     ).animate(ctx.controller);
 
-    if (animation.value.dx != .0 && ctx.dragExtent != .0) {
+    if (ctx.controller.value != .0 && ctx.dragExtent != .0) {
       return new Container(
         child: new Stack(
           children: <Widget>[
             buildStackActions(
                 context,
-                new SlidableStackDelegateBuildContext(
-                  ctx.slidable,
-                  ctx.showLeftActions,
-                  ctx.dragExtent,
-                  ctx.controller,
-                  animation,
-                )),
+                ctx,
+            ),
             new SlideTransition(
               position: animation,
               child: ctx.slidable.child,
@@ -91,7 +69,7 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
   }
 
   Widget buildStackActions(
-      BuildContext context, SlidableStackDelegateBuildContext ctx);
+      BuildContext context, SlidableDelegateBuildContext ctx);
 }
 
 class SlidableStrechDelegate extends SlidableStackDelegate {
@@ -101,7 +79,12 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
 
   @override
   Widget buildStackActions(
-      BuildContext context, SlidableStackDelegateBuildContext ctx) {
+      BuildContext context, SlidableDelegateBuildContext ctx) {
+    final animation = new Tween(
+      begin: Offset.zero,
+      end: new Offset(actionsExtentRatio * ctx.dragExtent.sign, 0.0),
+    ).animate(ctx.controller);
+
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         return new AnimatedBuilder(
@@ -114,7 +97,7 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
                     right: ctx.showLeftActions ? null : .0,
                     top: .0,
                     bottom: .0,
-                    width: constraints.maxWidth * ctx.animation.value.dx.abs(),
+                    width: constraints.maxWidth * animation.value.dx.abs(),
                     child: new Row(
                       children: ctx.actions.map((a) => Expanded(child: a)).toList(),
                     ),
@@ -134,7 +117,7 @@ class SlidableBehindDelegate extends SlidableStackDelegate {
 
   @override
   Widget buildStackActions(
-      BuildContext context, SlidableStackDelegateBuildContext ctx) {
+      BuildContext context, SlidableDelegateBuildContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         return new Stack(
@@ -163,20 +146,24 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
 
   @override
   Widget buildStackActions(
-      BuildContext context, SlidableStackDelegateBuildContext ctx) {
+      BuildContext context, SlidableDelegateBuildContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
+        final double totalWidth = constraints.maxWidth * actionsExtentRatio;
+
+        final animation = new Tween(
+          begin:new Offset(-totalWidth, 0.0),
+          end: Offset.zero,
+        ).animate(ctx.controller);
+
         return new AnimatedBuilder(
             animation: ctx.controller,
             builder: (context, child) {
-              final double width = constraints.maxWidth;
-              final double totalWidth = width * actionsExtentRatio;
-              final double position = -totalWidth * (1-ctx.controller.value.abs());
               return new Stack(
                 children: <Widget>[
                   new Positioned(
-                    left: ctx.showLeftActions ? position : null,
-                    right: ctx.showLeftActions ? null : position,
+                    left: ctx.showLeftActions ? animation.value.dx : null,
+                    right: ctx.showLeftActions ? null : animation.value.dx,
                     top: .0,
                     bottom: .0,
                     width: totalWidth,
@@ -189,6 +176,60 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
             });
       }),
     );
+  }
+}
+
+class SlidableDrawerDelegate extends SlidableStackDelegate {
+  const SlidableDrawerDelegate({
+    actionsExtentRatio = _kActionsExtentRatio,
+  }) : super(actionsExtentRatio: actionsExtentRatio);
+
+  @override
+  Widget buildStackActions(
+      BuildContext context, SlidableDelegateBuildContext ctx) {
+    return new Positioned.fill(
+      child: new LayoutBuilder(builder: (context, constraints) {
+        final count = ctx.actions.length;
+        final double width = constraints.maxWidth;
+        final double totalWidth = width * actionsExtentRatio;
+        final double actionWidth = totalWidth / ctx.actions.length;
+
+        final animations = Iterable.generate(count).map((index){
+          return new Tween(
+            begin: new Offset(-actionWidth, 0.0),
+            end: new Offset((count - index - 1) * actionWidth, 0.0),
+          ).animate(ctx.controller);
+        }).toList();
+
+        return new AnimatedBuilder(
+            animation: ctx.controller,
+            builder: (context, child) {
+              // For the left items we have to reverse the order if we want the last item at the bottom of the stack.
+              final Iterable<Widget> actions = ctx.showLeftActions ? ctx.actions.reversed : ctx.actions;
+
+              return new Stack(
+                children: _map(actions, (action, index) =>
+                new Positioned(
+                  left: ctx.showLeftActions ? animations[index].value.dx : null,
+                  right: ctx.showLeftActions ? null : animations[index].value.dx,
+                  top: .0,
+                  bottom: .0,
+                  width: actionWidth,
+                    child: action,)
+                ) .toList(),
+              );
+            });
+      }),
+    );
+  }
+
+  static Iterable<TResult> _map<T, TResult>(Iterable<T> iterable, TResult selector(T item, int index)){
+    int index = 0;
+    final  List<TResult> result = new List<TResult>();
+    for(T item in iterable){
+      result.add(selector(item, index++));
+    }
+    return result;
   }
 }
 

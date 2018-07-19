@@ -42,6 +42,7 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
 
   final double actionsExtentRatio;
 
+  @override
   Widget buildActions(BuildContext context, SlidableDelegateBuildContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
@@ -53,8 +54,8 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
         child: new Stack(
           children: <Widget>[
             buildStackActions(
-                context,
-                ctx,
+              context,
+              ctx,
             ),
             new SlideTransition(
               position: animation,
@@ -99,7 +100,8 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
                     bottom: .0,
                     width: constraints.maxWidth * animation.value.dx.abs(),
                     child: new Row(
-                      children: ctx.actions.map((a) => Expanded(child: a)).toList(),
+                      children:
+                          ctx.actions.map((a) => Expanded(child: a)).toList(),
                     ),
                   )
                 ],
@@ -152,7 +154,7 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
         final double totalWidth = constraints.maxWidth * actionsExtentRatio;
 
         final animation = new Tween(
-          begin:new Offset(-totalWidth, 0.0),
+          begin: new Offset(-totalWidth, 0.0),
           end: Offset.zero,
         ).animate(ctx.controller);
 
@@ -168,7 +170,8 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
                     bottom: .0,
                     width: totalWidth,
                     child: new Row(
-                      children: ctx.actions.map((a) => Expanded(child: a)).toList(),
+                      children:
+                          ctx.actions.map((a) => Expanded(child: a)).toList(),
                     ),
                   )
                 ],
@@ -194,7 +197,7 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
         final double totalWidth = width * actionsExtentRatio;
         final double actionWidth = totalWidth / ctx.actions.length;
 
-        final animations = Iterable.generate(count).map((index){
+        final animations = Iterable.generate(count).map((index) {
           return new Tween(
             begin: new Offset(-actionWidth, 0.0),
             end: new Offset((count - index - 1) * actionWidth, 0.0),
@@ -205,28 +208,35 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
             animation: ctx.controller,
             builder: (context, child) {
               // For the left items we have to reverse the order if we want the last item at the bottom of the stack.
-              final Iterable<Widget> actions = ctx.showLeftActions ? ctx.actions.reversed : ctx.actions;
+              final Iterable<Widget> actions =
+                  ctx.showLeftActions ? ctx.actions.reversed : ctx.actions;
 
               return new Stack(
-                children: _map(actions, (action, index) =>
-                new Positioned(
-                  left: ctx.showLeftActions ? animations[index].value.dx : null,
-                  right: ctx.showLeftActions ? null : animations[index].value.dx,
-                  top: .0,
-                  bottom: .0,
-                  width: actionWidth,
-                    child: action,)
-                ) .toList(),
+                children: _map(
+                    actions,
+                    (action, index) => new Positioned(
+                          left: ctx.showLeftActions
+                              ? animations[index].value.dx
+                              : null,
+                          right: ctx.showLeftActions
+                              ? null
+                              : animations[index].value.dx,
+                          top: .0,
+                          bottom: .0,
+                          width: actionWidth,
+                          child: action,
+                        )).toList(),
               );
             });
       }),
     );
   }
 
-  static Iterable<TResult> _map<T, TResult>(Iterable<T> iterable, TResult selector(T item, int index)){
+  static Iterable<TResult> _map<T, TResult>(
+      Iterable<T> iterable, TResult selector(T item, int index)) {
     int index = 0;
-    final  List<TResult> result = new List<TResult>();
-    for(T item in iterable){
+    final List<TResult> result = new List<TResult>();
+    for (T item in iterable) {
       result.add(selector(item, index++));
     }
     return result;
@@ -357,19 +367,27 @@ class _SlidableState extends State<Slidable>
       return widget.child;
     }
 
+    Widget content = widget.child;
+
+    if (_showLeftActions && widget.leftActions != null ||
+        !_showLeftActions && widget.rightActions != null) {
+      content = widget.delegate.buildActions(
+        context,
+        new SlidableDelegateBuildContext(
+          widget,
+          _showLeftActions,
+          _dragExtent,
+          _controller,
+        ),
+      );
+    }
+
     return new GestureDetector(
       onHorizontalDragStart: _handleDragStart,
       onHorizontalDragUpdate: _handleDragUpdate,
       onHorizontalDragEnd: _handleDragEnd,
       behavior: HitTestBehavior.opaque,
-      child: widget.delegate.buildActions(
-          context,
-          new SlidableDelegateBuildContext(
-            widget,
-            _showLeftActions,
-            _dragExtent,
-            _controller,
-          )),
+      child: content,
     );
   }
 

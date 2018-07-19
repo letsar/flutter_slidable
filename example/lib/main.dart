@@ -36,46 +36,51 @@ class _MyHomePageState extends State<MyHomePage> {
       body: new Center(
         child: new ListView.builder(
           itemBuilder: (context, index) {
-            return new Slidable(
-              key: Key('$index'),
-              delegate: _getDelegate(index),
-              child: new Container(
-                color: Colors.white,
-                child: new ListTile(
-                  leading: new CircleAvatar(
-                    backgroundColor: _getAvatarColor(index),
-                    child: new Text('$index'),
-                    foregroundColor: Colors.white,
-                  ),
-                  title: new Text('Tile n°$index'),
-                  subtitle: new Text(_getSubtitle(index)),
-                ),
-              ),
-              leftActions: <Widget>[
-                new _HomePageSlideAction(
-                  text: 'Archive',
-                  color: Colors.blue,
-                  icon: Icons.archive,
-                ),
-                new _HomePageSlideAction(
-                  text: 'Share',
-                  color: Colors.indigo,
-                  icon: Icons.share,
-                ),
-              ],
-              rightActions: <Widget>[
-                new _HomePageSlideAction(
-                  text: 'More',
-                  color: Colors.black45,
-                  icon: Icons.more_horiz,
-                ),
-                new _HomePageSlideAction(
-                  text: 'Delete',
-                  color: Colors.red,
-                  icon: Icons.delete,
-                ),
-              ],
-            );
+  return new Slidable(
+    key: Key('$index'),
+    delegate: _getDelegate(index),
+    actionsExtentRatio: 0.5,
+    child: new Container(
+      color: Colors.white,
+      child: new ListTile(
+        leading: new CircleAvatar(
+          backgroundColor: _getAvatarColor(index),
+          child: new Text('$index'),
+          foregroundColor: Colors.white,
+        ),
+        title: new Text('Tile n°$index'),
+        subtitle: new Text(_getSubtitle(index)),
+      ),
+    ),
+    leftActions: <Widget>[
+      new IconSlideAction(
+        caption: 'Archive',
+        color: Colors.blue,
+        icon: Icons.archive,
+        onTap: () => _showSnackBar('Archive'),
+      ),
+      new IconSlideAction(
+        caption: 'Share',
+        color: Colors.indigo,
+        icon: Icons.share,
+        onTap: () => _showSnackBar('Share'),
+      ),
+    ],
+    rightActions: <Widget>[
+      new IconSlideAction(
+        caption: 'More',
+        color: Colors.grey.shade200,
+        icon: Icons.more_horiz,
+        onTap: () => _showSnackBar('More'),
+      ),
+      new IconSlideAction(
+        caption: 'Delete',
+        color: Colors.red,
+        icon: Icons.delete,
+        onTap: () => _showSnackBar('Delete'),
+      ),
+    ],
+  );
           },
           itemCount: 20,
         ),
@@ -127,52 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
         return null;
     }
   }
-}
 
-class _HomePageSlideAction extends StatelessWidget {
-  _HomePageSlideAction({
-    this.text,
-    this.icon,
-    this.color,
-  });
-
-  final String text;
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color foregroundColor =
-        ThemeData.estimateBrightnessForColor(color) == Brightness.light
-            ? Colors.black
-            : Colors.white;
-    final Text textWidget = new Text(
-      text,
-      overflow: TextOverflow.ellipsis,
-      style: Theme
-          .of(context)
-          .primaryTextTheme
-          .caption
-          .copyWith(color: foregroundColor),
-    );
-    return GestureDetector(
-      onTap: () =>
-          Scaffold.of(context).showSnackBar(SnackBar(content: textWidget)),
-      child: Container(
-        color: color,
-        child: new Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new Icon(
-                icon,
-                color: foregroundColor,
-              ),
-              textWidget,
-            ],
-          ),
-        ),
-      ),
-    );
+  void _showSnackBar(String text) {
+    Scaffold.of(context).showSnackBar(SnackBar(content: new Text(text)));
   }
 }

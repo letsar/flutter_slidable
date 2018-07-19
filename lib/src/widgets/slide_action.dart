@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// A basic slide action with a background color and a child that will
@@ -33,6 +34,58 @@ class SlideAction extends StatelessWidget {
         decoration: decoration,
         child: new Center(
           child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// A basic slide action with an icon, a caption and a background color.
+class IconSlideAction extends StatelessWidget {
+  const IconSlideAction({
+    Key key,
+    @required this.icon,
+    this.caption,
+    Color color,
+    this.onTap,
+  })  : color = color ?? Colors.white,
+        super(key: key);
+
+  final IconData icon;
+  final String caption;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color foregroundColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.light
+            ? Colors.black
+            : Colors.white;
+    final Text textWidget = new Text(
+      caption ?? '',
+      overflow: TextOverflow.ellipsis,
+      style: Theme
+          .of(context)
+          .primaryTextTheme
+          .caption
+          .copyWith(color: foregroundColor),
+    );
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        color: color,
+        child: new Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new Icon(
+                icon,
+                color: foregroundColor,
+              ),
+              textWidget,
+            ],
+          ),
         ),
       ),
     );

@@ -36,13 +36,14 @@ A `Slidable` needs multiple things:
 
 * Left, right (or both) slide actions. Which can be any widget. For convenience this package has 2 built-in side action widgets.
 * A delegate. This is what controls the layout and the animation of the slide menu.
+* An extent ratio between a slide action extent and the item extent.
 * A child.
 
 ```dart
 new Slidable(
   key: Key('$3'),
   delegate: new SlidableDrawerDelegate(),
-  actionsExtentRatio: 0.3,
+  actionExtentRatio: 0.25,
   child: new Container(
     color: Colors.white,
     child: new ListTile(
@@ -100,21 +101,25 @@ This package comes with 4 kind of delegates:
 #### SlidableBehindDelegate
 
 The slide actions stay behind the item while it's sliding:
+
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_behind.gif)
 
 #### SlidableScrollDelegate
 
 The slide actions follow the item while it's sliding:
+
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_scroll.gif)
 
 #### SlidableDrawerDelegate
 
 The slide actions which animate like drawers while the item is sliding:
+
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_drawer.gif)
 
 #### SlidableStrechDelegate
 
 The slide actions stretch while the item is sliding:
+
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_stretch.gif)
 
 ## Changelog

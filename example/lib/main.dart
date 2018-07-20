@@ -36,51 +36,51 @@ class _MyHomePageState extends State<MyHomePage> {
       body: new Center(
         child: new ListView.builder(
           itemBuilder: (context, index) {
-  return new Slidable(
-    key: Key('$index'),
-    delegate: _getDelegate(index),
-    actionsExtentRatio: 0.5,
-    child: new Container(
-      color: Colors.white,
-      child: new ListTile(
-        leading: new CircleAvatar(
-          backgroundColor: _getAvatarColor(index),
-          child: new Text('$index'),
-          foregroundColor: Colors.white,
-        ),
-        title: new Text('Tile n°$index'),
-        subtitle: new Text(_getSubtitle(index)),
-      ),
-    ),
-    leftActions: <Widget>[
-      new IconSlideAction(
-        caption: 'Archive',
-        color: Colors.blue,
-        icon: Icons.archive,
-        onTap: () => _showSnackBar(context, 'Archive'),
-      ),
-      new IconSlideAction(
-        caption: 'Share',
-        color: Colors.indigo,
-        icon: Icons.share,
-        onTap: () => _showSnackBar(context, 'Share'),
-      ),
-    ],
-    rightActions: <Widget>[
-      new IconSlideAction(
-        caption: 'More',
-        color: Colors.grey.shade200,
-        icon: Icons.more_horiz,
-        onTap: () => _showSnackBar(context, 'More'),
-      ),
-      new IconSlideAction(
-        caption: 'Delete',
-        color: Colors.red,
-        icon: Icons.delete,
-        onTap: () => _showSnackBar(context, 'Delete'),
-      ),
-    ],
-  );
+            return new Slidable(
+              key: Key('$index'),
+              delegate: _getDelegate(index),
+              actionExtentRatio: 0.25,
+              child: new Container(
+                color: Colors.white,
+                child: new ListTile(
+                  leading: new CircleAvatar(
+                    backgroundColor: _getAvatarColor(index),
+                    child: new Text('$index'),
+                    foregroundColor: Colors.white,
+                  ),
+                  title: new Text('Tile n°$index'),
+                  subtitle: new Text(_getSubtitle(index)),
+                ),
+              ),
+              leftActions: <Widget>[
+                new IconSlideAction(
+                  caption: 'Archive',
+                  color: Colors.blue,
+                  icon: Icons.archive,
+                  onTap: () => _showSnackBar(context, 'Archive'),
+                ),
+                new IconSlideAction(
+                  caption: 'Share',
+                  color: Colors.indigo,
+                  icon: Icons.share,
+                  onTap: () => _showSnackBar(context, 'Share'),
+                ),
+              ],
+              rightActions: <Widget>[
+                new IconSlideAction(
+                  caption: 'More',
+                  color: Colors.grey.shade200,
+                  icon: Icons.more_horiz,
+                  onTap: () => _showSnackBar(context, 'More'),
+                ),
+                new IconSlideAction(
+                  caption: 'Delete',
+                  color: Colors.red,
+                  icon: Icons.delete,
+                  onTap: () => _showSnackBar(context, 'Delete'),
+                ),
+              ],
+            );
           },
           itemCount: 20,
         ),

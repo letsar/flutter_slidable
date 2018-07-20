@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-const double _kActionsExtentRatio = 0.3;
-const double _kFastThreshold = 3000.0;
+const double _kActionsExtentRatio = 0.25;
+const double _kFastThreshold = 2500.0;
 
 /// A handle to various properties useful while calling [SlidableDelegate.buildActions].
 ///
@@ -23,6 +23,9 @@ class SlidableDelegateContext {
   /// The current actions that have to be shown.
   List<Widget> get actions =>
       showLeftActions ? slidable.leftActions : slidable.rightActions;
+
+  double get totalActionsWidth =>
+      slidable.actionExtentRatio * (actions?.length ?? 0);
 
   /// Whether the left actions have to be shown.
   final bool showLeftActions;
@@ -70,8 +73,7 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
   Widget buildActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: new Offset(
-          ctx.slidable.actionsExtentRatio * ctx.dragExtent.sign, 0.0),
+      end: new Offset(ctx.totalActionsWidth * ctx.dragExtent.sign, 0.0),
     ).animate(ctx.controller);
 
     if (ctx.controller.value != .0 && ctx.dragExtent != .0) {
@@ -109,8 +111,7 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: new Offset(
-          ctx.slidable.actionsExtentRatio * ctx.dragExtent.sign, 0.0),
+      end: new Offset(ctx.totalActionsWidth * ctx.dragExtent.sign, 0.0),
     ).animate(ctx.controller);
 
     return new Positioned.fill(
@@ -158,7 +159,7 @@ class SlidableBehindDelegate extends SlidableStackDelegate {
               right: ctx.showLeftActions ? null : .0,
               top: .0,
               bottom: .0,
-              width: constraints.maxWidth * ctx.slidable.actionsExtentRatio,
+              width: constraints.maxWidth * ctx.totalActionsWidth,
               child: new Row(
                 children: ctx.actions.map((a) => Expanded(child: a)).toList(),
               ),
@@ -182,8 +183,7 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
-        final double totalWidth =
-            constraints.maxWidth * ctx.slidable.actionsExtentRatio;
+        final double totalWidth = constraints.maxWidth * ctx.totalActionsWidth;
 
         final animation = new Tween(
           begin: new Offset(-totalWidth, 0.0),
@@ -228,8 +228,7 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
       child: new LayoutBuilder(builder: (context, constraints) {
         final count = ctx.actions.length;
         final double width = constraints.maxWidth;
-        final double totalWidth = width * ctx.slidable.actionsExtentRatio;
-        final double actionWidth = totalWidth / ctx.actions.length;
+        final double actionWidth = width * ctx.slidable.actionExtentRatio;
 
         final animations = Iterable.generate(count).map((index) {
           return new Tween(
@@ -282,7 +281,7 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
 class Slidable extends StatefulWidget {
   /// Creates a widget that can be dismissed.
   ///
-  /// The [delegate] argument must not be null. The [actionsExtentRatio]
+  /// The [delegate] argument must not be null. The [actionExtentRatio]
   /// and [showAllActionsThreshold] arguments must be greater or equal than 0 and less or equal than 1.
   Slidable({
     Key key,
@@ -291,19 +290,19 @@ class Slidable extends StatefulWidget {
     this.leftActions,
     this.rightActions,
     this.showAllActionsThreshold = 0.5,
-    this.actionsExtentRatio = _kActionsExtentRatio,
+    this.actionExtentRatio = _kActionsExtentRatio,
     this.movementDuration: const Duration(milliseconds: 200),
   })  : assert(delegate != null),
         assert(
             showAllActionsThreshold != null &&
                 showAllActionsThreshold >= .0 &&
                 showAllActionsThreshold <= 1.0,
-            'actionsExtentRatio must be between 0.0 and 1.0'),
+            'showAllActionsThreshold must be between 0.0 and 1.0'),
         assert(
-            actionsExtentRatio != null &&
-                actionsExtentRatio >= .0 &&
-                actionsExtentRatio <= 1.0,
-            'actionsExtentRatio must be between 0.0 and 1.0'),
+            actionExtentRatio != null &&
+                actionExtentRatio >= .0 &&
+                actionExtentRatio <= 1.0,
+            'actionExtentRatio must be between 0.0 and 1.0'),
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -315,8 +314,8 @@ class Slidable extends StatefulWidget {
 
   final SlidableDelegate delegate;
 
-  /// Relative ratio between the slide actions menu and the extent of the child.
-  final double actionsExtentRatio;
+  /// Relative ratio between one slide action and the extent of the child.
+  final double actionExtentRatio;
 
   /// The offset threshold the item has to be dragged in order to show all actions
   /// in the slide direction.
@@ -358,8 +357,12 @@ class SlidableState extends State<Slidable>
     return _dragExtent > 0;
   }
 
+  /// The current actions that have to be shown.
+  List<Widget> get actions =>
+      _showLeftActions ? widget.leftActions : widget.rightActions;
+
   double get _overallDragAxisExtent =>
-      context.size.width * widget.actionsExtentRatio;
+      context.size.width * widget.actionExtentRatio * (actions?.length ?? 0);
 
   @override
   void dispose() {

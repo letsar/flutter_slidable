@@ -57,13 +57,13 @@ class _MyHomePageState extends State<MyHomePage> {
         caption: 'Archive',
         color: Colors.blue,
         icon: Icons.archive,
-        onTap: () => _showSnackBar('Archive'),
+        onTap: () => _showSnackBar(context, 'Archive'),
       ),
       new IconSlideAction(
         caption: 'Share',
         color: Colors.indigo,
         icon: Icons.share,
-        onTap: () => _showSnackBar('Share'),
+        onTap: () => _showSnackBar(context, 'Share'),
       ),
     ],
     rightActions: <Widget>[
@@ -71,13 +71,13 @@ class _MyHomePageState extends State<MyHomePage> {
         caption: 'More',
         color: Colors.grey.shade200,
         icon: Icons.more_horiz,
-        onTap: () => _showSnackBar('More'),
+        onTap: () => _showSnackBar(context, 'More'),
       ),
       new IconSlideAction(
         caption: 'Delete',
         color: Colors.red,
         icon: Icons.delete,
-        onTap: () => _showSnackBar('Delete'),
+        onTap: () => _showSnackBar(context, 'Delete'),
       ),
     ],
   );
@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _showSnackBar(String text) {
+  void _showSnackBar(BuildContext context, String text) {
     Scaffold.of(context).showSnackBar(SnackBar(content: new Text(text)));
   }
 }

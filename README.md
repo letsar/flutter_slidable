@@ -5,7 +5,7 @@ A Flutter implementation of slidable list item with left and right slide actions
 [![Pub](https://img.shields.io/pub/v/flutter_slidable.svg)](https://pub.dartlang.org/packages/flutter_slidable)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QTT34M25RDNL6)
 
-![Screenshot](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/flutter_slidable.gif)
+![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_overview.gif)
 
 ## Features
 
@@ -97,25 +97,25 @@ This package comes with 2 kind of slide actions:
 
 This package comes with 4 kind of delegates:
 
-#### SlidableStrechDelegate
-
-The slide actions stretch while the item is sliding:
-// TODO image.
-
 #### SlidableBehindDelegate
 
 The slide actions stay behind the item while it's sliding:
-// TODO image.
+![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_behind.gif)
 
 #### SlidableScrollDelegate
 
 The slide actions follow the item while it's sliding:
-// TODO image.
+![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_scroll.gif)
 
 #### SlidableDrawerDelegate
 
 The slide actions which animate like drawers while the item is sliding:
-// TODO image.
+![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_drawer.gif)
+
+#### SlidableStrechDelegate
+
+The slide actions stretch while the item is sliding:
+![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_stretch.gif)
 
 ## Changelog
 

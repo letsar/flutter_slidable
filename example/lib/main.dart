@@ -113,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
           subtitle: new Text(_getSubtitle(index)),
         ),
       ),
-      leftActionDelegate: new SlidableActionBuilderDelegate(
+      leftActionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation) {
             if (index == 0) {
@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }
           }),
-      rightActionDelegate: new SlidableActionBuilderDelegate(
+      rightActionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation) {
             if (index == 0) {

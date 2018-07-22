@@ -4,10 +4,25 @@ import 'package:flutter/widgets.dart';
 const double _kActionsExtentRatio = 0.25;
 const double _kFastThreshold = 2500.0;
 
-typedef Widget SlidableActionBuilder(BuildContext context, int index, Animation<double> animation);
+/// Signature for the builder callback used to create slide actions.
+typedef Widget SlideActionBuilder(BuildContext context, int index, Animation<double> animation);
 
-abstract class SlidableActionDelegate {
-  const SlidableActionDelegate();
+/// A delegate that supplies slide actions.
+///
+/// It's uncommon to subclass [SlideActionDelegate]. Instead, consider using one
+/// of the existing subclasses that provide adaptors to builder callbacks or
+/// explicit action lists.
+///
+/// See also:
+///
+///  * [SlideActionBuilderDelegate], which is a delegate that uses a builder
+///    callback to construct the slide actions.
+///  * [SlideActionListDelegate], which is a delegate that has an explicit list
+///    of slidable action.
+abstract class SlideActionDelegate {
+  /// Abstract const constructor. This constructor enables subclasses to provide
+  /// const constructors so that they can be used in const expressions.
+  const SlideActionDelegate();
 
   /// Returns the child with the given index.
   ///
@@ -18,25 +33,58 @@ abstract class SlidableActionDelegate {
   int get actionCount;
 }
 
-class SlidableActionBuilderDelegate extends SlidableActionDelegate {
-  const SlidableActionBuilderDelegate({
+/// A delegate that supplies slide actions using a builder callback.
+///
+/// This delegate provides slide actions using a [SlideActionBuilder] callback,
+/// so that the animation can be passed down to the final widget.
+///
+/// See also:
+///
+///  * [SlideActionListDelegate], which is a delegate that has an explicit list
+///    of slidable action.
+class SlideActionBuilderDelegate extends SlideActionDelegate {
+  /// Creates a delegate that supplies slide actions using the given
+  /// builder callback.
+  ///
+  /// The [builder] must not be null. The [actionCount] argument must not be positive.
+  const SlideActionBuilderDelegate({
     @required this.builder,
     @required this.actionCount,
   }) : assert(actionCount != null && actionCount >= 0);
 
-  final SlidableActionBuilder builder;
+  /// Called to build slide actions.
+  ///
+  /// Will be called only for indices greater than or equal to zero and less
+  /// than [childCount].
+  final SlideActionBuilder builder;
 
+  /// The total number of slide actions this delegate can provide.
   final int actionCount;
 
   @override
   Widget build(BuildContext context, int index, Animation<double> animation) => builder(context, index, animation);
 }
 
-class SlidableActionListDelegate extends SlidableActionDelegate {
-  const SlidableActionListDelegate({
+/// A delegate that supplies slide actions using an explicit list.
+///
+/// This delegate provides slide actions using an explicit list,
+/// which is convenient but reduces the benefit of passing the animation down
+/// to the final widget.
+///
+/// See also:
+///
+///  * [SlideActionBuilderDelegate], which is a delegate that uses a builder
+///    callback to construct the slide actions.
+class SlideActionListDelegate extends SlideActionDelegate {
+  /// Creates a delegate that supplies slide actions using the given
+  /// list.
+  ///
+  /// The [actions] argument must not be null.
+  const SlideActionListDelegate({
     @required this.actions,
   });
 
+  /// The slide actions.
   final List<Widget> actions;
 
   @override
@@ -63,7 +111,7 @@ class SlidableDelegateContext {
   final Slidable slidable;
 
   /// The current actions that have to be shown.
-  SlidableActionDelegate get actionDelegate => showLeftActions ? slidable.leftActionDelegate : slidable.rightActionDelegate;
+  SlideActionDelegate get actionDelegate => showLeftActions ? slidable.leftActionDelegate : slidable.rightActionDelegate;
 
   int get actionCount => actionDelegate?.actionCount ?? 0;
 
@@ -77,7 +125,7 @@ class SlidableDelegateContext {
   /// The animation controller which value depends on  `dragExtent`.
   final AnimationController controller;
 
-  /// Builds the slide actions using the active [SlidableActionDelegate]'s builder.
+  /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
   List<Widget> buildActions(BuildContext context) {
     return List.generate(actionCount, (int index) => actionDelegate.build(context, index, controller.view));
   }
@@ -324,8 +372,8 @@ class Slidable extends StatefulWidget {
             key: key,
             child: child,
             delegate: delegate,
-            leftActionDelegate: new SlidableActionListDelegate(actions: leftActions),
-            rightActionDelegate: new SlidableActionListDelegate(actions: rightActions),
+            leftActionDelegate: new SlideActionListDelegate(actions: leftActions),
+            rightActionDelegate: new SlideActionListDelegate(actions: rightActions),
             showAllActionsThreshold: showAllActionsThreshold,
             actionExtentRatio: actionExtentRatio,
             movementDuration: movementDuration);
@@ -348,9 +396,9 @@ class Slidable extends StatefulWidget {
   /// The widget below this widget in the tree.
   final Widget child;
 
-  final SlidableActionDelegate leftActionDelegate;
+  final SlideActionDelegate leftActionDelegate;
 
-  final SlidableActionDelegate rightActionDelegate;
+  final SlideActionDelegate rightActionDelegate;
 
   final SlidableDelegate delegate;
 
@@ -398,7 +446,7 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
   }
 
   /// The current actions that have to be shown.
-  SlidableActionDelegate get actionDelegate => _showLeftActions ? widget.leftActionDelegate : widget.rightActionDelegate;
+  SlideActionDelegate get actionDelegate => _showLeftActions ? widget.leftActionDelegate : widget.rightActionDelegate;
 
   double get _overallDragAxisExtent => context.size.width * widget.actionExtentRatio * (actionDelegate?.actionCount ?? 0);
 

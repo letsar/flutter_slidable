@@ -13,6 +13,7 @@ A Flutter implementation of slidable list item with left and right slide actions
 * 4 built-in layouts.
 * 2 built-in slide action widget.
 * You can easily create you custom layouts and animations.
+* You can use a builder to create your slide actions if you want special effects during animation.
 
 ## Getting started
 
@@ -31,6 +32,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 ```
 
 For help getting started with Flutter, view the online [documentation](https://flutter.io/).
+
+### Constructors
+You can create a `Slidable` in two different ways:
+* By calling the `Slidable` constructor and passing a list of slide actions.
+* By calling the `Slidable.builder` constructor and passing slide action builders, if you want special effects during the animation.
 
 A `Slidable` needs multiple things:
 

@@ -151,6 +151,10 @@ class SlidableDelegateContext {
       child: child,
     );
   }
+
+  double getAnimationValue(Animation<Offset> animation){
+    return directionIsXAxis ? animation.value.dx : animation.value.dy;
+  }
 }
 
 /// A delegate that controls how the slide actions are displayed.
@@ -239,7 +243,7 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
                 children: <Widget>[
                   ctx.createPositioned(
                     position: 0.0,
-                    extent: ctx.getMaxExtent(constraints) * animation.value.dx.abs(),
+                    extent: ctx.getMaxExtent(constraints) * ctx.getAnimationValue(animation).abs(),
                     child: new Flex(
                       direction: ctx.slidable.direction,
                       children: ctx.buildActions(context).map((a) => Expanded(child: a)).toList(),
@@ -307,7 +311,7 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
               return new Stack(
                 children: <Widget>[
                   ctx.createPositioned(
-                    position: animation.value.dx,
+                    position: ctx.getAnimationValue(animation),
                     extent: totalExtent,
                     child: new Flex(
                       direction: ctx.slidable.direction,
@@ -352,7 +356,7 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
                   // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
                   int displayIndex = ctx.showActions ? ctx.actionCount - index - 1 : index;
                   return ctx.createPositioned(
-                    position: animations[index].value.dx,
+                    position: ctx.getAnimationValue(animations[index]),
                     extent: actionExtent,
                     child: ctx.actionDelegate.build(context, displayIndex, ctx.controller.view),
                   );
@@ -366,8 +370,8 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
 
 /// A widget that can be slid in both direction of the specified axis.
 ///
-/// For example if the axis is [Axis.horizontal], this widget can be slid to the left or to the right.
-/// If the axis is [Axis.vertical], this widget can be slid up or slid down.
+/// If the direction is [Axis.horizontal], this widget can be slid to the left or to the right,
+/// otherwise this widget can be slid up or slid down.
 ///
 /// By sliding in one of these direction, slide actions will appear.
 class Slidable extends StatefulWidget {
@@ -384,7 +388,7 @@ class Slidable extends StatefulWidget {
     double showAllActionsThreshold = 0.5,
     double actionExtentRatio = _kActionsExtentRatio,
     Duration movementDuration = const Duration(milliseconds: 200),
-    Axis slideAxis = Axis.horizontal,
+    Axis direction = Axis.horizontal,
   }) : this.builder(
           key: key,
           child: child,
@@ -394,7 +398,7 @@ class Slidable extends StatefulWidget {
           showAllActionsThreshold: showAllActionsThreshold,
           actionExtentRatio: actionExtentRatio,
           movementDuration: movementDuration,
-          direction: slideAxis,
+          direction: direction,
         );
 
   Slidable.builder({

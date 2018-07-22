@@ -103,7 +103,7 @@ class SlideActionListDelegate extends SlideActionDelegate {
 class SlidableDelegateContext {
   const SlidableDelegateContext(
     this.slidable,
-    this.showLeftActions,
+    this.showActions,
     this.dragExtent,
     this.controller,
   );
@@ -111,14 +111,16 @@ class SlidableDelegateContext {
   final Slidable slidable;
 
   /// The current actions that have to be shown.
-  SlideActionDelegate get actionDelegate => showLeftActions ? slidable.leftActionDelegate : slidable.rightActionDelegate;
+  SlideActionDelegate get actionDelegate => showActions ? slidable.actionDelegate : slidable.secondaryActionDelegate;
+
+  bool get directionIsXAxis => slidable.direction == Axis.horizontal;
 
   int get actionCount => actionDelegate?.actionCount ?? 0;
 
-  double get totalActionsWidth => slidable.actionExtentRatio * (actionCount);
+  double get totalActionsExtent => slidable.actionExtentRatio * (actionCount);
 
-  /// Whether the left actions have to be shown.
-  final bool showLeftActions;
+  /// Whether the actions have to be shown.
+  final bool showActions;
 
   final double dragExtent;
 
@@ -128,6 +130,26 @@ class SlidableDelegateContext {
   /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
   List<Widget> buildActions(BuildContext context) {
     return List.generate(actionCount, (int index) => actionDelegate.build(context, index, controller.view));
+  }
+
+  Offset createOffset(double value) {
+    return directionIsXAxis ? new Offset(value, 0.0) : new Offset(0.0, value);
+  }
+
+  double getMaxExtent(BoxConstraints constraints) {
+    return directionIsXAxis ? constraints.maxWidth : constraints.maxHeight;
+  }
+
+  Positioned createPositioned({Widget child, double extent, double position}) {
+    return new Positioned(
+      left: directionIsXAxis ? (showActions ? position : null) : 0.0 ,
+      right: directionIsXAxis ? (showActions ? null : position) : 0.0 ,
+      top: directionIsXAxis ? 0.0 : (showActions ? position : null),
+      bottom: directionIsXAxis ? 0.0  : (showActions ? null : position),
+      width: directionIsXAxis ? extent : null,
+      height: directionIsXAxis ? null : extent,
+      child: child,
+    );
   }
 }
 
@@ -167,7 +189,7 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
   Widget buildActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: new Offset(ctx.totalActionsWidth * ctx.dragExtent.sign, 0.0),
+      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragExtent.sign),
     ).animate(ctx.controller);
 
     if (ctx.controller.value != .0 && ctx.dragExtent != .0) {
@@ -205,7 +227,7 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: new Offset(ctx.totalActionsWidth * ctx.dragExtent.sign, 0.0),
+      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragExtent.sign),
     ).animate(ctx.controller);
 
     return new Positioned.fill(
@@ -215,16 +237,14 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
             builder: (context, child) {
               return new Stack(
                 children: <Widget>[
-                  new Positioned(
-                    left: ctx.showLeftActions ? .0 : null,
-                    right: ctx.showLeftActions ? null : .0,
-                    top: .0,
-                    bottom: .0,
-                    width: constraints.maxWidth * animation.value.dx.abs(),
-                    child: new Row(
+                  ctx.createPositioned(
+                    position: 0.0,
+                    extent: ctx.getMaxExtent(constraints) * animation.value.dx.abs(),
+                    child: new Flex(
+                      direction: ctx.slidable.direction,
                       children: ctx.buildActions(context).map((a) => Expanded(child: a)).toList(),
                     ),
-                  )
+                  ),
                 ],
               );
             });
@@ -247,16 +267,14 @@ class SlidableBehindDelegate extends SlidableStackDelegate {
       child: new LayoutBuilder(builder: (context, constraints) {
         return new Stack(
           children: <Widget>[
-            new Positioned(
-              left: ctx.showLeftActions ? .0 : null,
-              right: ctx.showLeftActions ? null : .0,
-              top: .0,
-              bottom: .0,
-              width: constraints.maxWidth * ctx.totalActionsWidth,
-              child: new Row(
+            ctx.createPositioned(
+              position: 0.0,
+              extent: ctx.getMaxExtent(constraints) * ctx.totalActionsExtent,
+              child: new Flex(
+                direction: ctx.slidable.direction,
                 children: ctx.buildActions(context).map((a) => Expanded(child: a)).toList(),
               ),
-            )
+            ),
           ],
         );
       }),
@@ -276,10 +294,10 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
-        final double totalWidth = constraints.maxWidth * ctx.totalActionsWidth;
+        final double totalExtent = ctx.getMaxExtent(constraints) * ctx.totalActionsExtent;
 
         final animation = new Tween(
-          begin: new Offset(-totalWidth, 0.0),
+          begin: ctx.createOffset(-totalExtent),
           end: Offset.zero,
         ).animate(ctx.controller);
 
@@ -288,16 +306,14 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
             builder: (context, child) {
               return new Stack(
                 children: <Widget>[
-                  new Positioned(
-                    left: ctx.showLeftActions ? animation.value.dx : null,
-                    right: ctx.showLeftActions ? null : animation.value.dx,
-                    top: .0,
-                    bottom: .0,
-                    width: totalWidth,
-                    child: new Row(
+                  ctx.createPositioned(
+                    position: animation.value.dx,
+                    extent: totalExtent,
+                    child: new Flex(
+                      direction: ctx.slidable.direction,
                       children: ctx.buildActions(context).map((a) => Expanded(child: a)).toList(),
                     ),
-                  )
+                  ),
                 ],
               );
             });
@@ -319,13 +335,12 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         final count = ctx.actionCount;
-        final double width = constraints.maxWidth;
-        final double actionWidth = width * ctx.slidable.actionExtentRatio;
+        final double actionExtent = ctx.getMaxExtent(constraints) * ctx.slidable.actionExtentRatio;
 
         final animations = Iterable.generate(count).map((index) {
           return new Tween(
-            begin: new Offset(-actionWidth, 0.0),
-            end: new Offset((count - index - 1) * actionWidth, 0.0),
+            begin: ctx.createOffset(-actionExtent),
+            end: ctx.createOffset((count - index - 1) * actionExtent),
           ).animate(ctx.controller);
         }).toList();
 
@@ -334,14 +349,11 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
             builder: (context, child) {
               return new Stack(
                 children: List.generate(ctx.actionCount, (index) {
-                  // For the left items we have to reverse the order if we want the last item at the bottom of the stack.
-                  int displayIndex = ctx.showLeftActions ? ctx.actionCount - index - 1 : index;
-                  return new Positioned(
-                    left: ctx.showLeftActions ? animations[index].value.dx : null,
-                    right: ctx.showLeftActions ? null : animations[index].value.dx,
-                    top: .0,
-                    bottom: .0,
-                    width: actionWidth,
+                  // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
+                  int displayIndex = ctx.showActions ? ctx.actionCount - index - 1 : index;
+                  return ctx.createPositioned(
+                    position: animations[index].value.dx,
+                    extent: actionExtent,
                     child: ctx.actionDelegate.build(context, displayIndex, ctx.controller.view),
                   );
                 }),
@@ -352,7 +364,11 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
   }
 }
 
-/// A widget that can be slide to the right or to the left.
+/// A widget that can be slid in both direction of the specified axis.
+///
+/// For example if the axis is [Axis.horizontal], this widget can be slid to the left or to the right.
+/// If the axis is [Axis.vertical], this widget can be slid up or slid down.
+///
 /// By sliding in one of these direction, slide actions will appear.
 class Slidable extends StatefulWidget {
   /// Creates a widget that can be dismissed.
@@ -363,31 +379,36 @@ class Slidable extends StatefulWidget {
     Key key,
     @required Widget child,
     @required SlidableDelegate delegate,
-    List<Widget> leftActions,
-    List<Widget> rightActions,
+    List<Widget> actions,
+    List<Widget> secondaryActions,
     double showAllActionsThreshold = 0.5,
     double actionExtentRatio = _kActionsExtentRatio,
-    Duration movementDuration: const Duration(milliseconds: 200),
+    Duration movementDuration = const Duration(milliseconds: 200),
+    Axis slideAxis = Axis.horizontal,
   }) : this.builder(
-            key: key,
-            child: child,
-            delegate: delegate,
-            leftActionDelegate: new SlideActionListDelegate(actions: leftActions),
-            rightActionDelegate: new SlideActionListDelegate(actions: rightActions),
-            showAllActionsThreshold: showAllActionsThreshold,
-            actionExtentRatio: actionExtentRatio,
-            movementDuration: movementDuration);
+          key: key,
+          child: child,
+          delegate: delegate,
+          actionDelegate: new SlideActionListDelegate(actions: actions),
+          secondaryActionDelegate: new SlideActionListDelegate(actions: secondaryActions),
+          showAllActionsThreshold: showAllActionsThreshold,
+          actionExtentRatio: actionExtentRatio,
+          movementDuration: movementDuration,
+          direction: slideAxis,
+        );
 
   Slidable.builder({
     Key key,
     @required this.child,
     @required this.delegate,
-    this.leftActionDelegate,
-    this.rightActionDelegate,
+    this.actionDelegate,
+    this.secondaryActionDelegate,
     this.showAllActionsThreshold = 0.5,
     this.actionExtentRatio = _kActionsExtentRatio,
-    this.movementDuration: const Duration(milliseconds: 200),
+    this.movementDuration = const Duration(milliseconds: 200),
+    this.direction = Axis.horizontal,
   })  : assert(delegate != null),
+        assert(direction != null),
         assert(showAllActionsThreshold != null && showAllActionsThreshold >= .0 && showAllActionsThreshold <= 1.0,
             'showAllActionsThreshold must be between 0.0 and 1.0'),
         assert(actionExtentRatio != null && actionExtentRatio >= .0 && actionExtentRatio <= 1.0, 'actionExtentRatio must be between 0.0 and 1.0'),
@@ -396,14 +417,22 @@ class Slidable extends StatefulWidget {
   /// The widget below this widget in the tree.
   final Widget child;
 
-  final SlideActionDelegate leftActionDelegate;
+  /// A delegate that builds slide actions that appears when the child has been dragged
+  /// down or to the right.
+  final SlideActionDelegate actionDelegate;
 
-  final SlideActionDelegate rightActionDelegate;
+  /// A delegate that builds slide actions that appears when the child has been dragged
+  /// up or to the left.
+  final SlideActionDelegate secondaryActionDelegate;
 
+  /// A delegate that controls how the slide actions are animated;
   final SlidableDelegate delegate;
 
   /// Relative ratio between one slide action and the extent of the child.
   final double actionExtentRatio;
+
+  /// The direction in which this widget can be slid.
+  final Axis direction;
 
   /// The offset threshold the item has to be dragged in order to show all actions
   /// in the slide direction.
@@ -431,7 +460,7 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
       _dragExtent = .0;
     }
 
-    if(status == AnimationStatus.completed){
+    if (status == AnimationStatus.completed) {
       setState(() {});
     }
   }
@@ -441,14 +470,20 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
   bool _dragUnderway = false;
   bool _opening = false;
 
-  bool get _showLeftActions {
+  bool get _showActions {
     return _dragExtent > 0;
   }
 
   /// The current actions that have to be shown.
-  SlideActionDelegate get actionDelegate => _showLeftActions ? widget.leftActionDelegate : widget.rightActionDelegate;
+  SlideActionDelegate get actionDelegate => _showActions ? widget.actionDelegate : widget.secondaryActionDelegate;
 
-  double get _overallDragAxisExtent => context.size.width * widget.actionExtentRatio * (actionDelegate?.actionCount ?? 0);
+  bool get _directionIsXAxis {
+    return widget.direction == Axis.horizontal;
+  }
+
+  double get _overallDragAxisExtent {
+    return (_directionIsXAxis ? context.size.width : context.size.height) * widget.actionExtentRatio * (actionDelegate?.actionCount ?? 0);
+  }
 
   @override
   void dispose() {
@@ -493,20 +528,20 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
-    if ((widget.leftActionDelegate == null || widget.leftActionDelegate.actionCount == 0) &&
-        (widget.rightActionDelegate == null || widget.rightActionDelegate.actionCount == 0)) {
+    if ((widget.actionDelegate == null || widget.actionDelegate.actionCount == 0) &&
+        (widget.secondaryActionDelegate == null || widget.secondaryActionDelegate.actionCount == 0)) {
       return widget.child;
     }
 
     Widget content = widget.child;
 
-    if (_showLeftActions && widget.leftActionDelegate != null && widget.leftActionDelegate.actionCount > 0 ||
-        !_showLeftActions && widget.rightActionDelegate != null && widget.rightActionDelegate.actionCount > 0) {
+    if (_showActions && widget.actionDelegate != null && widget.actionDelegate.actionCount > 0 ||
+        !_showActions && widget.secondaryActionDelegate != null && widget.secondaryActionDelegate.actionCount > 0) {
       content = widget.delegate.buildActions(
         context,
         new SlidableDelegateContext(
           widget,
-          _showLeftActions,
+          _showActions,
           _dragExtent,
           _controller,
         ),
@@ -514,9 +549,12 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
     }
 
     return new GestureDetector(
-      onHorizontalDragStart: _handleDragStart,
-      onHorizontalDragUpdate: _handleDragUpdate,
-      onHorizontalDragEnd: _handleDragEnd,
+      onHorizontalDragStart: _directionIsXAxis ? _handleDragStart : null,
+      onHorizontalDragUpdate: _directionIsXAxis ? _handleDragUpdate : null,
+      onHorizontalDragEnd: _directionIsXAxis ? _handleDragEnd : null,
+      onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
+      onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
+      onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
       behavior: HitTestBehavior.opaque,
       child: content,
     );

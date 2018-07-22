@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
           subtitle: new Text(_getSubtitle(index)),
         ),
       ),
-      leftActions: <Widget>[
+      actions: <Widget>[
         new IconSlideAction(
           caption: 'Archive',
           color: Colors.blue,
@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onTap: () => _showSnackBar(context, 'Share'),
         ),
       ],
-      rightActions: <Widget>[
+      secondaryActions: <Widget>[
         new IconSlideAction(
           caption: 'More',
           color: Colors.grey.shade200,
@@ -113,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
           subtitle: new Text(_getSubtitle(index)),
         ),
       ),
-      leftActionDelegate: new SlideActionBuilderDelegate(
+      actionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation) {
             if (index == 0) {
@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }
           }),
-      rightActionDelegate: new SlideActionBuilderDelegate(
+      secondaryActionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation) {
             if (index == 0) {

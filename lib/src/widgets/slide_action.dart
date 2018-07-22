@@ -16,7 +16,8 @@ class SlideAction extends StatelessWidget {
             color == null || decoration == null,
             'Cannot provide both a color and a decoration\n'
             'The color argument is just a shorthand for "decoration: new BoxDecoration(color: color)".'),
-        decoration = decoration ?? (color != null ? new BoxDecoration(color: color) : null),
+        decoration = decoration ??
+            (color != null ? new BoxDecoration(color: color) : null),
         super(key: key);
 
   final Decoration decoration;
@@ -57,11 +58,18 @@ class IconSlideAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color foregroundColor = ThemeData.estimateBrightnessForColor(color) == Brightness.light ? Colors.black : Colors.white;
+    final Color foregroundColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.light
+            ? Colors.black
+            : Colors.white;
     final Text textWidget = new Text(
       caption ?? '',
       overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).primaryTextTheme.caption.copyWith(color: foregroundColor),
+      style: Theme
+          .of(context)
+          .primaryTextTheme
+          .caption
+          .copyWith(color: foregroundColor),
     );
     return GestureDetector(
       onTap: onTap,

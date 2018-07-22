@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: new Text(widget.title),
       ),
       body: new Center(
-        child: _buildList(context, Axis.vertical),
+        child: _buildList(context, Axis.horizontal),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -43,7 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return new ListView.builder(
       scrollDirection: direction,
       itemBuilder: (context, index) {
-        final Axis slidableDirection = direction == Axis.horizontal ? Axis.vertical : Axis.horizontal;
+        final Axis slidableDirection =
+            direction == Axis.horizontal ? Axis.vertical : Axis.horizontal;
         if (index < 8) {
           return _getSlidableWithLists(context, index, slidableDirection);
         } else {
@@ -95,13 +96,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _getSlidableWithLists(BuildContext context, int index, Axis direction) {
+  Widget _getSlidableWithLists(
+      BuildContext context, int index, Axis direction) {
     return new Slidable(
       key: Key('$index'),
       direction: direction,
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
-      child: direction == Axis.horizontal ? _buildVerticalListItem(context, index) : _buildhorizontalListItem(context, index),
+      child: direction == Axis.horizontal
+          ? _buildVerticalListItem(context, index)
+          : _buildhorizontalListItem(context, index),
       actions: <Widget>[
         new IconSlideAction(
           caption: 'Archive',
@@ -133,13 +137,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _getSlidableWithDelegates(BuildContext context, int index, Axis direction) {
+  Widget _getSlidableWithDelegates(
+      BuildContext context, int index, Axis direction) {
     return new Slidable.builder(
       key: Key('$index'),
       direction: direction,
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
-      child: direction == Axis.horizontal ? _buildVerticalListItem(context, index) : _buildhorizontalListItem(context, index),
+      child: direction == Axis.horizontal
+          ? _buildVerticalListItem(context, index)
+          : _buildhorizontalListItem(context, index),
       actionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation) {

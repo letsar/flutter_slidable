@@ -34,38 +34,79 @@ class _MyHomePageState extends State<MyHomePage> {
         title: new Text(widget.title),
       ),
       body: new Center(
-        child: new ListView.builder(
-          itemBuilder: (context, index) {
-            if (index < 8) {
-              return _getSlidableWithLists(context, index);
-            } else {
-              return _getSlidableWithDelegates(context, index);
-            }
-          },
-          itemCount: 20,
-        ),
+        child: _buildList(context, Axis.horizontal),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  Widget _getSlidableWithLists(BuildContext context, int index) {
+  Widget _buildList(BuildContext context, Axis direction) {
+    return new ListView.builder(
+      scrollDirection: direction,
+      itemBuilder: (context, index) {
+        final Axis slidableDirection =
+            direction == Axis.horizontal ? Axis.vertical : Axis.horizontal;
+        if (index < 8) {
+          return _getSlidableWithLists(context, index, slidableDirection);
+        } else {
+          return _getSlidableWithDelegates(context, index, slidableDirection);
+        }
+      },
+      itemCount: 20,
+    );
+  }
+
+  Widget _buildVerticalListItem(BuildContext context, int index) {
+    return new Container(
+      color: Colors.white,
+      child: new ListTile(
+        leading: new CircleAvatar(
+          backgroundColor: _getAvatarColor(index),
+          child: new Text('$index'),
+          foregroundColor: Colors.white,
+        ),
+        title: new Text('Tile n°$index'),
+        subtitle: new Text(_getSubtitle(index)),
+      ),
+    );
+  }
+
+  Widget _buildhorizontalListItem(BuildContext context, int index) {
+    return new Container(
+      color: Colors.white,
+      width: 160.0,
+      child: new Column(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          new Expanded(
+            child: new CircleAvatar(
+              backgroundColor: _getAvatarColor(index),
+              child: new Text('$index'),
+              foregroundColor: Colors.white,
+            ),
+          ),
+          new Expanded(
+            child: Center(
+              child: new Text(
+                _getSubtitle(index),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getSlidableWithLists(
+      BuildContext context, int index, Axis direction) {
     return new Slidable(
       key: Key('$index'),
+      direction: direction,
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
-      child: new Container(
-        color: Colors.white,
-        child: new ListTile(
-          leading: new CircleAvatar(
-            backgroundColor: _getAvatarColor(index),
-            child: new Text('$index'),
-            foregroundColor: Colors.white,
-          ),
-          title: new Text('Tile n°$index'),
-          subtitle: new Text(_getSubtitle(index)),
-        ),
-      ),
-      leftActions: <Widget>[
+      child: direction == Axis.horizontal
+          ? _buildVerticalListItem(context, index)
+          : _buildhorizontalListItem(context, index),
+      actions: <Widget>[
         new IconSlideAction(
           caption: 'Archive',
           color: Colors.blue,
@@ -79,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onTap: () => _showSnackBar(context, 'Share'),
         ),
       ],
-      rightActions: <Widget>[
+      secondaryActions: <Widget>[
         new IconSlideAction(
           caption: 'More',
           color: Colors.grey.shade200,
@@ -96,24 +137,17 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _getSlidableWithDelegates(BuildContext context, int index) {
+  Widget _getSlidableWithDelegates(
+      BuildContext context, int index, Axis direction) {
     return new Slidable.builder(
       key: Key('$index'),
+      direction: direction,
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
-      child: new Container(
-        color: Colors.white,
-        child: new ListTile(
-          leading: new CircleAvatar(
-            backgroundColor: _getAvatarColor(index),
-            child: new Text('$index'),
-            foregroundColor: Colors.white,
-          ),
-          title: new Text('Tile n°$index'),
-          subtitle: new Text(_getSubtitle(index)),
-        ),
-      ),
-      leftActionDelegate: new SlideActionBuilderDelegate(
+      child: direction == Axis.horizontal
+          ? _buildVerticalListItem(context, index)
+          : _buildhorizontalListItem(context, index),
+      actionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation) {
             if (index == 0) {
@@ -132,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }
           }),
-      rightActionDelegate: new SlideActionBuilderDelegate(
+      secondaryActionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation) {
             if (index == 0) {

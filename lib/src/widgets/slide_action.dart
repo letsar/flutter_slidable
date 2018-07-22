@@ -79,11 +79,13 @@ class IconSlideAction extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              new Icon(
-                icon,
-                color: foregroundColor,
+              new Flexible(
+                child: new Icon(
+                  icon,
+                  color: foregroundColor,
+                ),
               ),
-              textWidget,
+              new Flexible(child: textWidget),
             ],
           ),
         ),

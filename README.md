@@ -40,10 +40,15 @@ You can create a `Slidable` in two different ways:
 
 A `Slidable` needs multiple things:
 
-* Left, right (or both) slide actions. Which can be any widget. For convenience this package has 2 built-in side action widgets.
+* Slide actions (see below for details). Which can be any widget. For convenience this package has 2 built-in side action widgets.
 * A delegate. This is what controls the layout and the animation of the slide menu.
 * An extent ratio between a slide action extent and the item extent.
 * A child.
+
+The `actions` contains the slide actions that appears when the child has been dragged down or to the right.
+The `secondaryActions` contains the slide actions that appears when the child has been dragged up or to the left.
+
+A `direction` parameter let you choose if you want actions to appear when you slide horizontally or vertically (horizontally by default).
 
 ```dart
 new Slidable(
@@ -62,7 +67,7 @@ new Slidable(
       subtitle: new Text('SlidableDrawerDelegate'),
     ),
   ),
-  leftActions: <Widget>[
+  actions: <Widget>[
     new IconSlideAction(
       caption: 'Archive',
       color: Colors.blue,
@@ -76,7 +81,7 @@ new Slidable(
       onTap: () => _showSnackBar('Share'),
     ),
   ],
-  rightActions: <Widget>[
+  secondaryActions: <Widget>[
     new IconSlideAction(
       caption: 'More',
       color: Colors.black45,

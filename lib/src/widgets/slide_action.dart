@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/widgets/slidable.dart';
 
-const bool _kCloseAfterTap = true;
+const bool _kCloseOnTap = true;
 
 /// Abstract class for slide actions that can close after [onTap] occurred.
 abstract class ClosableSlideAction extends StatelessWidget {
-  /// Creates a slide that closes after tap occurred if [closeAfterTap] is [true].
+  /// Creates a slide that closes when a tap has occurred if [closeOnTap] is [true].
   ///
-  /// The [closeAfterTap] argument must not be null.
+  /// The [closeOnTap] argument must not be null.
   const ClosableSlideAction({
     Key key,
     this.onTap,
-    this.closeAfterTap = _kCloseAfterTap,
-  })  : assert(closeAfterTap != null),
+    this.closeOnTap = _kCloseOnTap,
+  })  : assert(closeOnTap != null),
         super(key: key);
 
   /// A tap has occurred.
@@ -22,7 +22,7 @@ abstract class ClosableSlideAction extends StatelessWidget {
   /// Whether close this after tap occurred.
   ///
   /// Defaults to true.
-  final bool closeAfterTap;
+  final bool closeOnTap;
 
   /// Calls [onTap] if not null and closes the closest [Slidable] that encloses the given context.
   void _handleCloseAfterTap(BuildContext context) {
@@ -35,7 +35,7 @@ abstract class ClosableSlideAction extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: !closeAfterTap ? onTap : () => _handleCloseAfterTap(context),
+      onTap: !closeOnTap ? onTap : () => _handleCloseAfterTap(context),
       child: buildAction(context),
     );
   }
@@ -54,14 +54,14 @@ class SlideAction extends ClosableSlideAction {
   /// `decoration`, you can pass the color as the `color` argument to the
   /// `BoxDecoration`.
   ///
-  /// The [closeAfterTap] argument must not be null.
+  /// The [closeOnTap] argument must not be null.
   SlideAction({
     Key key,
     @required this.child,
     VoidCallback onTap,
     Color color,
     Decoration decoration,
-    bool closeAfterTap = _kCloseAfterTap,
+    bool closeOnTap = _kCloseOnTap,
   })  : assert(child != null),
         assert(decoration == null || decoration.debugAssertIsValid()),
         assert(
@@ -72,7 +72,7 @@ class SlideAction extends ClosableSlideAction {
         super(
           key: key,
           onTap: onTap,
-          closeAfterTap: closeAfterTap,
+          closeOnTap: closeOnTap,
         );
 
   final Decoration decoration;
@@ -95,19 +95,19 @@ class IconSlideAction extends ClosableSlideAction {
   /// Creates a slide action with an icon, a [caption] if set and a
   /// background color.
   ///
-  /// The [closeAfterTap] argument must not be null.
+  /// The [closeOnTap] argument must not be null.
   const IconSlideAction({
     Key key,
     @required this.icon,
     this.caption,
     Color color,
     VoidCallback onTap,
-    bool closeAfterTap = _kCloseAfterTap,
+    bool closeOnTap = _kCloseOnTap,
   })  : color = color ?? Colors.white,
         super(
           key: key,
           onTap: onTap,
-          closeAfterTap: closeAfterTap,
+          closeOnTap: closeOnTap,
         );
 
   final IconData icon;

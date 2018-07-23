@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.grey.shade200,
           icon: Icons.more_horiz,
           onTap: () => _showSnackBar(context, 'More'),
-          closeAfterTap: false,
+          closeOnTap: false,
         ),
         new IconSlideAction(
           caption: 'Delete',
@@ -174,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.grey.shade200.withOpacity(animation.value),
                 icon: Icons.more_horiz,
                 onTap: () => _showSnackBar(context, 'More'),
-                closeAfterTap: false,
+                closeOnTap: false,
               );
             } else {
               return new IconSlideAction(

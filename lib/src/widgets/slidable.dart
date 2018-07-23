@@ -104,7 +104,7 @@ class SlidableDelegateContext {
   const SlidableDelegateContext(
     this.slidable,
     this.showActions,
-    this.dragExtent,
+    this.dragSign,
     this.controller,
   );
 
@@ -122,7 +122,7 @@ class SlidableDelegateContext {
   /// Whether the actions have to be shown.
   final bool showActions;
 
-  final double dragExtent;
+  final double dragSign;
 
   /// The animation controller which value depends on  `dragExtent`.
   final AnimationController controller;
@@ -193,10 +193,10 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
   Widget buildActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragExtent.sign),
+      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragSign),
     ).animate(ctx.controller);
 
-    if (ctx.controller.value != .0 && ctx.dragExtent != .0) {
+    if (ctx.controller.value != .0) {
       return new Container(
         child: new Stack(
           children: <Widget>[
@@ -231,7 +231,7 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragExtent.sign),
+      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragSign),
     ).animate(ctx.controller);
 
     return new Positioned.fill(
@@ -375,12 +375,12 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
 ///
 /// By sliding in one of these direction, slide actions will appear.
 class Slidable extends StatefulWidget {
-  /// Creates a widget that can be dismissed.
+  /// Creates a widget that can be slid.
   ///
   /// The [actions] contains the slide actions that appears when the child has been dragged down or to the right.
   /// The [secondaryActions] contains the slide actions that appears when the child has been dragged up or to the left.
   ///
-  /// The [delegate] argument must not be null. The [actionExtentRatio]
+  /// The [delegate] and [closeOnScroll] arguments must not be null. The [actionExtentRatio]
   /// and [showAllActionsThreshold] arguments must be greater or equal than 0 and less or equal than 1.
   Slidable({
     Key key,
@@ -392,6 +392,7 @@ class Slidable extends StatefulWidget {
     double actionExtentRatio = _kActionsExtentRatio,
     Duration movementDuration = const Duration(milliseconds: 200),
     Axis direction = Axis.horizontal,
+    bool closeOnScroll = true,
   }) : this.builder(
           key: key,
           child: child,
@@ -402,8 +403,16 @@ class Slidable extends StatefulWidget {
           actionExtentRatio: actionExtentRatio,
           movementDuration: movementDuration,
           direction: direction,
+          closeOnScroll: closeOnScroll,
         );
 
+  /// Creates a widget that can be slid.
+  ///
+  /// The [actionDelegate] is a delegate that builds the slide actions that appears when the child has been dragged down or to the right.
+  /// The [secondaryActionDelegate] is a delegate that builds the slide actions that appears when the child has been dragged up or to the left.
+  ///
+  /// The [delegate] and [closeOnScroll] arguments must not be null. The [actionExtentRatio]
+  /// and [showAllActionsThreshold] arguments must be greater or equal than 0 and less or equal than 1.
   Slidable.builder({
     Key key,
     @required this.child,
@@ -414,11 +423,13 @@ class Slidable extends StatefulWidget {
     this.actionExtentRatio = _kActionsExtentRatio,
     this.movementDuration = const Duration(milliseconds: 200),
     this.direction = Axis.horizontal,
+    this.closeOnScroll = true,
   })  : assert(delegate != null),
         assert(direction != null),
         assert(showAllActionsThreshold != null && showAllActionsThreshold >= .0 && showAllActionsThreshold <= 1.0,
             'showAllActionsThreshold must be between 0.0 and 1.0'),
         assert(actionExtentRatio != null && actionExtentRatio >= .0 && actionExtentRatio <= 1.0, 'actionExtentRatio must be between 0.0 and 1.0'),
+        assert(closeOnScroll != null),
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -451,6 +462,11 @@ class Slidable extends StatefulWidget {
   /// Defines the duration for card to go to final position or to come back to original position if threshold not reached.
   final Duration movementDuration;
 
+  /// Specifies to close this slidable after the closest [Scrollable]'s position changed.
+  ///
+  /// Defaults to true.
+  final bool closeOnScroll;
+
   /// The state from the closest instance of this class that encloses the given context.
   static SlidableState of(BuildContext context) {
     return context.ancestorStateOfType(const TypeMatcher<SlidableState>());
@@ -471,6 +487,8 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
 
   double _dragExtent = 0.0;
 
+  ScrollPosition _scrollPosition;
+
   bool get _showActions {
     return _dragExtent > 0;
   }
@@ -490,8 +508,39 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _removeScrollingNotifierListener();
+    _addScrollingNotifierListener();
+  }
+
+  @override
+  void didUpdateWidget(Slidable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.closeOnScroll != oldWidget.closeOnScroll) {
+      _removeScrollingNotifierListener();
+      _addScrollingNotifierListener();
+    }
+  }
+
+  void _addScrollingNotifierListener() {
+    if (widget.closeOnScroll) {
+      _scrollPosition = Scrollable.of(context)?.position;
+      if (_scrollPosition != null) _scrollPosition.isScrollingNotifier.addListener(_isScrollingListener);
+    }
+  }
+
+  void _removeScrollingNotifierListener() {
+    if (_scrollPosition != null) {
+      _scrollPosition.isScrollingNotifier.removeListener(_isScrollingListener);
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
+    _removeScrollingNotifierListener();
     super.dispose();
   }
 
@@ -501,6 +550,15 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
 
   void close() {
     _controller.fling(velocity: -1.0);
+  }
+
+  void _isScrollingListener() {
+    if (!widget.closeOnScroll || _scrollPosition == null) return;
+
+    // When a scroll starts close this.
+    if (_scrollPosition.isScrollingNotifier.value) {
+      close();
+    }
   }
 
   void _handleDragStart(DragStartDetails details) {
@@ -555,7 +613,7 @@ class SlidableState extends State<Slidable> with TickerProviderStateMixin, Autom
         new SlidableDelegateContext(
           widget,
           _showActions,
-          _dragExtent,
+          _dragExtent.sign,
           _controller,
         ),
       );

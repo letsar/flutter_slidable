@@ -14,6 +14,8 @@ A Flutter implementation of slidable list item with left and right slide actions
 * 2 built-in slide action widget.
 * You can easily create you custom layouts and animations.
 * You can use a builder to create your slide actions if you want special effects during animation.
+* Close when a slide action has been tapped (overridable).
+* Close when the nearest `Scrollable` starts to scroll (overridable).
 
 ## Getting started
 
@@ -22,7 +24,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.2.0"
+  flutter_slidable: "^0.3.0"
 ```
 
 In your library add the following import:
@@ -52,7 +54,6 @@ A `direction` parameter let you choose if you want actions to appear when you sl
 
 ```dart
 new Slidable(
-  key: Key('$3'),
   delegate: new SlidableDrawerDelegate(),
   actionExtentRatio: 0.25,
   child: new Container(
@@ -132,6 +133,16 @@ The slide actions which animate like drawers while the item is sliding:
 The slide actions stretch while the item is sliding:
 
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_stretch.gif)
+
+#### How to prevent my slide action to close after it has been tapped?
+
+By default, `SlideAction` and `IconSlideAction` close on tap.
+To prevent this, you can set `false` to the `closeOnTap` constructor argument. 
+
+#### How to prevent my Slidable to close after my list scrolled?
+
+By default, a `Slidable` closes when the nearest `Scrollable` widget starts to scroll.
+To prevent this, you can set `false` to the `closeOnScroll` constructor argument. 
 
 ## Changelog
 

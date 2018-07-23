@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: new Text(widget.title),
       ),
       body: new Center(
-        child: _buildList(context, Axis.horizontal),
+        child: _buildList(context, Axis.vertical),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -99,7 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _getSlidableWithLists(
       BuildContext context, int index, Axis direction) {
     return new Slidable(
-      key: Key('$index'),
       direction: direction,
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
@@ -126,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.grey.shade200,
           icon: Icons.more_horiz,
           onTap: () => _showSnackBar(context, 'More'),
+          closeOnTap: false,
         ),
         new IconSlideAction(
           caption: 'Delete',
@@ -140,7 +140,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _getSlidableWithDelegates(
       BuildContext context, int index, Axis direction) {
     return new Slidable.builder(
-      key: Key('$index'),
       direction: direction,
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
@@ -175,6 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.grey.shade200.withOpacity(animation.value),
                 icon: Icons.more_horiz,
                 onTap: () => _showSnackBar(context, 'More'),
+                closeOnTap: false,
               );
             } else {
               return new IconSlideAction(

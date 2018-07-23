@@ -1,3 +1,12 @@
+## 0.3.0
+## Added
+* The `closeOnTap` argument on slide actions to close when a action has been tapped.
+* The `closeOnScroll` argument on `Slidable` to close when the nearest `Scrollable` starts to scroll.
+* The static `Slidable.of` function.
+
+## Changed
+* The `dragExtent` field in `SlidableDelegateContext` has been changed to `dragSign`. 
+
 ## 0.2.0
 ### Added
 * `Slidable.builder` constructor.

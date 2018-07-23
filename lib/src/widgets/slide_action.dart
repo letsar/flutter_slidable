@@ -6,7 +6,8 @@ const bool _kCloseOnTap = true;
 
 /// Abstract class for slide actions that can close after [onTap] occurred.
 abstract class ClosableSlideAction extends StatelessWidget {
-  /// Creates a slide that closes when a tap has occurred if [closeOnTap] is [true].
+  /// Creates a slide that closes when a tap has occurred if [closeOnTap]
+  /// is [true].
   ///
   /// The [closeOnTap] argument must not be null.
   const ClosableSlideAction({
@@ -24,7 +25,8 @@ abstract class ClosableSlideAction extends StatelessWidget {
   /// Defaults to true.
   final bool closeOnTap;
 
-  /// Calls [onTap] if not null and closes the closest [Slidable] that encloses the given context.
+  /// Calls [onTap] if not null and closes the closest [Slidable]
+  /// that encloses the given context.
   void _handleCloseAfterTap(BuildContext context) {
     if (onTap != null) {
       onTap();
@@ -68,7 +70,8 @@ class SlideAction extends ClosableSlideAction {
             color == null || decoration == null,
             'Cannot provide both a color and a decoration\n'
             'The color argument is just a shorthand for "decoration: new BoxDecoration(color: color)".'),
-        decoration = decoration ?? (color != null ? new BoxDecoration(color: color) : null),
+        decoration = decoration ??
+            (color != null ? new BoxDecoration(color: color) : null),
         super(
           key: key,
           onTap: onTap,
@@ -121,11 +124,18 @@ class IconSlideAction extends ClosableSlideAction {
 
   @override
   Widget buildAction(BuildContext context) {
-    final Color foregroundColor = ThemeData.estimateBrightnessForColor(color) == Brightness.light ? Colors.black : Colors.white;
+    final Color foregroundColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.light
+            ? Colors.black
+            : Colors.white;
     final Text textWidget = new Text(
       caption ?? '',
       overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).primaryTextTheme.caption.copyWith(color: foregroundColor),
+      style: Theme
+          .of(context)
+          .primaryTextTheme
+          .caption
+          .copyWith(color: foregroundColor),
     );
     return Container(
       color: color,

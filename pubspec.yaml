@@ -1,6 +1,6 @@
 name: flutter_slidable
 description: A Flutter implementation of slidable list item with directional slide actions.
-version: 0.3.0
+version: 0.3.1
 author: Romain Rastel <lets4r@gmail.com>
 homepage: https://github.com/letsar/flutter_slidable
 

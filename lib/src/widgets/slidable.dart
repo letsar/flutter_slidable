@@ -413,6 +413,7 @@ class Slidable extends StatefulWidget {
     Duration movementDuration = const Duration(milliseconds: 200),
     Axis direction = Axis.horizontal,
     bool closeOnScroll = true,
+    bool enabled = true,
   }) : this.builder(
           key: key,
           child: child,
@@ -425,6 +426,7 @@ class Slidable extends StatefulWidget {
           movementDuration: movementDuration,
           direction: direction,
           closeOnScroll: closeOnScroll,
+          enabled: enabled,
         );
 
   /// Creates a widget that can be slid.
@@ -432,7 +434,7 @@ class Slidable extends StatefulWidget {
   /// The [actionDelegate] is a delegate that builds the slide actions that appears when the child has been dragged down or to the right.
   /// The [secondaryActionDelegate] is a delegate that builds the slide actions that appears when the child has been dragged up or to the left.
   ///
-  /// The [delegate] and [closeOnScroll] arguments must not be null. The [actionExtentRatio]
+  /// The [delegate], [closeOnScroll] and [enabled] arguments must not be null. The [actionExtentRatio]
   /// and [showAllActionsThreshold] arguments must be greater or equal than 0 and less or equal than 1.
   Slidable.builder({
     Key key,
@@ -445,6 +447,7 @@ class Slidable extends StatefulWidget {
     this.movementDuration = const Duration(milliseconds: 200),
     this.direction = Axis.horizontal,
     this.closeOnScroll = true,
+    this.enabled = true,
   })  : assert(delegate != null),
         assert(direction != null),
         assert(
@@ -458,6 +461,7 @@ class Slidable extends StatefulWidget {
                 actionExtentRatio <= 1.0,
             'actionExtentRatio must be between 0.0 and 1.0'),
         assert(closeOnScroll != null),
+        assert(enabled != null),
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -494,6 +498,13 @@ class Slidable extends StatefulWidget {
   ///
   /// Defaults to true.
   final bool closeOnScroll;
+
+  /// Whether this slidable is interactive.
+  ///
+  /// If false, the child will not slid to show slide actions.
+  ///
+  /// Defaults to true.
+  final bool enabled;
 
   /// The state from the closest instance of this class that encloses the given context.
   static SlidableState of(BuildContext context) {
@@ -637,10 +648,11 @@ class SlidableState extends State<Slidable>
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
-    if ((widget.actionDelegate == null ||
-            widget.actionDelegate.actionCount == 0) &&
-        (widget.secondaryActionDelegate == null ||
-            widget.secondaryActionDelegate.actionCount == 0)) {
+    if (!widget.enabled ||
+        ((widget.actionDelegate == null ||
+                widget.actionDelegate.actionCount == 0) &&
+            (widget.secondaryActionDelegate == null ||
+                widget.secondaryActionDelegate.actionCount == 0))) {
       return widget.child;
     }
 

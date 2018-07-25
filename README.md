@@ -11,7 +11,7 @@ A Flutter implementation of slidable list item with left and right slide actions
 
 * Accepts left and right widget lists as slide actions.
 * 4 built-in layouts.
-* 2 built-in slide action widget.
+* 2 built-in slide action widgets.
 * You can easily create you custom layouts and animations.
 * You can use a builder to create your slide actions if you want special effects during animation.
 * Close when a slide action has been tapped (overridable).
@@ -24,7 +24,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.3.0"
+  flutter_slidable: "^0.3.1"
 ```
 
 In your library add the following import:
@@ -42,15 +42,15 @@ You can create a `Slidable` in two different ways:
 
 A `Slidable` needs multiple things:
 
-* Slide actions (see below for details). Which can be any widget. For convenience this package has 2 built-in side action widgets.
+* Slide actions (see below for details). They can be any widget. For convenience, this package has 2 built-in side action widgets.
 * A delegate. This is what controls the layout and the animation of the slide menu.
 * An extent ratio between a slide action extent and the item extent.
 * A child.
 
-The `actions` contains the slide actions that appears when the child has been dragged down or to the right.
-The `secondaryActions` contains the slide actions that appears when the child has been dragged up or to the left.
+The `actions` contains the slide actions that appear when the child has been dragged down or to the right.
+The `secondaryActions` contains the slide actions that appear when the child has been dragged up or to the left.
 
-A `direction` parameter let you choose if you want actions to appear when you slide horizontally or vertically (horizontally by default).
+A `direction` parameter lets you choose if you want actions to appear when you slide horizontally (default) or vertically.
 
 ```dart
 new Slidable(
@@ -101,14 +101,14 @@ new Slidable(
 
 ### Built-in slide actions
 
-This package comes with 2 kind of slide actions:
+This package comes with 2 kinds of slide actions:
 
-* `SlideAction` which the more permissive. You can choose a background color, or any decoration, and it takes any widget as a child.
-* `IconSlideAction` which requires an icon, and cake have a background color and a caption below the icon.
+* `SlideAction`, which is the most flexible. You can choose a background color, or any decoration, and it takes any widget as a child.
+* `IconSlideAction`, which requires an icon. It can have a background color and a caption below the icon.
 
 ### Built-in delegates
 
-This package comes with 4 kind of delegates:
+This package comes with 4 kinds of delegates:
 
 #### SlidableBehindDelegate
 
@@ -124,7 +124,7 @@ The slide actions follow the item while it's sliding:
 
 #### SlidableDrawerDelegate
 
-The slide actions which animate like drawers while the item is sliding:
+The slide actions animate like drawers while the item is sliding:
 
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_drawer.gif)
 
@@ -137,12 +137,12 @@ The slide actions stretch while the item is sliding:
 #### How to prevent my slide action to close after it has been tapped?
 
 By default, `SlideAction` and `IconSlideAction` close on tap.
-To prevent this, you can set `false` to the `closeOnTap` constructor argument. 
+To prevent this, you can pass in `false` to the `closeOnTap` constructor argument. 
 
-#### How to prevent my Slidable to close after my list scrolled?
+#### How to prevent my Slidable to close after my list has scrolled?
 
 By default, a `Slidable` closes when the nearest `Scrollable` widget starts to scroll.
-To prevent this, you can set `false` to the `closeOnScroll` constructor argument. 
+To prevent this, you can pass in `false` to the `closeOnScroll` constructor argument. 
 
 ## Changelog
 

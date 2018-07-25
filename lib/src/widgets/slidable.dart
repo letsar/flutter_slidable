@@ -637,7 +637,10 @@ class SlidableState extends State<Slidable>
   }
 
   void _handleShowAllActionsStatusChanged(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
+    // Make sure to rebuild a last time, otherwise the slide action could
+    // be scrambled.
+    if (status == AnimationStatus.completed ||
+        status == AnimationStatus.dismissed) {
       setState(() {});
     }
 

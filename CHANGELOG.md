@@ -1,10 +1,14 @@
+## 0.3.1
+### Fixed
+* https://github.com/letsar/flutter_slidable/issues/11 (slide action not rebuild after controller dismissed).
+
 ## 0.3.0
-## Added
+### Added
 * The `closeOnTap` argument on slide actions to close when a action has been tapped.
 * The `closeOnScroll` argument on `Slidable` to close when the nearest `Scrollable` starts to scroll.
 * The static `Slidable.of` function.
 
-## Changed
+### Changed
 * The `dragExtent` field in `SlidableDelegateContext` has been changed to `dragSign`. 
 
 ## 0.2.0

@@ -1,3 +1,7 @@
+## 0.3.2
+### Added
+* The `enabled` argument on `Slidable` constructors to enable or disable the slide effect (enabled by default). 
+
 ## 0.3.1
 ### Fixed
 * https://github.com/letsar/flutter_slidable/issues/11 (slide action not rebuild after controller dismissed).

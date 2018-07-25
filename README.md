@@ -1,6 +1,6 @@
 # flutter_slidable
 
-A Flutter implementation of slidable list item with left and right slide actions.
+A Flutter implementation of slidable list item with directional slide actions.
 
 [![Pub](https://img.shields.io/pub/v/flutter_slidable.svg)](https://pub.dartlang.org/packages/flutter_slidable)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QTT34M25RDNL6)
@@ -16,6 +16,7 @@ A Flutter implementation of slidable list item with left and right slide actions
 * You can use a builder to create your slide actions if you want special effects during animation.
 * Close when a slide action has been tapped (overridable).
 * Close when the nearest `Scrollable` starts to scroll (overridable).
+* Option to disable the slide effect easily.
 
 ## Getting started
 
@@ -24,7 +25,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.3.1"
+  flutter_slidable: "^0.3.2"
 ```
 
 In your library add the following import:

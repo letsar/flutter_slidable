@@ -73,7 +73,7 @@ Widget buildTest(
               height: scrollDirection == Axis.horizontal
                   ? screenSize.height
                   : itemExtent,
-              child: new Text(item.toString()),
+              child: new Text('item $item'),
             ),
           );
         }
@@ -111,9 +111,13 @@ Future<Null> flingElement(
   @required AxisDirection gestureDirection,
   double initialOffsetFactor = 0.0,
 }) async {
-  final Offset delta = getOffset(gestureDirection, -300.0);
-  await tester.fling(finder, delta, 1000.0,
-      initialOffset: delta * initialOffsetFactor);
+  final double itemExtent =
+      axisDirectionToAxis(gestureDirection) == Axis.horizontal
+          ? screenSize.width
+          : screenSize.height;
+  final Offset delta =
+      getOffset(gestureDirection, initialOffsetFactor * itemExtent);
+  await tester.fling(finder, delta, 1000.0);
 }
 
 Future<Null> dragElement(
@@ -139,21 +143,26 @@ Future<Null> dragItem(
 }) async {
   await dragElement(
     tester,
-    find.widgetWithText(Container, item.toString()),
+    find.text('item $item'),
     gestureDirection: gestureDirection,
     endOffsetFactor: endOffsetFactor,
   );
   await tester.pump(); // start the slide.
 }
 
-Future<Null> flingElementFromZero(WidgetTester tester, Finder finder,
-    {@required AxisDirection gestureDirection}) async {
-  // This is a special case where we drag in one direction, then fling back so
-  // that at the point of release, we're at exactly the point at which we
-  // started, but with velocity. This is needed to check a boundary condition
-  // in the flinging behavior.
-  await flingElement(tester, finder,
-      gestureDirection: gestureDirection, initialOffsetFactor: -1.0);
+Future<Null> flingItem(
+  WidgetTester tester,
+  int item, {
+  @required AxisDirection gestureDirection,
+  double initialOffsetFactor = 0.0,
+}) async {
+  await flingElement(tester, find.text('item $item'),
+      gestureDirection: gestureDirection,
+      initialOffsetFactor: initialOffsetFactor);
+  await tester.pump(); // start the slide.
+  await tester.pump(
+      const Duration(seconds: 1)); // finish the slide and start shrinking...
+  await tester.pump();
 }
 
 int getSlideActionBaseKey(int index) {
@@ -210,11 +219,11 @@ void checkAction(
       fail('unsupported gestureDirection');
   }
   expect(actualEdge.roundToDouble(), expectedEdge.roundToDouble(),
-      reason: 'edges not'
-          ' equals');
+      reason: 'edges are not'
+          ' equal');
   expect(actualExtent.roundToDouble(), expectedExtent.roundToDouble(),
       reason: 'exten'
-          'ts not equals');
+          'ts are not equal');
 }
 
 typedef List<_CheckActionValues> SlidableDelegateTestMethod(
@@ -306,7 +315,7 @@ List<_CheckActionValues> getSlidableScrollDelegateHalfValues(
     case AxisDirection.right:
       return <_CheckActionValues>[
         new _CheckActionValues(a0, .0, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio , extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
@@ -336,7 +345,7 @@ List<_CheckActionValues> getSlidableDrawerDelegateHalfValues(
     case AxisDirection.right:
       return <_CheckActionValues>[
         new _CheckActionValues(a0, actionExtentRatio / 2, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio , extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
@@ -375,8 +384,13 @@ void testSlidableDelegateScenario(
 
     checkActions(index, hidden: allActions);
 
-    await dragItem(tester, index,
-        gestureDirection: direction, endOffsetFactor: endOffsetFactor);
+    await dragItem(
+      tester,
+      index,
+      gestureDirection: direction,
+      endOffsetFactor: endOffsetFactor,
+    );
+
     checkActions(
       index,
       visible: values.map((v) => v.key).toList(),
@@ -395,6 +409,15 @@ void testSlidableDelegateScenario(
         extentRatio: v.extentRatio,
       );
     });
+
+    await flingItem(
+      tester,
+      index,
+      gestureDirection: flipAxisDirection(direction),
+      initialOffsetFactor: endOffsetFactor,
+    );
+
+    checkActions(index, hidden: allActions);
   });
 }
 
@@ -419,10 +442,8 @@ void main() {
   testSlidableDelegate(const SlidableDrawerDelegate(),
       getSlidableDrawerDelegateHalfValues, actionExtentRatio);
 
-  testWidgets(
-      'Cannot slide if slidable disabled', (WidgetTester tester) async {
-    await tester
-        .pumpWidget(buildTest(const SlidableBehindDelegate()));
+  testWidgets('Cannot slide if slidable disabled', (WidgetTester tester) async {
+    await tester.pumpWidget(buildTest(const SlidableBehindDelegate()));
 
     checkActions(3, hidden: allActions);
 
@@ -430,5 +451,26 @@ void main() {
         gestureDirection: AxisDirection.left, endOffsetFactor: 0.2);
 
     checkActions(3, hidden: allActions);
+  });
+
+  testWidgets('Close slidables when scroll', (WidgetTester tester) async {
+    await tester.pumpWidget(buildTest(const SlidableBehindDelegate()));
+
+    final int index = 1;
+    checkActions(index, hidden: allActions);
+
+    await dragItem(tester, index,
+        gestureDirection: AxisDirection.right, endOffsetFactor: 0.2);
+
+    checkActions(index, visible: <int>[a0, a1]);
+
+    await flingItem(
+      tester,
+      index,
+      gestureDirection: AxisDirection.up,
+      initialOffsetFactor: 0.2,
+    );
+
+    checkActions(index, hidden: allActions);
   });
 }

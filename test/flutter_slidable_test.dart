@@ -61,6 +61,7 @@ Widget buildTest(
           return new Slidable.builder(
             key: new ValueKey(item),
             delegate: delegate,
+            enabled: item != 3,
             direction: flipAxis(scrollDirection),
             actionExtentRatio: actionExtentRatio,
             actionDelegate: _buildActionDelegate(item),
@@ -408,6 +409,7 @@ class _CheckActionValues {
 void main() {
   setUp(() {});
 
+  // Tests all delegates dragging half of total action extents.
   testSlidableDelegate(const SlidableStrechDelegate(),
       getSlidableStrechDelegateHalfValues, actionExtentRatio);
   testSlidableDelegate(const SlidableBehindDelegate(),
@@ -416,4 +418,17 @@ void main() {
       getSlidableScrollDelegateHalfValues, actionExtentRatio);
   testSlidableDelegate(const SlidableDrawerDelegate(),
       getSlidableDrawerDelegateHalfValues, actionExtentRatio);
+
+  testWidgets(
+      'Cannot slide if slidable disabled', (WidgetTester tester) async {
+    await tester
+        .pumpWidget(buildTest(const SlidableBehindDelegate()));
+
+    checkActions(3, hidden: allActions);
+
+    await dragItem(tester, 3,
+        gestureDirection: AxisDirection.left, endOffsetFactor: 0.2);
+
+    checkActions(3, hidden: allActions);
+  });
 }

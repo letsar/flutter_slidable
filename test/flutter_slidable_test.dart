@@ -121,10 +121,12 @@ Future<Null> dragElement(
   @required AxisDirection gestureDirection,
   double endOffsetFactor,
 }) async {
-  final double itemExtent =  axisDirectionToAxis(gestureDirection) == Axis
-      .horizontal ? screenSize.width : screenSize.height;
+  final double itemExtent =
+      axisDirectionToAxis(gestureDirection) == Axis.horizontal
+          ? screenSize.width
+          : screenSize.height;
   final Offset delta =
-      getOffset(gestureDirection, endOffsetFactor *  itemExtent);
+      getOffset(gestureDirection, endOffsetFactor * itemExtent);
   await tester.drag(finder, delta);
 }
 
@@ -179,8 +181,10 @@ void checkAction(
   Finder finder = find.byKey(new ValueKey(getSlideActionBaseKey(index) + key));
   double actualEdge;
   double actualExtent;
-  final double fullExtent = axisDirectionToAxis(gestureDirection) == Axis
-      .horizontal ? screenSize.width : screenSize.height;
+  final double fullExtent =
+      axisDirectionToAxis(gestureDirection) == Axis.horizontal
+          ? screenSize.width
+          : screenSize.height;
   double expectedEdge = fullExtent * edgeRatio;
   double expectedExtent = fullExtent * extentRatio;
 
@@ -234,28 +238,28 @@ void testSlidableDelegate(
 
 List<_CheckActionValues> getSlidableStrechDelegateHalfValues(
     AxisDirection direction) {
-  final double extent = actionExtentRatio / 2;
+  final double extentRatio = actionExtentRatio / 2;
 
   switch (direction) {
     case AxisDirection.right:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, .1, extent),
-        new _CheckActionValues(a1, .2, extent),
+        new _CheckActionValues(a0, .1, extentRatio),
+        new _CheckActionValues(a1, .2, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, .2, extent),
-        new _CheckActionValues(s1, .1, extent),
+        new _CheckActionValues(s0, .2, extentRatio),
+        new _CheckActionValues(s1, .1, extentRatio),
       ];
     case AxisDirection.down:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, .1, extent),
-        new _CheckActionValues(a1, .2, extent),
+        new _CheckActionValues(a0, .1, extentRatio),
+        new _CheckActionValues(a1, .2, extentRatio),
       ];
     case AxisDirection.up:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, .2, extent),
-        new _CheckActionValues(s1, .1, extent),
+        new _CheckActionValues(s0, .2, extentRatio),
+        new _CheckActionValues(s1, .1, extentRatio),
       ];
     default:
       return null;
@@ -265,28 +269,88 @@ List<_CheckActionValues> getSlidableStrechDelegateHalfValues(
 List<_CheckActionValues> getSlidableBehindDelegateHalfValues(
     AxisDirection direction) {
   // All the actions are entirely built.
-  final double extent = actionExtentRatio;
+  final double extentRatio = actionExtentRatio;
 
   switch (direction) {
     case AxisDirection.right:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, actionExtentRatio, extent),
-        new _CheckActionValues(a1, actionExtentRatio * 2, extent),
+        new _CheckActionValues(a0, actionExtentRatio, extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio * 2, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio * 2, extent),
-        new _CheckActionValues(s1, actionExtentRatio, extent),
+        new _CheckActionValues(s0, actionExtentRatio * 2, extentRatio),
+        new _CheckActionValues(s1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.down:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, actionExtentRatio, extent),
-        new _CheckActionValues(a1, actionExtentRatio * 2, extent),
+        new _CheckActionValues(a0, actionExtentRatio, extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio * 2, extentRatio),
       ];
     case AxisDirection.up:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio * 2, extent),
-        new _CheckActionValues(s1, actionExtentRatio, extent),
+        new _CheckActionValues(s0, actionExtentRatio * 2, extentRatio),
+        new _CheckActionValues(s1, actionExtentRatio, extentRatio),
+      ];
+    default:
+      return null;
+  }
+}
+
+List<_CheckActionValues> getSlidableScrollDelegateHalfValues(
+    AxisDirection direction) {
+  final double extentRatio = actionExtentRatio;
+
+  switch (direction) {
+    case AxisDirection.right:
+      return <_CheckActionValues>[
+        new _CheckActionValues(a0, .0, extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio , extentRatio),
+      ];
+    case AxisDirection.left:
+      return <_CheckActionValues>[
+        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        new _CheckActionValues(s1, .0, extentRatio),
+      ];
+    case AxisDirection.down:
+      return <_CheckActionValues>[
+        new _CheckActionValues(a0, .0, extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
+      ];
+    case AxisDirection.up:
+      return <_CheckActionValues>[
+        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        new _CheckActionValues(s1, .0, extentRatio),
+      ];
+    default:
+      return null;
+  }
+}
+
+List<_CheckActionValues> getSlidableDrawerDelegateHalfValues(
+    AxisDirection direction) {
+  final double extentRatio = actionExtentRatio;
+
+  switch (direction) {
+    case AxisDirection.right:
+      return <_CheckActionValues>[
+        new _CheckActionValues(a0, actionExtentRatio / 2, extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio , extentRatio),
+      ];
+    case AxisDirection.left:
+      return <_CheckActionValues>[
+        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        new _CheckActionValues(s1, actionExtentRatio / 2, extentRatio),
+      ];
+    case AxisDirection.down:
+      return <_CheckActionValues>[
+        new _CheckActionValues(a0, actionExtentRatio / 2, extentRatio),
+        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
+      ];
+    case AxisDirection.up:
+      return <_CheckActionValues>[
+        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        new _CheckActionValues(s1, actionExtentRatio / 2, extentRatio),
       ];
     default:
       return null;
@@ -348,4 +412,8 @@ void main() {
       getSlidableStrechDelegateHalfValues, actionExtentRatio);
   testSlidableDelegate(const SlidableBehindDelegate(),
       getSlidableBehindDelegateHalfValues, actionExtentRatio);
+  testSlidableDelegate(const SlidableScrollDelegate(),
+      getSlidableScrollDelegateHalfValues, actionExtentRatio);
+  testSlidableDelegate(const SlidableDrawerDelegate(),
+      getSlidableDrawerDelegateHalfValues, actionExtentRatio);
 }

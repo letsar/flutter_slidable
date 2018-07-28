@@ -4,17 +4,29 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 const double itemExtent = 100.0;
 const double actionExtentRatio = 0.2;
+const int a0 = 0;
+const int a1 = 1;
+const int s0 = 10;
+const int s1 = 11;
+const List<int> allActions = const <int>[a0, a1, s0, s1];
+const List<AxisDirection> axisDirections = const <AxisDirection>[
+  AxisDirection.right,
+  AxisDirection.left,
+  AxisDirection.down,
+  AxisDirection.up
+];
+
 const Size screenSize = const Size(800.0, 600.0);
 
 SlideActionDelegate _buildActionDelegate(int index) {
   return SlideActionListDelegate(
     actions: <Widget>[
       SlideAction(
-        key: new ValueKey((index + 1) * 100 + 0),
+        key: new ValueKey(getSlideActionBaseKey(index) + a0),
         child: const Text('a0'),
       ),
       SlideAction(
-        key: new ValueKey((index + 1) * 100 + 1),
+        key: new ValueKey(getSlideActionBaseKey(index) + a1),
         child: const Text('a1'),
       ),
     ],
@@ -25,11 +37,11 @@ SlideActionDelegate _buildSecondaryActionDelegate(int index) {
   return SlideActionListDelegate(
     actions: <Widget>[
       SlideAction(
-        key: new ValueKey((index + 1) * 100 + 10),
+        key: new ValueKey(getSlideActionBaseKey(index) + s0),
         child: const Text('s0'),
       ),
       SlideAction(
-        key: new ValueKey((index + 1) * 100 + 11),
+        key: new ValueKey(getSlideActionBaseKey(index) + s1),
         child: const Text('s1'),
       ),
     ],
@@ -49,12 +61,17 @@ Widget buildTest(
           return new Slidable.builder(
             key: new ValueKey(item),
             delegate: delegate,
+            direction: flipAxis(scrollDirection),
             actionExtentRatio: actionExtentRatio,
             actionDelegate: _buildActionDelegate(item),
             secondaryActionDelegate: _buildSecondaryActionDelegate(item),
             child: new Container(
-              width: itemExtent,
-              height: itemExtent,
+              width: scrollDirection == Axis.horizontal
+                  ? itemExtent
+                  : screenSize.width,
+              height: scrollDirection == Axis.horizontal
+                  ? screenSize.height
+                  : itemExtent,
               child: new Text(item.toString()),
             ),
           );
@@ -117,7 +134,7 @@ Future<Null> dragItem(
 }) async {
   await dragElement(
     tester,
-    find.text(item.toString()),
+    find.widgetWithText(Container, item.toString()),
     gestureDirection: gestureDirection,
     endOffsetFactor: endOffsetFactor,
   );
@@ -134,23 +151,30 @@ Future<Null> flingElementFromZero(WidgetTester tester, Finder finder,
       gestureDirection: gestureDirection, initialOffsetFactor: -1.0);
 }
 
-void checkActions(
+int getSlideActionBaseKey(int index) {
+  return (index + 1) * 100;
+}
+
+void checkActions(int index,
     {List<int> visible = const <int>[], List<int> hidden = const <int>[]}) {
   for (int key in visible) {
-    expect(find.byKey(new ValueKey(key)), findsOneWidget);
+    expect(find.byKey(new ValueKey(getSlideActionBaseKey(index) + key)),
+        findsOneWidget);
   }
   for (int key in hidden) {
-    expect(find.byKey(new ValueKey(key)), findsNothing);
+    expect(find.byKey(new ValueKey(getSlideActionBaseKey(index) + key)),
+        findsNothing);
   }
 }
 
 void checkAction(
-    {@required int key,
+    {@required int index,
+    @required int key,
     @required WidgetTester tester,
     @required AxisDirection gestureDirection,
     @required double edge,
     @required double extent}) {
-  Finder finder = find.byKey(new ValueKey(key));
+  Finder finder = find.byKey(new ValueKey(getSlideActionBaseKey(index) + key));
   double actualEdge;
   double actualExtent;
   switch (gestureDirection) {
@@ -177,111 +201,107 @@ void checkAction(
   expect(actualExtent.roundToDouble(), extent.roundToDouble());
 }
 
+typedef List<_CheckActionValues> SlidableDelegateTestMethod(
+    AxisDirection direction);
+
+void testSlidableDelegate(
+    SlidableDelegate delegate,
+    SlidableDelegateTestMethod slidableDelegateTestMethod,
+    double endOffsetFactor) {
+  final int index = 0;
+
+  axisDirections.forEach((direction) {
+    testSlidableDelegateScenario(
+      delegate,
+      index,
+      endOffsetFactor,
+      slidableDelegateTestMethod,
+      direction,
+    );
+  });
+}
+
+List<_CheckActionValues> getSlidableStrechDelegateHalfValues(
+    AxisDirection direction) {
+  final double extent = 10.0;
+
+  switch (direction) {
+    case AxisDirection.right:
+      return <_CheckActionValues>[
+        new _CheckActionValues(a0, 10.0, extent),
+        new _CheckActionValues(a1, 20.0, extent),
+      ];
+    case AxisDirection.left:
+      return <_CheckActionValues>[
+        new _CheckActionValues(s0, 20.0, extent),
+        new _CheckActionValues(s1, 10.0, extent),
+      ];
+    case AxisDirection.down:
+      return <_CheckActionValues>[
+        new _CheckActionValues(a0, 10.0, extent),
+        new _CheckActionValues(a1, 20.0, extent),
+      ];
+    case AxisDirection.up:
+      return <_CheckActionValues>[
+        new _CheckActionValues(s0, 20.0, extent),
+        new _CheckActionValues(s1, 10.0, extent),
+      ];
+    default:
+      return null;
+  }
+}
+
+void testSlidableDelegateScenario(
+    SlidableDelegate delegate,
+    int index,
+    double endOffsetFactor,
+    SlidableDelegateTestMethod slidableDelegateTestMethod,
+    AxisDirection direction) {
+  final List<_CheckActionValues> values = slidableDelegateTestMethod(direction);
+
+  Axis scrollDirection = flipAxis(axisDirectionToAxis(direction));
+  testWidgets(
+      'Drag shows half of ${delegate.runtimeType}, scrollDirection=$scrollDirection, '
+      'gestureDirection=$direction', (WidgetTester tester) async {
+    await tester.pumpWidget(buildTest(const SlidableStrechDelegate(),
+        scrollDirection: scrollDirection));
+
+    checkActions(index, hidden: allActions);
+
+    await dragItem(tester, index,
+        gestureDirection: direction, endOffsetFactor: endOffsetFactor);
+    checkActions(
+      index,
+      visible: values.map((v) => v.key).toList(),
+      hidden: allActions
+          .where((i) => !values.map((v) => v.key).contains(i))
+          .toList(),
+    );
+
+    values.forEach((v) {
+      checkAction(
+        index: index,
+        key: v.key,
+        tester: tester,
+        gestureDirection: direction,
+        edge: v.edge,
+        extent: v.extent,
+      );
+    });
+  });
+}
+
+class _CheckActionValues {
+  const _CheckActionValues(this.key, this.edge, this.extent);
+
+  final int key;
+  final double extent;
+  final double edge;
+}
+
 void main() {
   setUp(() {});
 
-  testWidgets(
-      'Horizontal drag shows half of SlidableStrechDelegate, '
-      'scrollDirection=vertical, gestureDirection=right',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(buildTest(const SlidableStrechDelegate(),
-        scrollDirection: Axis.vertical));
-
-    final int index = 0;
-    final int a0 = (index + 1) * 100 + 0;
-    final int a1 = (index + 1) * 100 + 1;
-    final int s0 = (index + 1) * 100 + 10;
-    final int s1 = (index + 1) * 100 + 11;
-
-    checkActions(hidden: <int>[a0, a1, s0, s1]);
-
-    final AxisDirection gestureDirection = AxisDirection.right;
-    await dragItem(tester, index,
-        gestureDirection: gestureDirection, endOffsetFactor: 0.2);
-    checkActions(visible: <int>[a0, a1], hidden: <int>[s0, s1]);
-
-    checkAction(
-        key: a0,
-        tester: tester,
-        gestureDirection: gestureDirection,
-        edge: 10.0,
-        extent: 10.0);
-
-    checkAction(
-        key: a1,
-        tester: tester,
-        gestureDirection: gestureDirection,
-        edge: 20.0,
-        extent: 10.0);
-  });
-
-  testWidgets(
-      'Horizontal drag shows half of SlidableStrechDelegate, '
-      'scrollDirection=vertical, gestureDirection=left',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(buildTest(const SlidableStrechDelegate(),
-        scrollDirection: Axis.vertical));
-
-    final int index = 0;
-    final int a0 = (index + 1) * 100 + 0;
-    final int a1 = (index + 1) * 100 + 1;
-    final int s0 = (index + 1) * 100 + 10;
-    final int s1 = (index + 1) * 100 + 11;
-
-    checkActions(hidden: <int>[a0, a1, s0, s1]);
-
-    final AxisDirection gestureDirection = AxisDirection.left;
-    await dragItem(tester, index,
-        gestureDirection: gestureDirection, endOffsetFactor: 0.2);
-    checkActions(hidden: <int>[a0, a1], visible: <int>[s0, s1]);
-
-    checkAction(
-        key: s0,
-        tester: tester,
-        gestureDirection: gestureDirection,
-        edge: 20.0,
-        extent: 10.0);
-
-    checkAction(
-        key: s1,
-        tester: tester,
-        gestureDirection: gestureDirection,
-        edge: 10.0,
-        extent: 10.0);
-  });
-
-  testWidgets(
-      'Horizontal drag shows half of SlidableStrechDelegate, '
-          'scrollDirection=horizontal, gestureDirection=up',
-          (WidgetTester tester) async {
-        await tester.pumpWidget(buildTest(const SlidableStrechDelegate(),
-            scrollDirection: Axis.horizontal));
-
-        final int index = 0;
-        final int a0 = (index + 1) * 100 + 0;
-        final int a1 = (index + 1) * 100 + 1;
-        final int s0 = (index + 1) * 100 + 10;
-        final int s1 = (index + 1) * 100 + 11;
-
-        checkActions(hidden: <int>[a0, a1, s0, s1]);
-
-        final AxisDirection gestureDirection = AxisDirection.up;
-        await dragItem(tester, index,
-            gestureDirection: gestureDirection, endOffsetFactor: 0.2);
-        checkActions(visible: <int>[a0, a1], hidden: <int>[s0, s1]);
-
-        checkAction(
-            key: a0,
-            tester: tester,
-            gestureDirection: gestureDirection,
-            edge: 10.0,
-            extent: 10.0);
-
-        checkAction(
-            key: a1,
-            tester: tester,
-            gestureDirection: gestureDirection,
-            edge: 20.0,
-            extent: 10.0);
-      });
+  testSlidableDelegate(const SlidableStrechDelegate(),
+      getSlidableStrechDelegateHalfValues, actionExtentRatio);
 }

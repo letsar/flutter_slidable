@@ -1,3 +1,12 @@
+## 0.4.0
+### Added
+* The `SlidableRenderingMode` enum.
+* The `SlideActionType` enum.
+* The `SlideToDismissDelegate` classes.
+
+### Modified
+* Added a renderingMode parameter in the `SlideActionBuilder` signature .
+
 ## 0.3.2
 ### Added
 * The `enabled` argument on `Slidable` constructors to enable or disable the slide effect (enabled by default). 

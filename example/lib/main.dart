@@ -114,18 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return new Slidable(
       key: new Key(item.title),
       direction: direction,
-      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
-        onDismissed: (actionType) {
-          _showSnackBar(
-              context,
-              actionType == SlideActionType.primary
-                  ? 'Dismiss Archive'
-                  : 'Dimiss Delete');
-          setState(() {
-            items.removeAt(index);
-          });
-        },
-      ),
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
@@ -188,20 +176,22 @@ class _MyHomePageState extends State<MyHomePage> {
           : _buildhorizontalListItem(context, index),
       actionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
-          builder: (context, index, animation, step) {
+          builder: (context, index, animation, renderingMode) {
             if (index == 0) {
               return new IconSlideAction(
                 caption: 'Archive',
-                color: step == SlidableStep.slide
+                color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.blue.withOpacity(animation.value)
-                    : Colors.blue,
+                    : (renderingMode == SlidableRenderingMode.dismiss
+                        ? Colors.blue
+                        : Colors.green),
                 icon: Icons.archive,
                 onTap: () => _showSnackBar(context, 'Archive'),
               );
             } else {
               return new IconSlideAction(
                 caption: 'Share',
-                color: step == SlidableStep.slide
+                color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.indigo.withOpacity(animation.value)
                     : Colors.indigo,
                 icon: Icons.share,
@@ -211,11 +201,11 @@ class _MyHomePageState extends State<MyHomePage> {
           }),
       secondaryActionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
-          builder: (context, index, animation, step) {
+          builder: (context, index, animation, renderingMode) {
             if (index == 0) {
               return new IconSlideAction(
                 caption: 'More',
-                color: step == SlidableStep.slide
+                color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.grey.shade200.withOpacity(animation.value)
                     : Colors.grey.shade200,
                 icon: Icons.more_horiz,
@@ -225,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
             } else {
               return new IconSlideAction(
                 caption: 'Delete',
-                color: step == SlidableStep.slide
+                color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.red.withOpacity(animation.value)
                     : Colors.red,
                 icon: Icons.delete,

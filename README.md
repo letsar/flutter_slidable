@@ -1,6 +1,6 @@
 # flutter_slidable
 
-A Flutter implementation of slidable list item with directional slide actions.
+A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
 
 [![Pub](https://img.shields.io/pub/v/flutter_slidable.svg)](https://pub.dartlang.org/packages/flutter_slidable)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QTT34M25RDNL6)
@@ -10,8 +10,10 @@ A Flutter implementation of slidable list item with directional slide actions.
 ## Features
 
 * Accepts left and right widget lists as slide actions.
+* Can be dismissed.
 * 4 built-in layouts.
 * 2 built-in slide action widgets.
+* 1 built-in dismiss animation.
 * You can easily create you custom layouts and animations.
 * You can use a builder to create your slide actions if you want special effects during animation.
 * Close when a slide action has been tapped (overridable).
@@ -25,7 +27,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.3.2"
+  flutter_slidable: "^0.4.0"
 ```
 
 In your library add the following import:
@@ -138,12 +140,37 @@ The slide actions stretch while the item is sliding:
 #### How to prevent my slide action to close after it has been tapped?
 
 By default, `SlideAction` and `IconSlideAction` close on tap.
-To prevent this, you can pass in `false` to the `closeOnTap` constructor argument. 
+To prevent this, you can pass in `false` to the `closeOnTap` constructor argument.
 
 #### How to prevent my Slidable to close after my list has scrolled?
 
 By default, a `Slidable` closes when the nearest `Scrollable` widget starts to scroll.
-To prevent this, you can pass in `false` to the `closeOnScroll` constructor argument. 
+To prevent this, you can pass in `false` to the `closeOnScroll` constructor argument.
+
+#### How can I dismiss my Slidable?
+In order to make your `Slidable` dismissible, you have to set the `slideToDismissDelegate` argument of the `Slidable` constructor.
+You can set any class that inherits `SlideToDismissDelegate`. For now there is only one built-in: `SlideToDismissDrawerDelegate`.
+
+The `actionType` passed to the `onDismissed` callback let you know which action has been dismissed.
+
+When a `Slidable` is dismissible, the `key` argument must not be null.
+
+Example:
+
+``` dart
+slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+  onDismissed: (actionType) {
+    _showSnackBar(
+        context,
+        actionType == SlideActionType.primary
+            ? 'Dismiss Archive'
+            : 'Dimiss Delete');
+    setState(() {
+      items.removeAt(index);
+    });
+  },
+),
+```
 
 ## Changelog
 

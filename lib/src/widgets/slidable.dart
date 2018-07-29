@@ -762,7 +762,7 @@ class SlidableState extends State<Slidable>
   Animation<double> _resizeAnimation;
 
   double _dragExtent = 0.0;
-  double get dragSign => _dragExtent.sign;
+  double get dragSign => _dragExtent.sign == 0 ? 1.0 : _dragExtent.sign;
 
   SlidableRenderingMode _renderingMode = SlidableRenderingMode.none;
   SlidableRenderingMode get renderingMode => _renderingMode;
@@ -772,7 +772,7 @@ class SlidableState extends State<Slidable>
   Size _sizePriorToCollapse;
 
   SlideActionType get actionType =>
-      _dragExtent > 0 ? SlideActionType.primary : SlideActionType.secondary;
+      dragSign > 0 ? SlideActionType.primary : SlideActionType.secondary;
 
   int get actionCount => actionDelegate?.actionCount ?? 0;
 
@@ -857,8 +857,15 @@ class SlidableState extends State<Slidable>
     _overallMoveController.fling(velocity: -1.0);
   }
 
-  void dismiss() {
+  void dismiss({SlideActionType actionType}) {
     if (widget.slideToDismissDelegate != null) {
+      actionType ??= this.actionType;
+      if (actionType != this.actionType) {
+        setState(() {
+          _dragExtent = actionType == SlideActionType.primary ? 1.0 : -1.0;
+        });
+      }
+
       _overallMoveController.fling(velocity: 1.0);
     }
   }

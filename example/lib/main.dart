@@ -100,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
       BuildContext context, int index, Axis direction) {
     return new Slidable(
       direction: direction,
+      slideToDismissDelegate: const SlideToDismissDrawerDelegate(),
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
@@ -141,6 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
       BuildContext context, int index, Axis direction) {
     return new Slidable.builder(
       direction: direction,
+      slideToDismissDelegate: const SlideToDismissDrawerDelegate(),
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
@@ -148,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
           : _buildhorizontalListItem(context, index),
       actionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
-          builder: (context, index, animation) {
+          builder: (context, index, animation, step) {
             if (index == 0) {
               return new IconSlideAction(
                 caption: 'Archive',
@@ -167,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
           }),
       secondaryActionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
-          builder: (context, index, animation) {
+          builder: (context, index, animation, step) {
             if (index == 0) {
               return new IconSlideAction(
                 caption: 'More',

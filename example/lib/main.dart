@@ -27,6 +27,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final List<_HomeItem> items = List.generate(
+    20,
+    (i) => new _HomeItem(
+          i,
+          'Tile n°$i',
+          _getSubtitle(i),
+          _getAvatarColor(i),
+        ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -51,26 +61,28 @@ class _MyHomePageState extends State<MyHomePage> {
           return _getSlidableWithDelegates(context, index, slidableDirection);
         }
       },
-      itemCount: 20,
+      itemCount: items.length,
     );
   }
 
   Widget _buildVerticalListItem(BuildContext context, int index) {
+    final _HomeItem item = items[index];
     return new Container(
       color: Colors.white,
       child: new ListTile(
         leading: new CircleAvatar(
-          backgroundColor: _getAvatarColor(index),
-          child: new Text('$index'),
+          backgroundColor: item.color,
+          child: new Text('${item.index}'),
           foregroundColor: Colors.white,
         ),
-        title: new Text('Tile n°$index'),
-        subtitle: new Text(_getSubtitle(index)),
+        title: new Text(item.title),
+        subtitle: new Text(item.subtitle),
       ),
     );
   }
 
   Widget _buildhorizontalListItem(BuildContext context, int index) {
+    final _HomeItem item = items[index];
     return new Container(
       color: Colors.white,
       width: 160.0,
@@ -79,15 +91,15 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           new Expanded(
             child: new CircleAvatar(
-              backgroundColor: _getAvatarColor(index),
-              child: new Text('$index'),
+              backgroundColor: item.color,
+              child: new Text('${item.index}'),
               foregroundColor: Colors.white,
             ),
           ),
           new Expanded(
             child: Center(
               child: new Text(
-                _getSubtitle(index),
+                item.subtitle,
               ),
             ),
           ),
@@ -98,9 +110,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _getSlidableWithLists(
       BuildContext context, int index, Axis direction) {
+    final _HomeItem item = items[index];
     return new Slidable(
+      key: new Key(item.title),
       direction: direction,
-      slideToDismissDelegate: const SlideToDismissDrawerDelegate(),
+      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+        onDismissed: (actionType) {
+          _showSnackBar(
+              context,
+              actionType == SlideActionType.primary
+                  ? 'Dismiss Archive'
+                  : 'Dimiss Delete');
+          setState(() {
+            items.removeAt(index);
+          });
+        },
+      ),
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
@@ -140,9 +165,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _getSlidableWithDelegates(
       BuildContext context, int index, Axis direction) {
+    final _HomeItem item = items[index];
     return new Slidable.builder(
+      key: new Key(item.title),
       direction: direction,
-      slideToDismissDelegate: const SlideToDismissDrawerDelegate(),
+      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+        onDismissed: (actionType) {
+          _showSnackBar(
+              context,
+              actionType == SlideActionType.primary
+                  ? 'Dismiss Archive'
+                  : 'Dimiss Delete');
+          setState(() {
+            items.removeAt(index);
+          });
+        },
+      ),
       delegate: _getDelegate(index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
@@ -154,14 +192,18 @@ class _MyHomePageState extends State<MyHomePage> {
             if (index == 0) {
               return new IconSlideAction(
                 caption: 'Archive',
-                color: Colors.blue.withOpacity(animation.value),
+                color: step == SlidableStep.slide
+                    ? Colors.blue.withOpacity(animation.value)
+                    : Colors.blue,
                 icon: Icons.archive,
                 onTap: () => _showSnackBar(context, 'Archive'),
               );
             } else {
               return new IconSlideAction(
                 caption: 'Share',
-                color: Colors.indigo.withOpacity(animation.value),
+                color: step == SlidableStep.slide
+                    ? Colors.indigo.withOpacity(animation.value)
+                    : Colors.indigo,
                 icon: Icons.share,
                 onTap: () => _showSnackBar(context, 'Share'),
               );
@@ -173,7 +215,9 @@ class _MyHomePageState extends State<MyHomePage> {
             if (index == 0) {
               return new IconSlideAction(
                 caption: 'More',
-                color: Colors.grey.shade200.withOpacity(animation.value),
+                color: step == SlidableStep.slide
+                    ? Colors.grey.shade200.withOpacity(animation.value)
+                    : Colors.grey.shade200,
                 icon: Icons.more_horiz,
                 onTap: () => _showSnackBar(context, 'More'),
                 closeOnTap: false,
@@ -181,7 +225,9 @@ class _MyHomePageState extends State<MyHomePage> {
             } else {
               return new IconSlideAction(
                 caption: 'Delete',
-                color: Colors.red.withOpacity(animation.value),
+                color: step == SlidableStep.slide
+                    ? Colors.red.withOpacity(animation.value)
+                    : Colors.red,
                 icon: Icons.delete,
                 onTap: () => _showSnackBar(context, 'Delete'),
               );
@@ -190,7 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  SlidableDelegate _getDelegate(int index) {
+  static SlidableDelegate _getDelegate(int index) {
     switch (index % 4) {
       case 0:
         return new SlidableBehindDelegate();
@@ -205,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Color _getAvatarColor(int index) {
+  static Color _getAvatarColor(int index) {
     switch (index % 4) {
       case 0:
         return Colors.red;
@@ -220,7 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  String _getSubtitle(int index) {
+  static String _getSubtitle(int index) {
     switch (index % 4) {
       case 0:
         return 'SlidableBehindDelegate';
@@ -238,4 +284,18 @@ class _MyHomePageState extends State<MyHomePage> {
   void _showSnackBar(BuildContext context, String text) {
     Scaffold.of(context).showSnackBar(SnackBar(content: new Text(text)));
   }
+}
+
+class _HomeItem {
+  const _HomeItem(
+    this.index,
+    this.title,
+    this.subtitle,
+    this.color,
+  );
+
+  final int index;
+  final String title;
+  final String subtitle;
+  final Color color;
 }

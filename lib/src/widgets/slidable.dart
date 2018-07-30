@@ -5,6 +5,8 @@ const double _kActionsExtentRatio = 0.25;
 const double _kFastThreshold = 2500.0;
 const double _kDismissThreshold = 0.75;
 const Curve _kResizeTimeCurve = const Interval(0.4, 1.0, curve: Curves.ease);
+const Duration _kResizeDuration = const Duration(milliseconds: 300);
+const Duration _kMovementDuration = const Duration(milliseconds: 200);
 
 /// The rendering mode in which the [Slidable] is.
 enum SlidableRenderingMode {
@@ -57,7 +59,7 @@ abstract class SlideToDismissDelegate {
     this.dismissThresholds: const <SlideActionType, double>{},
     this.onResize,
     this.onDismissed,
-    this.resizeDuration: const Duration(milliseconds: 300),
+    this.resizeDuration: _kResizeDuration,
     this.crossAxisEndOffset: 0.0,
   }) : assert(dismissThresholds != null);
 
@@ -116,7 +118,7 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
         const <SlideActionType, double>{},
     VoidCallback onResize,
     DismissSlideActionCallback onDismissed,
-    Duration resizeDuration: const Duration(milliseconds: 300),
+    Duration resizeDuration: _kResizeDuration,
     double crossAxisEndOffset: 0.0,
   }) : super(
           dismissThresholds: dismissThresholds,
@@ -595,7 +597,7 @@ class Slidable extends StatefulWidget {
     List<Widget> secondaryActions,
     double showAllActionsThreshold = 0.5,
     double actionExtentRatio = _kActionsExtentRatio,
-    Duration movementDuration = const Duration(milliseconds: 200),
+    Duration movementDuration = _kMovementDuration,
     Axis direction = Axis.horizontal,
     bool closeOnScroll = true,
     bool enabled = true,
@@ -639,7 +641,7 @@ class Slidable extends StatefulWidget {
     this.secondaryActionDelegate,
     this.showAllActionsThreshold = 0.5,
     this.actionExtentRatio = _kActionsExtentRatio,
-    this.movementDuration = const Duration(milliseconds: 200),
+    this.movementDuration = _kMovementDuration,
     this.direction = Axis.horizontal,
     this.closeOnScroll = true,
     this.enabled = true,
@@ -855,7 +857,11 @@ class SlidableState extends State<Slidable>
 
   void open() {
     _actionsMoveController.fling(velocity: 1.0);
-    _overallMoveController.animateTo(totalActionsExtent);
+    _overallMoveController.animateTo(
+      totalActionsExtent,
+      curve: Curves.easeIn,
+      duration: widget.movementDuration,
+    );
   }
 
   void close() {
@@ -917,8 +923,7 @@ class SlidableState extends State<Slidable>
     final bool shouldOpen = velocity.sign == _dragExtent.sign;
     final bool fast = velocity.abs() > widget.delegate.fastThreshold;
 
-    if (dismissible  &&
-        overallMoveAnimation.value > totalActionsExtent) {
+    if (dismissible && overallMoveAnimation.value > totalActionsExtent) {
       // We are in a dismiss state.
       if (overallMoveAnimation.value >= dismissThreshold) {
         dismiss();

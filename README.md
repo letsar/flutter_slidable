@@ -172,6 +172,16 @@ slideToDismissDelegate: new SlideToDismissDrawerDelegate(
 ),
 ```
 
+#### How can I prevent to dismiss one side but not the other?
+If you only want one side to be dismissible, you can set the associated threshold to 1.0 or more.
+For example, if you don't want the first primary action to be dismissed, you will set the following thresholds on the `slideToDismissDelegate`:
+
+``` dart
+dismissThresholds: <SlideActionType, double>{
+  SlideActionType.primary: 1.0
+},
+```  
+
 ## Changelog
 
 Please see the [Changelog](https://github.com/letsar/flutter_slidable/blob/master/CHANGELOG.md) page to know what's recently changed.

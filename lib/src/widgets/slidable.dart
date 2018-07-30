@@ -920,7 +920,7 @@ class SlidableState extends State<Slidable>
     if (dismissible  &&
         overallMoveAnimation.value > totalActionsExtent) {
       // We are in a dismiss state.
-      if (overallMoveAnimation.value > dismissThreshold) {
+      if (overallMoveAnimation.value >= dismissThreshold) {
         dismiss();
       } else {
         open();

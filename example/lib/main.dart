@@ -158,6 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
       key: new Key(item.title),
       direction: direction,
       slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+        dismissThresholds: const <SlideActionType, double>{ SlideActionType.primary : 1.0, },
         onDismissed: (actionType) {
           _showSnackBar(
               context,

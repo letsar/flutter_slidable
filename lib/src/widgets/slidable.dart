@@ -71,6 +71,9 @@ abstract class SlideToDismissDelegate {
   ///
   /// Flinging is treated as being equivalent to dragging almost to 1.0, so
   /// flinging can dismiss an item past any threshold less than 1.0.
+  ///
+  /// Setting a threshold of 1.0 (or greater) prevents a drag for
+  //  the given [SlideActionType]
   final Map<SlideActionType, double> dismissThresholds;
 
   /// Called when the widget has been dismissed, after finishing resizing.
@@ -782,6 +785,9 @@ class SlidableState extends State<Slidable>
       widget.slideToDismissDelegate.dismissThresholds[actionType] ??
       _kDismissThreshold;
 
+  bool get dismissible =>
+      widget.slideToDismissDelegate != null && dismissThreshold < 1.0;
+
   @override
   bool get wantKeepAlive =>
       _overallMoveController?.isAnimating == true ||
@@ -858,7 +864,7 @@ class SlidableState extends State<Slidable>
   }
 
   void dismiss({SlideActionType actionType}) {
-    if (widget.slideToDismissDelegate != null) {
+    if (dismissible) {
       actionType ??= this.actionType;
       if (actionType != this.actionType) {
         setState(() {
@@ -911,10 +917,10 @@ class SlidableState extends State<Slidable>
     final bool shouldOpen = velocity.sign == _dragExtent.sign;
     final bool fast = velocity.abs() > widget.delegate.fastThreshold;
 
-    if (widget.slideToDismissDelegate != null &&
+    if (dismissible  &&
         overallMoveAnimation.value > totalActionsExtent) {
       // We are in a dismiss state.
-      if (overallMoveAnimation.value >= dismissThreshold) {
+      if (overallMoveAnimation.value > dismissThreshold) {
         dismiss();
       } else {
         open();
@@ -939,7 +945,7 @@ class SlidableState extends State<Slidable>
   }
 
   void _handleDismissStatusChanged(AnimationStatus status) {
-    if (widget.slideToDismissDelegate != null) {
+    if (dismissible) {
       if (status == AnimationStatus.completed &&
           _overallMoveController.value == _overallMoveController.upperBound &&
           !_dragUnderway) {
@@ -1014,7 +1020,7 @@ class SlidableState extends State<Slidable>
         actionType == SlideActionType.secondary &&
             widget.secondaryActionDelegate != null &&
             widget.secondaryActionDelegate.actionCount > 0) {
-      if (widget.slideToDismissDelegate != null) {
+      if (dismissible) {
         content = widget.slideToDismissDelegate.buildActions(
           context,
           new SlidableDelegateContext(this),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -33,10 +35,16 @@ enum SlideActionType {
 }
 
 /// Signature used by [SlideToDismissDelegate] to indicate that it has been
-/// dismissed for the given `actionType`.
+/// dismissed for the given [actionType].
 ///
 /// Used by [SlideToDismissDelegate.onDismissed].
 typedef void DismissSlideActionCallback(SlideActionType actionType);
+
+/// Signature for determining whether the widget will be dismissed for the
+/// given [actionType].
+///
+/// Used by [SlideToDismissDelegate.onWillDismiss].
+typedef FutureOr<bool> SlideActionWillBeDismissed(SlideActionType actionType);
 
 /// Signature for the builder callback used to create slide actions.
 typedef Widget SlideActionBuilder(BuildContext context, int index,
@@ -61,6 +69,7 @@ abstract class SlideToDismissDelegate {
     this.onDismissed,
     this.resizeDuration: _kResizeDuration,
     this.crossAxisEndOffset: 0.0,
+    this.onWillDismiss,
   }) : assert(dismissThresholds != null);
 
   /// The offset threshold the item has to be dragged in order to be considered
@@ -80,6 +89,12 @@ abstract class SlideToDismissDelegate {
 
   /// Called when the widget has been dismissed, after finishing resizing.
   final DismissSlideActionCallback onDismissed;
+
+  /// Called before the widget is dismissed. If the call returns false, the
+  /// item will not be dismissed.
+  ///
+  /// If null, the widget will always be dismissed.
+  final SlideActionWillBeDismissed onWillDismiss;
 
   /// Called when the widget changes size (i.e., when contracting before being dismissed).
   final VoidCallback onResize;
@@ -120,12 +135,14 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
     DismissSlideActionCallback onDismissed,
     Duration resizeDuration: _kResizeDuration,
     double crossAxisEndOffset: 0.0,
+    SlideActionWillBeDismissed onWillDismiss,
   }) : super(
           dismissThresholds: dismissThresholds,
           onResize: onResize,
           onDismissed: onDismissed,
           resizeDuration: resizeDuration,
           crossAxisEndOffset: crossAxisEndOffset,
+          onWillDismiss: onWillDismiss,
         );
 
   Widget buildActionsWhileDismissing(
@@ -949,12 +966,17 @@ class SlidableState extends State<Slidable>
     updateKeepAlive();
   }
 
-  void _handleDismissStatusChanged(AnimationStatus status) {
+  void _handleDismissStatusChanged(AnimationStatus status) async {
     if (dismissible) {
       if (status == AnimationStatus.completed &&
           _overallMoveController.value == _overallMoveController.upperBound &&
           !_dragUnderway) {
-        _startResizeAnimation();
+        if (widget.slideToDismissDelegate.onWillDismiss == null ||
+            await widget.slideToDismissDelegate.onWillDismiss(actionType)) {
+          _startResizeAnimation();
+        } else {
+          open();
+        }
       }
       updateKeepAlive();
     }

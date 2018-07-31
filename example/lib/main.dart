@@ -55,7 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
       itemBuilder: (context, index) {
         final Axis slidableDirection =
             direction == Axis.horizontal ? Axis.vertical : Axis.horizontal;
-        if (index < 8) {
+        var item = items[index];
+        if (item.index < 8) {
           return _getSlidableWithLists(context, index, slidableDirection);
         } else {
           return _getSlidableWithDelegates(context, index, slidableDirection);
@@ -111,10 +112,23 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _getSlidableWithLists(
       BuildContext context, int index, Axis direction) {
     final _HomeItem item = items[index];
+    //final int t = index;
     return new Slidable(
       key: new Key(item.title),
       direction: direction,
-      delegate: _getDelegate(index),
+      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+        onDismissed: (actionType) {
+          _showSnackBar(
+              context,
+              actionType == SlideActionType.primary
+                  ? 'Dismiss Archive'
+                  : 'Dimiss Delete');
+          setState(() {
+            items.removeAt(index);
+          });
+        },
+      ),
+      delegate: _getDelegate(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
           ? _buildVerticalListItem(context, index)
@@ -154,10 +168,34 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _getSlidableWithDelegates(
       BuildContext context, int index, Axis direction) {
     final _HomeItem item = items[index];
+
     return new Slidable.builder(
       key: new Key(item.title),
       direction: direction,
       slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+        onWillDismiss: (item.index != 10)
+            ? null
+            : (actionType) {
+                return showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return new AlertDialog(
+                      title: new Text('Delete'),
+                      content: new Text('Item will be deleted'),
+                      actions: <Widget>[
+                        new FlatButton(
+                          child: new Text('Cancel'),
+                          onPressed: () => Navigator.of(context).pop(false),
+                        ),
+                        new FlatButton(
+                          child: new Text('Ok'),
+                          onPressed: () => Navigator.of(context).pop(true),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
         onDismissed: (actionType) {
           _showSnackBar(
               context,
@@ -169,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
       ),
-      delegate: _getDelegate(index),
+      delegate: _getDelegate(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
           ? _buildVerticalListItem(context, index)

@@ -148,6 +148,7 @@ By default, a `Slidable` closes when the nearest `Scrollable` widget starts to s
 To prevent this, you can pass in `false` to the `closeOnScroll` constructor argument.
 
 #### How can I dismiss my Slidable?
+
 In order to make your `Slidable` dismissible, you have to set the `slideToDismissDelegate` argument of the `Slidable` constructor.
 You can set any class that inherits `SlideToDismissDelegate`. For now there is only one built-in: `SlideToDismissDrawerDelegate`.
 
@@ -173,6 +174,7 @@ slideToDismissDelegate: new SlideToDismissDrawerDelegate(
 ```
 
 #### How can I prevent to dismiss one side but not the other?
+
 If you only want one side to be dismissible, you can set the associated threshold to 1.0 or more.
 For example, if you don't want the first primary action to be dismissed, you will set the following thresholds on the `slideToDismissDelegate`:
 
@@ -181,6 +183,39 @@ dismissThresholds: <SlideActionType, double>{
   SlideActionType.primary: 1.0
 },
 ```  
+
+#### How to let the user cancel a dismissal?
+
+You can let the user confirm the dismissal by setting the `onWillDismiss` callback on the `slideToDismissDelegate`.
+
+Example:
+
+```dart
+slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+  onWillDismiss: (actionType) {
+          return showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return new AlertDialog(
+                title: new Text('Delete'),
+                content: new Text('Item will be deleted'),
+                actions: <Widget>[
+                  new FlatButton(
+                    child: new Text('Cancel'),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                  new FlatButton(
+                    child: new Text('Ok'),
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        ...
+        ),
+```
 
 ## Changelog
 

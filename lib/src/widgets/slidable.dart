@@ -1,12 +1,213 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 const double _kActionsExtentRatio = 0.25;
 const double _kFastThreshold = 2500.0;
+const double _kDismissThreshold = 0.75;
+const Curve _kResizeTimeCurve = const Interval(0.4, 1.0, curve: Curves.ease);
+const Duration _kResizeDuration = const Duration(milliseconds: 300);
+const Duration _kMovementDuration = const Duration(milliseconds: 200);
+
+/// The rendering mode in which the [Slidable] is.
+enum SlidableRenderingMode {
+  /// The [Slidable] is not showing actions.
+  none,
+
+  /// The [Slidable] is showing actions during sliding.
+  slide,
+
+  /// The [Slidable] is showing actions during dismissing.
+  dismiss,
+
+  /// The [Slidable] is resizing after dismissing.
+  resize,
+}
+
+/// The type of slide action that is currently been showed by the [Slidable].
+enum SlideActionType {
+  /// The [actions] are being shown.
+  primary,
+
+  /// The [secondaryActions] are being shown.
+  secondary,
+}
+
+/// Signature used by [SlideToDismissDelegate] to indicate that it has been
+/// dismissed for the given [actionType].
+///
+/// Used by [SlideToDismissDelegate.onDismissed].
+typedef void DismissSlideActionCallback(SlideActionType actionType);
+
+/// Signature for determining whether the widget will be dismissed for the
+/// given [actionType].
+///
+/// Used by [SlideToDismissDelegate.onWillDismiss].
+typedef FutureOr<bool> SlideActionWillBeDismissed(SlideActionType actionType);
 
 /// Signature for the builder callback used to create slide actions.
-typedef Widget SlideActionBuilder(
-    BuildContext context, int index, Animation<double> animation);
+typedef Widget SlideActionBuilder(BuildContext context, int index,
+    Animation<double> animation, SlidableRenderingMode step);
+
+/// A delegate that controls how the [Slidable] is dismissed.
+///
+/// The [Slidable] widget calls the [onDismissed] callback either after its size has
+/// collapsed to zero (if [resizeDuration] is non-null) or immediately after
+/// the slide animation (if [resizeDuration] is null). If the [Slidable] is a
+/// list item, it must have a key that distinguishes it from the other items and
+/// its [onDismissed] callback must remove the item from the list.
+///
+/// See also:
+///
+///  * [SlideToDismissDrawerDelegate], which creates slide actions that are displayed like drawers
+///  while the item is dismissing.///
+abstract class SlideToDismissDelegate {
+  const SlideToDismissDelegate({
+    this.dismissThresholds: const <SlideActionType, double>{},
+    this.onResize,
+    this.onDismissed,
+    this.resizeDuration: _kResizeDuration,
+    this.crossAxisEndOffset: 0.0,
+    this.onWillDismiss,
+  }) : assert(dismissThresholds != null);
+
+  /// The offset threshold the item has to be dragged in order to be considered
+  /// dismissed.
+  ///
+  /// Represented as a fraction, e.g. if it is 0.4 (the default), then the item
+  /// has to be dragged at least 40% towards one direction to be considered
+  /// dismissed. Clients can define different thresholds for each dismiss
+  /// direction.
+  ///
+  /// Flinging is treated as being equivalent to dragging almost to 1.0, so
+  /// flinging can dismiss an item past any threshold less than 1.0.
+  ///
+  /// Setting a threshold of 1.0 (or greater) prevents a drag for
+  //  the given [SlideActionType]
+  final Map<SlideActionType, double> dismissThresholds;
+
+  /// Called when the widget has been dismissed, after finishing resizing.
+  final DismissSlideActionCallback onDismissed;
+
+  /// Called before the widget is dismissed. If the call returns false, the
+  /// item will not be dismissed.
+  ///
+  /// If null, the widget will always be dismissed.
+  final SlideActionWillBeDismissed onWillDismiss;
+
+  /// Called when the widget changes size (i.e., when contracting before being dismissed).
+  final VoidCallback onResize;
+
+  /// The amount of time the widget will spend contracting before [onDismissed] is called.
+  ///
+  /// If null, the widget will not contract and [onDismissed] will be called
+  /// immediately after the widget is dismissed.
+  final Duration resizeDuration;
+
+  /// Defines the end offset across the main axis after the card is dismissed.
+  ///
+  /// If non-zero value is given then widget moves in cross direction depending on whether
+  /// it is positive or negative.
+  final double crossAxisEndOffset;
+
+  Widget buildActions(BuildContext context, SlidableDelegateContext ctx,
+      SlidableDelegate slidableDelegate) {
+    if (ctx.state.overallMoveAnimation.value > ctx.state.totalActionsExtent) {
+      return buildActionsWhileDismissing(context, ctx);
+    } else {
+      return slidableDelegate.buildActions(context, ctx);
+    }
+  }
+
+  Widget buildActionsWhileDismissing(
+      BuildContext context, SlidableDelegateContext ctx);
+}
+
+/// A delegate that creates slide actions that are displayed like drawers
+/// while the item is dismissing.
+/// The further slide action will grow faster than the other ones.
+class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
+  const SlideToDismissDrawerDelegate({
+    Map<SlideActionType, double> dismissThresholds:
+        const <SlideActionType, double>{},
+    VoidCallback onResize,
+    DismissSlideActionCallback onDismissed,
+    Duration resizeDuration: _kResizeDuration,
+    double crossAxisEndOffset: 0.0,
+    SlideActionWillBeDismissed onWillDismiss,
+  }) : super(
+          dismissThresholds: dismissThresholds,
+          onResize: onResize,
+          onDismissed: onDismissed,
+          resizeDuration: resizeDuration,
+          crossAxisEndOffset: crossAxisEndOffset,
+          onWillDismiss: onWillDismiss,
+        );
+
+  Widget buildActionsWhileDismissing(
+      BuildContext context, SlidableDelegateContext ctx) {
+    final animation = new Tween(
+      begin: Offset.zero,
+      end: ctx.createOffset(ctx.state.dragSign),
+    ).animate(ctx.state.overallMoveAnimation);
+
+    return new Container(
+      child: new Stack(
+        children: <Widget>[
+          new Positioned.fill(
+            child: new LayoutBuilder(builder: (context, constraints) {
+              final count = ctx.state.actionCount;
+              final double actionExtent = ctx.getMaxExtent(constraints) *
+                  ctx.state.widget.actionExtentRatio;
+              final double totalExtent = ctx.getMaxExtent(constraints);
+
+              final extentAnimations = Iterable.generate(count).map((index) {
+                return new Tween(
+                  begin: ctx.createOffset(actionExtent),
+                  end: ctx.createOffset(totalExtent),
+                ).animate(
+                  new CurvedAnimation(
+                    parent: ctx.state.overallMoveAnimation,
+                    curve: new Interval(ctx.state.totalActionsExtent, 1.0),
+                  ),
+                );
+              }).toList();
+
+              return new AnimatedBuilder(
+                  animation: ctx.state.overallMoveAnimation,
+                  builder: (context, child) {
+                    return new Stack(
+                      children: List.generate(ctx.state.actionCount, (index) {
+                        // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
+                        int displayIndex = ctx.showActions
+                            ? ctx.state.actionCount - index - 1
+                            : index;
+                        return ctx.createPositioned(
+                          position: actionExtent *
+                              (ctx.state.actionCount - index - 1),
+                          extent:
+                              ctx.getAnimationValue(extentAnimations[index]),
+                          child: ctx.state.actionDelegate.build(
+                              context,
+                              displayIndex,
+                              ctx.state.overallMoveAnimation,
+                              ctx.state.renderingMode),
+                        );
+                      }),
+                    );
+                  });
+            }),
+          ),
+          new SlideTransition(
+            position: animation,
+            child: ctx.state.widget.child,
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 /// A delegate that supplies slide actions.
 ///
@@ -28,7 +229,8 @@ abstract class SlideActionDelegate {
   /// Returns the child with the given index.
   ///
   /// Must not return null.
-  Widget build(BuildContext context, int index, Animation<double> animation);
+  Widget build(BuildContext context, int index, Animation<double> animation,
+      SlidableRenderingMode step);
 
   /// Returns the number of actions this delegate will build.
   int get actionCount;
@@ -42,7 +244,7 @@ abstract class SlideActionDelegate {
 /// See also:
 ///
 ///  * [SlideActionListDelegate], which is a delegate that has an explicit list
-///    of slidable action.
+///    of slide action.
 class SlideActionBuilderDelegate extends SlideActionDelegate {
   /// Creates a delegate that supplies slide actions using the given
   /// builder callback.
@@ -63,8 +265,9 @@ class SlideActionBuilderDelegate extends SlideActionDelegate {
   final int actionCount;
 
   @override
-  Widget build(BuildContext context, int index, Animation<double> animation) =>
-      builder(context, index, animation);
+  Widget build(BuildContext context, int index, Animation<double> animation,
+          SlidableRenderingMode step) =>
+      builder(context, index, animation, step);
 }
 
 /// A delegate that supplies slide actions using an explicit list.
@@ -93,7 +296,8 @@ class SlideActionListDelegate extends SlideActionDelegate {
   int get actionCount => actions?.length ?? 0;
 
   @override
-  Widget build(BuildContext context, int index, Animation<double> animation) =>
+  Widget build(BuildContext context, int index, Animation<double> animation,
+          SlidableRenderingMode step) =>
       actions[index];
 }
 
@@ -105,60 +309,47 @@ class SlideActionListDelegate extends SlideActionDelegate {
 ///  * [SlidableDelegate] and other delegates inheriting it, which uses this object in [SlidableDelegate.buildActions].
 class SlidableDelegateContext {
   const SlidableDelegateContext(
-    this.slidable,
-    this.showActions,
-    this.dragSign,
-    this.controller,
+    this.state,
   );
 
-  final Slidable slidable;
+  final SlidableStateView state;
 
-  /// The current actions that have to be shown.
-  SlideActionDelegate get actionDelegate =>
-      showActions ? slidable.actionDelegate : slidable.secondaryActionDelegate;
-
-  bool get directionIsXAxis => slidable.direction == Axis.horizontal;
-
-  int get actionCount => actionDelegate?.actionCount ?? 0;
-
-  double get totalActionsExtent => slidable.actionExtentRatio * (actionCount);
-
-  /// Whether the actions have to be shown.
-  final bool showActions;
-
-  final double dragSign;
-
-  /// The animation controller which value depends on  `dragExtent`.
-  final AnimationController controller;
+  bool get showActions => state.actionType == SlideActionType.primary;
 
   /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
   List<Widget> buildActions(BuildContext context) {
-    return List.generate(actionCount,
-        (int index) => actionDelegate.build(context, index, controller.view));
+    return List.generate(
+        state.actionCount,
+        (int index) => state.actionDelegate.build(context, index,
+            state.actionsMoveAnimation, SlidableRenderingMode.slide));
   }
 
   Offset createOffset(double value) {
-    return directionIsXAxis ? new Offset(value, 0.0) : new Offset(0.0, value);
+    return state.directionIsXAxis
+        ? new Offset(value, 0.0)
+        : new Offset(0.0, value);
   }
 
   double getMaxExtent(BoxConstraints constraints) {
-    return directionIsXAxis ? constraints.maxWidth : constraints.maxHeight;
+    return state.directionIsXAxis
+        ? constraints.maxWidth
+        : constraints.maxHeight;
   }
 
   Positioned createPositioned({Widget child, double extent, double position}) {
     return new Positioned(
-      left: directionIsXAxis ? (showActions ? position : null) : 0.0,
-      right: directionIsXAxis ? (showActions ? null : position) : 0.0,
-      top: directionIsXAxis ? 0.0 : (showActions ? position : null),
-      bottom: directionIsXAxis ? 0.0 : (showActions ? null : position),
-      width: directionIsXAxis ? extent : null,
-      height: directionIsXAxis ? null : extent,
+      left: state.directionIsXAxis ? (showActions ? position : null) : 0.0,
+      right: state.directionIsXAxis ? (showActions ? null : position) : 0.0,
+      top: state.directionIsXAxis ? 0.0 : (showActions ? position : null),
+      bottom: state.directionIsXAxis ? 0.0 : (showActions ? null : position),
+      width: state.directionIsXAxis ? extent : null,
+      height: state.directionIsXAxis ? null : extent,
       child: child,
     );
   }
 
   double getAnimationValue(Animation<Offset> animation) {
-    return directionIsXAxis ? animation.value.dx : animation.value.dy;
+    return state.directionIsXAxis ? animation.value.dx : animation.value.dy;
   }
 }
 
@@ -199,10 +390,10 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
   Widget buildActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragSign),
-    ).animate(ctx.controller);
+      end: ctx.createOffset(ctx.state.totalActionsExtent * ctx.state.dragSign),
+    ).animate(ctx.state.actionsMoveAnimation);
 
-    if (ctx.controller.value != .0) {
+    if (ctx.state.actionsMoveAnimation.value != .0) {
       return new Container(
         child: new Stack(
           children: <Widget>[
@@ -212,13 +403,13 @@ abstract class SlidableStackDelegate extends SlidableDelegate {
             ),
             new SlideTransition(
               position: animation,
-              child: ctx.slidable.child,
+              child: ctx.state.widget.child,
             ),
           ],
         ),
       );
     } else {
-      return ctx.slidable.child;
+      return ctx.state.widget.child;
     }
   }
 
@@ -237,13 +428,13 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
-      end: ctx.createOffset(ctx.totalActionsExtent * ctx.dragSign),
-    ).animate(ctx.controller);
+      end: ctx.createOffset(ctx.state.totalActionsExtent * ctx.state.dragSign),
+    ).animate(ctx.state.actionsMoveAnimation);
 
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         return new AnimatedBuilder(
-            animation: ctx.controller,
+            animation: ctx.state.actionsMoveAnimation,
             builder: (context, child) {
               return new Stack(
                 children: <Widget>[
@@ -252,7 +443,7 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
                     extent: ctx.getMaxExtent(constraints) *
                         ctx.getAnimationValue(animation).abs(),
                     child: new Flex(
-                      direction: ctx.slidable.direction,
+                      direction: ctx.state.widget.direction,
                       children: ctx
                           .buildActions(context)
                           .map((a) => Expanded(child: a))
@@ -283,9 +474,10 @@ class SlidableBehindDelegate extends SlidableStackDelegate {
           children: <Widget>[
             ctx.createPositioned(
               position: 0.0,
-              extent: ctx.getMaxExtent(constraints) * ctx.totalActionsExtent,
+              extent:
+                  ctx.getMaxExtent(constraints) * ctx.state.totalActionsExtent,
               child: new Flex(
-                direction: ctx.slidable.direction,
+                direction: ctx.state.widget.direction,
                 children: ctx
                     .buildActions(context)
                     .map((a) => Expanded(child: a))
@@ -312,15 +504,15 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
         final double totalExtent =
-            ctx.getMaxExtent(constraints) * ctx.totalActionsExtent;
+            ctx.getMaxExtent(constraints) * ctx.state.totalActionsExtent;
 
         final animation = new Tween(
           begin: ctx.createOffset(-totalExtent),
           end: Offset.zero,
-        ).animate(ctx.controller);
+        ).animate(ctx.state.actionsMoveAnimation);
 
         return new AnimatedBuilder(
-            animation: ctx.controller,
+            animation: ctx.state.actionsMoveAnimation,
             builder: (context, child) {
               return new Stack(
                 children: <Widget>[
@@ -328,7 +520,7 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
                     position: ctx.getAnimationValue(animation),
                     extent: totalExtent,
                     child: new Flex(
-                      direction: ctx.slidable.direction,
+                      direction: ctx.state.widget.direction,
                       children: ctx
                           .buildActions(context)
                           .map((a) => Expanded(child: a))
@@ -355,30 +547,34 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
-        final count = ctx.actionCount;
+        final count = ctx.state.actionCount;
         final double actionExtent =
-            ctx.getMaxExtent(constraints) * ctx.slidable.actionExtentRatio;
+            ctx.getMaxExtent(constraints) * ctx.state.widget.actionExtentRatio;
 
         final animations = Iterable.generate(count).map((index) {
           return new Tween(
             begin: ctx.createOffset(-actionExtent),
             end: ctx.createOffset((count - index - 1) * actionExtent),
-          ).animate(ctx.controller);
+          ).animate(ctx.state.actionsMoveAnimation);
         }).toList();
 
         return new AnimatedBuilder(
-            animation: ctx.controller,
+            animation: ctx.state.actionsMoveAnimation,
             builder: (context, child) {
               return new Stack(
-                children: List.generate(ctx.actionCount, (index) {
+                children: List.generate(ctx.state.actionCount, (index) {
                   // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-                  int displayIndex =
-                      ctx.showActions ? ctx.actionCount - index - 1 : index;
+                  int displayIndex = ctx.showActions
+                      ? ctx.state.actionCount - index - 1
+                      : index;
                   return ctx.createPositioned(
                     position: ctx.getAnimationValue(animations[index]),
                     extent: actionExtent,
-                    child: ctx.actionDelegate
-                        .build(context, displayIndex, ctx.controller.view),
+                    child: ctx.state.actionDelegate.build(
+                        context,
+                        displayIndex,
+                        ctx.state.actionsMoveAnimation,
+                        SlidableRenderingMode.slide),
                   );
                 }),
               );
@@ -402,6 +598,14 @@ class Slidable extends StatefulWidget {
   ///
   /// The [delegate] and [closeOnScroll] arguments must not be null. The [actionExtentRatio]
   /// and [showAllActionsThreshold] arguments must be greater or equal than 0 and less or equal than 1.
+  ///
+  /// The [key] argument must not be null if the `slideToDismissDelegate`
+  /// is provided because [Slidable]s are commonly
+  /// used in lists and removed from the list when dismissed. Without keys, the
+  /// default behavior is to sync widgets based on their index in the list,
+  /// which means the item after the dismissed item would be synced with the
+  /// state of the dismissed item. Using keys causes the widgets to sync
+  /// according to their keys and avoids this pitfall.
   Slidable({
     Key key,
     @required Widget child,
@@ -410,10 +614,11 @@ class Slidable extends StatefulWidget {
     List<Widget> secondaryActions,
     double showAllActionsThreshold = 0.5,
     double actionExtentRatio = _kActionsExtentRatio,
-    Duration movementDuration = const Duration(milliseconds: 200),
+    Duration movementDuration = _kMovementDuration,
     Axis direction = Axis.horizontal,
     bool closeOnScroll = true,
     bool enabled = true,
+    SlideToDismissDelegate slideToDismissDelegate,
   }) : this.builder(
           key: key,
           child: child,
@@ -427,6 +632,7 @@ class Slidable extends StatefulWidget {
           direction: direction,
           closeOnScroll: closeOnScroll,
           enabled: enabled,
+          slideToDismissDelegate: slideToDismissDelegate,
         );
 
   /// Creates a widget that can be slid.
@@ -436,6 +642,14 @@ class Slidable extends StatefulWidget {
   ///
   /// The [delegate], [closeOnScroll] and [enabled] arguments must not be null. The [actionExtentRatio]
   /// and [showAllActionsThreshold] arguments must be greater or equal than 0 and less or equal than 1.
+  ///
+  /// The [key] argument must not be null if the `slideToDismissDelegate`
+  /// is provided because [Slidable]s are commonly
+  /// used in lists and removed from the list when dismissed. Without keys, the
+  /// default behavior is to sync widgets based on their index in the list,
+  /// which means the item after the dismissed item would be synced with the
+  /// state of the dismissed item. Using keys causes the widgets to sync
+  /// according to their keys and avoids this pitfall.
   Slidable.builder({
     Key key,
     @required this.child,
@@ -444,10 +658,11 @@ class Slidable extends StatefulWidget {
     this.secondaryActionDelegate,
     this.showAllActionsThreshold = 0.5,
     this.actionExtentRatio = _kActionsExtentRatio,
-    this.movementDuration = const Duration(milliseconds: 200),
+    this.movementDuration = _kMovementDuration,
     this.direction = Axis.horizontal,
     this.closeOnScroll = true,
     this.enabled = true,
+    this.slideToDismissDelegate,
   })  : assert(delegate != null),
         assert(direction != null),
         assert(
@@ -462,6 +677,8 @@ class Slidable extends StatefulWidget {
             'actionExtentRatio must be between 0.0 and 1.0'),
         assert(closeOnScroll != null),
         assert(enabled != null),
+        assert(slideToDismissDelegate == null || key != null,
+            'a key must be provided if slideToDismissDelegate is set'),
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -477,6 +694,9 @@ class Slidable extends StatefulWidget {
 
   /// A delegate that controls how the slide actions are animated;
   final SlidableDelegate delegate;
+
+  /// A delegate that controls how to dismiss the item.
+  final SlideToDismissDelegate slideToDismissDelegate;
 
   /// Relative ratio between one slide action and the extent of the child.
   final double actionExtentRatio;
@@ -515,43 +735,101 @@ class Slidable extends StatefulWidget {
   SlidableState createState() => SlidableState();
 }
 
+/// A view of a [SlidableState].
+abstract class SlidableStateView {
+  Animation<double> get overallMoveAnimation;
+
+  Animation<double> get actionsMoveAnimation;
+
+  double get dragSign;
+
+  /// The type of slide actions that are being shown.
+  SlideActionType get actionType;
+
+  int get actionCount;
+
+  double get totalActionsExtent;
+
+  /// The current actions that have to be shown.
+  SlideActionDelegate get actionDelegate;
+
+  bool get directionIsXAxis;
+
+  Slidable get widget;
+
+  SlidableRenderingMode get renderingMode;
+}
+
 class SlidableState extends State<Slidable>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable> {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable>
+    implements SlidableStateView {
   @override
   void initState() {
     super.initState();
-    _controller =
+    _overallMoveController =
+        new AnimationController(duration: widget.movementDuration, vsync: this)
+          ..addStatusListener(_handleDismissStatusChanged);
+    _actionsMoveController =
         new AnimationController(duration: widget.movementDuration, vsync: this)
           ..addStatusListener(_handleShowAllActionsStatusChanged);
   }
 
-  AnimationController _controller;
+  AnimationController _overallMoveController;
+  Animation<double> get overallMoveAnimation => _overallMoveController.view;
+
+  AnimationController _actionsMoveController;
+  Animation<double> get actionsMoveAnimation => _actionsMoveController.view;
+
+  AnimationController _resizeController;
+  Animation<double> _resizeAnimation;
 
   double _dragExtent = 0.0;
+  double get dragSign => _dragExtent.sign == 0 ? 1.0 : _dragExtent.sign;
+
+  SlidableRenderingMode _renderingMode = SlidableRenderingMode.none;
+  SlidableRenderingMode get renderingMode => _renderingMode;
 
   ScrollPosition _scrollPosition;
+  bool _dragUnderway = false;
+  Size _sizePriorToCollapse;
 
-  bool get _showActions {
-    return _dragExtent > 0;
-  }
+  SlideActionType get actionType =>
+      dragSign > 0 ? SlideActionType.primary : SlideActionType.secondary;
+
+  int get actionCount => actionDelegate?.actionCount ?? 0;
+
+  double get totalActionsExtent => widget.actionExtentRatio * (actionCount);
+
+  double get dismissThreshold =>
+      widget.slideToDismissDelegate.dismissThresholds[actionType] ??
+      _kDismissThreshold;
+
+  bool get dismissible =>
+      widget.slideToDismissDelegate != null && dismissThreshold < 1.0;
 
   @override
   bool get wantKeepAlive =>
-      _controller != null &&
-      (_controller.isAnimating || _controller.isCompleted);
+      _overallMoveController?.isAnimating == true ||
+      _overallMoveController?.isCompleted == true ||
+      _actionsMoveController?.isAnimating == true ||
+      _actionsMoveController?.isCompleted == true ||
+      _resizeController?.isAnimating == true;
 
   /// The current actions that have to be shown.
   SlideActionDelegate get actionDelegate =>
-      _showActions ? widget.actionDelegate : widget.secondaryActionDelegate;
+      actionType == SlideActionType.primary
+          ? widget.actionDelegate
+          : widget.secondaryActionDelegate;
 
-  bool get _directionIsXAxis {
-    return widget.direction == Axis.horizontal;
-  }
+  bool get directionIsXAxis => widget.direction == Axis.horizontal;
 
   double get _overallDragAxisExtent {
-    return (_directionIsXAxis ? context.size.width : context.size.height) *
-        widget.actionExtentRatio *
-        (actionDelegate?.actionCount ?? 0);
+    final Size size = context.size;
+    return directionIsXAxis ? size.width : size.height;
+  }
+
+  double get _actionsDragAxisExtent {
+    return _overallDragAxisExtent * totalActionsExtent;
   }
 
   @override
@@ -587,17 +865,38 @@ class SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _overallMoveController.dispose();
+    _actionsMoveController.dispose();
+    _resizeController?.dispose();
     _removeScrollingNotifierListener();
     super.dispose();
   }
 
   void open() {
-    _controller.fling(velocity: 1.0);
+    _actionsMoveController.fling(velocity: 1.0);
+    _overallMoveController.animateTo(
+      totalActionsExtent,
+      curve: Curves.easeIn,
+      duration: widget.movementDuration,
+    );
   }
 
   void close() {
-    _controller.fling(velocity: -1.0);
+    _actionsMoveController.fling(velocity: -1.0);
+    _overallMoveController.fling(velocity: -1.0);
+  }
+
+  void dismiss({SlideActionType actionType}) {
+    if (dismissible) {
+      actionType ??= this.actionType;
+      if (actionType != this.actionType) {
+        setState(() {
+          _dragExtent = actionType == SlideActionType.primary ? 1.0 : -1.0;
+        });
+      }
+
+      _overallMoveController.fling(velocity: 1.0);
+    }
   }
 
   void _isScrollingListener() {
@@ -610,9 +909,16 @@ class SlidableState extends State<Slidable>
   }
 
   void _handleDragStart(DragStartDetails details) {
-    _dragExtent = _controller.value * _overallDragAxisExtent * _dragExtent.sign;
-    if (_controller.isAnimating) {
-      _controller.stop();
+    _dragUnderway = true;
+    _dragExtent = _actionsMoveController.value *
+        _actionsDragAxisExtent *
+        _dragExtent.sign;
+    if (_overallMoveController.isAnimating) {
+      _overallMoveController.stop();
+    }
+
+    if (_actionsMoveController.isAnimating) {
+      _actionsMoveController.stop();
     }
   }
 
@@ -620,15 +926,28 @@ class SlidableState extends State<Slidable>
     final double delta = details.primaryDelta;
     _dragExtent += delta;
     setState(() {
-      _controller.value = _dragExtent.abs() / _overallDragAxisExtent;
+      _overallMoveController.value = _dragExtent.abs() / _overallDragAxisExtent;
+      _actionsMoveController.value = _dragExtent.abs() / _actionsDragAxisExtent;
+      _renderingMode = _overallMoveController.value > totalActionsExtent
+          ? SlidableRenderingMode.dismiss
+          : SlidableRenderingMode.slide;
     });
   }
 
   void _handleDragEnd(DragEndDetails details) {
+    _dragUnderway = false;
     final double velocity = details.primaryVelocity;
     final bool shouldOpen = velocity.sign == _dragExtent.sign;
     final bool fast = velocity.abs() > widget.delegate.fastThreshold;
-    if (_controller.value >= widget.showAllActionsThreshold ||
+
+    if (dismissible && overallMoveAnimation.value > totalActionsExtent) {
+      // We are in a dismiss state.
+      if (overallMoveAnimation.value >= dismissThreshold) {
+        dismiss();
+      } else {
+        open();
+      }
+    } else if (actionsMoveAnimation.value >= widget.showAllActionsThreshold ||
         (shouldOpen && fast)) {
       open();
     } else {
@@ -647,6 +966,67 @@ class SlidableState extends State<Slidable>
     updateKeepAlive();
   }
 
+  void _handleDismissStatusChanged(AnimationStatus status) async {
+    if (dismissible) {
+      if (status == AnimationStatus.completed &&
+          _overallMoveController.value == _overallMoveController.upperBound &&
+          !_dragUnderway) {
+        if (widget.slideToDismissDelegate.onWillDismiss == null ||
+            await widget.slideToDismissDelegate.onWillDismiss(actionType)) {
+          _startResizeAnimation();
+        } else {
+          open();
+        }
+      }
+      updateKeepAlive();
+    }
+  }
+
+  void _handleDismiss() {
+    final SlideToDismissDelegate slideToDismissDelegate =
+        widget.slideToDismissDelegate;
+    if (slideToDismissDelegate.onDismissed != null) {
+      assert(actionType != null);
+      slideToDismissDelegate.onDismissed(actionType);
+    }
+  }
+
+  void _startResizeAnimation() {
+    assert(_overallMoveController != null);
+    assert(_overallMoveController.isCompleted);
+    assert(_resizeController == null);
+    assert(_sizePriorToCollapse == null);
+    final SlideToDismissDelegate slideToDismissDelegate =
+        widget.slideToDismissDelegate;
+    if (slideToDismissDelegate.resizeDuration == null) {
+      _handleDismiss();
+    } else {
+      _resizeController = new AnimationController(
+          duration: slideToDismissDelegate.resizeDuration, vsync: this)
+        ..addListener(_handleResizeProgressChanged)
+        ..addStatusListener((AnimationStatus status) => updateKeepAlive());
+      _resizeController.forward();
+      setState(() {
+        _renderingMode = SlidableRenderingMode.resize;
+        _sizePriorToCollapse = context.size;
+        _resizeAnimation = new Tween<double>(begin: 1.0, end: 0.0).animate(
+            new CurvedAnimation(
+                parent: _resizeController, curve: _kResizeTimeCurve));
+      });
+    }
+  }
+
+  void _handleResizeProgressChanged() {
+    final SlideToDismissDelegate slideToDismissDelegate =
+        widget.slideToDismissDelegate;
+    if (_resizeController.isCompleted) {
+      _handleDismiss();
+    } else {
+      if (slideToDismissDelegate.onResize != null)
+        slideToDismissDelegate.onResize();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
@@ -661,30 +1041,56 @@ class SlidableState extends State<Slidable>
 
     Widget content = widget.child;
 
-    if (_showActions &&
+    if (actionType == SlideActionType.primary &&
             widget.actionDelegate != null &&
             widget.actionDelegate.actionCount > 0 ||
-        !_showActions &&
+        actionType == SlideActionType.secondary &&
             widget.secondaryActionDelegate != null &&
             widget.secondaryActionDelegate.actionCount > 0) {
-      content = widget.delegate.buildActions(
-        context,
-        new SlidableDelegateContext(
-          widget,
-          _showActions,
-          _dragExtent.sign,
-          _controller,
-        ),
-      );
+      if (dismissible) {
+        content = widget.slideToDismissDelegate.buildActions(
+          context,
+          new SlidableDelegateContext(this),
+          widget.delegate,
+        );
+
+        if (_resizeAnimation != null) {
+          // we've been dragged aside, and are now resizing.
+          assert(() {
+            if (_resizeAnimation.status != AnimationStatus.forward) {
+              assert(_resizeAnimation.status == AnimationStatus.completed);
+              throw new FlutterError(
+                  'A dismissed Slidable widget is still part of the tree.\n'
+                  'Make sure to implement the onDismissed handler and to immediately remove the Slidable\n'
+                  'widget from the application once that handler has fired.');
+            }
+            return true;
+          }());
+
+          return new SizeTransition(
+              sizeFactor: _resizeAnimation,
+              axis: directionIsXAxis ? Axis.vertical : Axis.horizontal,
+              child: new SizedBox(
+                width: _sizePriorToCollapse.width,
+                height: _sizePriorToCollapse.height,
+                child: content,
+              ));
+        }
+      } else {
+        content = widget.delegate.buildActions(
+          context,
+          new SlidableDelegateContext(this),
+        );
+      }
     }
 
     return new GestureDetector(
-      onHorizontalDragStart: _directionIsXAxis ? _handleDragStart : null,
-      onHorizontalDragUpdate: _directionIsXAxis ? _handleDragUpdate : null,
-      onHorizontalDragEnd: _directionIsXAxis ? _handleDragEnd : null,
-      onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
-      onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
-      onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
+      onHorizontalDragStart: directionIsXAxis ? _handleDragStart : null,
+      onHorizontalDragUpdate: directionIsXAxis ? _handleDragUpdate : null,
+      onHorizontalDragEnd: directionIsXAxis ? _handleDragEnd : null,
+      onVerticalDragStart: directionIsXAxis ? null : _handleDragStart,
+      onVerticalDragUpdate: directionIsXAxis ? null : _handleDragUpdate,
+      onVerticalDragEnd: directionIsXAxis ? null : _handleDragEnd,
       behavior: HitTestBehavior.opaque,
       child: content,
     );

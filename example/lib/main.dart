@@ -27,6 +27,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final SlidableController slidableController = new SlidableController();
   final List<_HomeItem> items = List.generate(
     20,
     (i) => new _HomeItem(
@@ -44,7 +45,13 @@ class _MyHomePageState extends State<MyHomePage> {
         title: new Text(widget.title),
       ),
       body: new Center(
-        child: _buildList(context, Axis.vertical),
+        child: new OrientationBuilder(
+          builder: (context, orientation) => _buildList(
+              context,
+              orientation == Orientation.portrait
+                  ? Axis.vertical
+                  : Axis.horizontal),
+        ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -115,6 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //final int t = index;
     return new Slidable(
       key: new Key(item.title),
+      controller: slidableController,
       direction: direction,
       slideToDismissDelegate: new SlideToDismissDrawerDelegate(
         onDismissed: (actionType) {
@@ -171,6 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return new Slidable.builder(
       key: new Key(item.title),
+      controller: slidableController,
       direction: direction,
       slideToDismissDelegate: new SlideToDismissDrawerDelegate(
         onWillDismiss: (item.index != 10)

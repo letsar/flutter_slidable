@@ -9,7 +9,7 @@ A Flutter implementation of slidable list item with directional slide actions th
 
 ## Features
 
-* Accepts left and right widget lists as slide actions.
+* Accepts primary (left/top) and secondary (right/bottom) widget lists as slide actions.
 * Can be dismissed.
 * 4 built-in layouts.
 * 2 built-in slide action widgets.
@@ -27,7 +27,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.4.0"
+  flutter_slidable: "^0.4.1"
 ```
 
 In your library add the following import:
@@ -137,6 +137,8 @@ The slide actions stretch while the item is sliding:
 
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_stretch.gif)
 
+### FAQ
+
 #### How to prevent my slide action to close after it has been tapped?
 
 By default, `SlideAction` and `IconSlideAction` close on tap.
@@ -216,6 +218,20 @@ slideToDismissDelegate: new SlideToDismissDrawerDelegate(
         ...
         ),
 ```
+
+#### How to let keep only one `Slidable` open?
+
+You have to set the `controller` argument of the `Slidable` constructors to a `SlidableController` instance:
+
+```dart
+final SlidableController slidableController = new SlidableController();
+...
+new Slidable(
+      key: new Key(item.title),
+      controller: slidableController,
+      ...
+      );
+``` 
 
 ## Changelog
 

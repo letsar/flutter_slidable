@@ -584,6 +584,17 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
   }
 }
 
+/// A controller that keep tracks of the active [SlidableState] and close
+/// the previous one.
+class SlidableController {
+  SlidableState _activeState;
+  SlidableState get activeState => _activeState;
+  set activeState(SlidableState value) {
+    _activeState?.close();
+    _activeState = value;
+  }
+}
+
 /// A widget that can be slid in both direction of the specified axis.
 ///
 /// If the direction is [Axis.horizontal], this widget can be slid to the left or to the right,
@@ -619,6 +630,7 @@ class Slidable extends StatefulWidget {
     bool closeOnScroll = true,
     bool enabled = true,
     SlideToDismissDelegate slideToDismissDelegate,
+    SlidableController controller,
   }) : this.builder(
           key: key,
           child: child,
@@ -633,6 +645,7 @@ class Slidable extends StatefulWidget {
           closeOnScroll: closeOnScroll,
           enabled: enabled,
           slideToDismissDelegate: slideToDismissDelegate,
+          controller: controller,
         );
 
   /// Creates a widget that can be slid.
@@ -663,6 +676,7 @@ class Slidable extends StatefulWidget {
     this.closeOnScroll = true,
     this.enabled = true,
     this.slideToDismissDelegate,
+    this.controller,
   })  : assert(delegate != null),
         assert(direction != null),
         assert(
@@ -683,6 +697,9 @@ class Slidable extends StatefulWidget {
 
   /// The widget below this widget in the tree.
   final Widget child;
+
+  /// The controller that tracks the active [Slidable] and keep only one open.
+  final SlidableController controller;
 
   /// A delegate that builds slide actions that appears when the child has been dragged
   /// down or to the right.
@@ -869,6 +886,7 @@ class SlidableState extends State<Slidable>
     _actionsMoveController.dispose();
     _resizeController?.dispose();
     _removeScrollingNotifierListener();
+    widget.controller?.activeState = null;
     super.dispose();
   }
 
@@ -910,6 +928,7 @@ class SlidableState extends State<Slidable>
 
   void _handleDragStart(DragStartDetails details) {
     _dragUnderway = true;
+    widget.controller?.activeState = this;
     _dragExtent = _actionsMoveController.value *
         _actionsDragAxisExtent *
         _dragExtent.sign;
@@ -923,6 +942,10 @@ class SlidableState extends State<Slidable>
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
+    if (widget.controller != null && widget.controller.activeState != this) {
+      return;
+    }
+
     final double delta = details.primaryDelta;
     _dragExtent += delta;
     setState(() {
@@ -935,6 +958,10 @@ class SlidableState extends State<Slidable>
   }
 
   void _handleDragEnd(DragEndDetails details) {
+    if (widget.controller != null && widget.controller.activeState != this) {
+      return;
+    }
+
     _dragUnderway = false;
     final double velocity = details.primaryVelocity;
     final bool shouldOpen = velocity.sign == _dragExtent.sign;

@@ -1,3 +1,8 @@
+## 0.4.1
+### Added
+* The `SlidableController` class.
+* The `controller` argument on `Slidable` constructors to enable keeping only one `Slidable` open.
+
 ## 0.4.0
 ### Added
 * The `SlidableRenderingMode` enum.
@@ -5,7 +10,7 @@
 * The `SlideToDismissDelegate` classes.
 
 ### Modified
-* Added a renderingMode parameter in the `SlideActionBuilder` signature .
+* Added a renderingMode parameter in the `SlideActionBuilder` signature.
 
 ## 0.3.2
 ### Added

@@ -886,7 +886,7 @@ class SlidableState extends State<Slidable>
     _actionsMoveController.dispose();
     _resizeController?.dispose();
     _removeScrollingNotifierListener();
-    widget.controller?.activeState = null;
+    widget.controller?._activeState = null;
     super.dispose();
   }
 

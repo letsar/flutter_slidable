@@ -1,3 +1,7 @@
+## 0.4.2
+### Fixed
+* https://github.com/letsar/flutter_slidable/issues/22 and https://github.com/letsar/flutter_slidable/issues/24 (Issue with controller).
+
 ## 0.4.1
 ### Added
 * The `SlidableController` class.

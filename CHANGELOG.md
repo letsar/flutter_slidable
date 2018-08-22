@@ -1,3 +1,7 @@
+## 0.4.3
+### Fixed
+* https://github.com/letsar/flutter_slidable/issues/23 (Issue with Drawer delegate when different action count).
+
 ## 0.4.2
 ### Fixed
 * https://github.com/letsar/flutter_slidable/issues/22 and https://github.com/letsar/flutter_slidable/issues/24 (Issue with controller).

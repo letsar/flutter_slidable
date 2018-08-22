@@ -27,7 +27,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.4.2"
+  flutter_slidable: "^0.4.3"
 ```
 
 In your library add the following import:

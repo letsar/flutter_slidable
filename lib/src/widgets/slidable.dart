@@ -547,34 +547,34 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     return new Positioned.fill(
       child: new LayoutBuilder(builder: (context, constraints) {
-        final count = ctx.state.actionCount;
+        final state = ctx.state;
+        final count = state.actionCount;
+        final bool showActions = ctx.showActions;
+        final Animation<double> actionsMoveAnimation =
+            state.actionsMoveAnimation;
         final double actionExtent =
-            ctx.getMaxExtent(constraints) * ctx.state.widget.actionExtentRatio;
+            ctx.getMaxExtent(constraints) * state.widget.actionExtentRatio;
+        final SlideActionDelegate actionDelegate = state.actionDelegate;
 
         final animations = Iterable.generate(count).map((index) {
           return new Tween(
             begin: ctx.createOffset(-actionExtent),
             end: ctx.createOffset((count - index - 1) * actionExtent),
-          ).animate(ctx.state.actionsMoveAnimation);
+          ).animate(actionsMoveAnimation);
         }).toList();
 
         return new AnimatedBuilder(
-            animation: ctx.state.actionsMoveAnimation,
+            animation: actionsMoveAnimation,
             builder: (context, child) {
               return new Stack(
-                children: List.generate(ctx.state.actionCount, (index) {
+                children: List.generate(count, (index) {
                   // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-                  int displayIndex = ctx.showActions
-                      ? ctx.state.actionCount - index - 1
-                      : index;
+                  int displayIndex = showActions ? count - index - 1 : index;
                   return ctx.createPositioned(
                     position: ctx.getAnimationValue(animations[index]),
                     extent: actionExtent,
-                    child: ctx.state.actionDelegate.build(
-                        context,
-                        displayIndex,
-                        ctx.state.actionsMoveAnimation,
-                        SlidableRenderingMode.slide),
+                    child: actionDelegate.build(context, displayIndex,
+                        actionsMoveAnimation, SlidableRenderingMode.slide),
                   );
                 }),
               );

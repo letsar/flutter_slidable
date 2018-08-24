@@ -164,8 +164,8 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
 
               final extentAnimations = Iterable.generate(count).map((index) {
                 return new Tween(
-                  begin: ctx.createOffset(actionExtent),
-                  end: ctx.createOffset(totalExtent),
+                  begin: actionExtent,
+                  end: totalExtent,
                 ).animate(
                   new CurvedAnimation(
                     parent: ctx.state.overallMoveAnimation,
@@ -186,8 +186,7 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
                         return ctx.createPositioned(
                           position: actionExtent *
                               (ctx.state.actionCount - index - 1),
-                          extent:
-                              ctx.getAnimationValue(extentAnimations[index]),
+                          extent: extentAnimations[index].value,
                           child: ctx.state.actionDelegate.build(
                               context,
                               displayIndex,
@@ -347,10 +346,6 @@ class SlidableDelegateContext {
       child: child,
     );
   }
-
-  double getAnimationValue(Animation<Offset> animation) {
-    return state.directionIsXAxis ? animation.value.dx : animation.value.dy;
-  }
 }
 
 /// A delegate that controls how the slide actions are displayed.
@@ -427,8 +422,8 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
   @override
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
     final animation = new Tween(
-      begin: Offset.zero,
-      end: ctx.createOffset(ctx.state.totalActionsExtent * ctx.state.dragSign),
+      begin: 0.0,
+      end: ctx.state.totalActionsExtent * ctx.state.dragSign,
     ).animate(ctx.state.actionsMoveAnimation);
 
     return new Positioned.fill(
@@ -440,8 +435,8 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
                 children: <Widget>[
                   ctx.createPositioned(
                     position: 0.0,
-                    extent: ctx.getMaxExtent(constraints) *
-                        ctx.getAnimationValue(animation).abs(),
+                    extent:
+                        ctx.getMaxExtent(constraints) * animation.value.abs(),
                     child: new Flex(
                       direction: ctx.state.widget.direction,
                       children: ctx
@@ -507,8 +502,8 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
             ctx.getMaxExtent(constraints) * ctx.state.totalActionsExtent;
 
         final animation = new Tween(
-          begin: ctx.createOffset(-totalExtent),
-          end: Offset.zero,
+          begin: -totalExtent,
+          end: 0.0,
         ).animate(ctx.state.actionsMoveAnimation);
 
         return new AnimatedBuilder(
@@ -517,7 +512,7 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
               return new Stack(
                 children: <Widget>[
                   ctx.createPositioned(
-                    position: ctx.getAnimationValue(animation),
+                    position: animation.value,
                     extent: totalExtent,
                     child: new Flex(
                       direction: ctx.state.widget.direction,
@@ -558,8 +553,8 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
 
         final animations = Iterable.generate(count).map((index) {
           return new Tween(
-            begin: ctx.createOffset(-actionExtent),
-            end: ctx.createOffset((count - index - 1) * actionExtent),
+            begin: -actionExtent,
+            end: (count - index - 1) * actionExtent,
           ).animate(actionsMoveAnimation);
         }).toList();
 
@@ -571,7 +566,7 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
                   // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
                   int displayIndex = showActions ? count - index - 1 : index;
                   return ctx.createPositioned(
-                    position: ctx.getAnimationValue(animations[index]),
+                    position: animations[index].value,
                     extent: actionExtent,
                     child: actionDelegate.build(context, displayIndex,
                         actionsMoveAnimation, SlidableRenderingMode.slide),

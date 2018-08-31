@@ -81,8 +81,7 @@ Widget buildTest(
         return new ListView(
           scrollDirection: scrollDirection,
           itemExtent: itemExtent,
-          children: List
-              .generate(5, (int index) => buildSlidableWidget(index))
+          children: List.generate(5, (int index) => buildSlidableWidget(index))
               .toList(),
         );
       },

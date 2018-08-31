@@ -131,8 +131,7 @@ class IconSlideAction extends ClosableSlideAction {
     final Text textWidget = new Text(
       caption ?? '',
       overflow: TextOverflow.ellipsis,
-      style: Theme
-          .of(context)
+      style: Theme.of(context)
           .primaryTextTheme
           .caption
           .copyWith(color: foregroundColor),

@@ -623,7 +623,7 @@ class Slidable extends StatefulWidget {
     Duration movementDuration = _kMovementDuration,
     Axis direction = Axis.horizontal,
     bool closeOnScroll = true,
-    bool closeOnCancelledDismiss = false,
+    bool closeOnCanceledDismiss = false,
     bool enabled = true,
     SlideToDismissDelegate slideToDismissDelegate,
     SlidableController controller,
@@ -639,7 +639,7 @@ class Slidable extends StatefulWidget {
           movementDuration: movementDuration,
           direction: direction,
           closeOnScroll: closeOnScroll,
-          closeOnCancelledDismiss: closeOnCancelledDismiss,
+          closeOnCanceledDismiss: closeOnCanceledDismiss,
           enabled: enabled,
           slideToDismissDelegate: slideToDismissDelegate,
           controller: controller,
@@ -671,7 +671,7 @@ class Slidable extends StatefulWidget {
     this.movementDuration = _kMovementDuration,
     this.direction = Axis.horizontal,
     this.closeOnScroll = true,
-    this.closeOnCancelledDismiss = false,
+    this.closeOnCanceledDismiss = false,
     this.enabled = true,
     this.slideToDismissDelegate,
     this.controller,
@@ -734,10 +734,10 @@ class Slidable extends StatefulWidget {
   /// Defaults to true.
   final bool closeOnScroll;
 
-  /// Specifies to close this slidable after cancelling dismiss.
+  /// Specifies to close this slidable after canceling dismiss.
   ///
   /// Defaults to false.
-  final bool closeOnCancelledDismiss;
+  final bool closeOnCanceledDismiss;
 
   /// Whether this slidable is interactive.
   ///
@@ -1004,7 +1004,7 @@ class SlidableState extends State<Slidable>
         if (widget.slideToDismissDelegate.onWillDismiss == null ||
             await widget.slideToDismissDelegate.onWillDismiss(actionType)) {
           _startResizeAnimation();
-        } else if (widget.closeOnCancelledDismiss) {
+        } else if (widget.closeOnCanceledDismiss) {
           close();
         } else {
           open();

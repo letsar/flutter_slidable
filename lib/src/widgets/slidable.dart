@@ -64,12 +64,13 @@ typedef Widget SlideActionBuilder(BuildContext context, int index,
 ///  while the item is dismissing.///
 abstract class SlideToDismissDelegate {
   const SlideToDismissDelegate({
-    this.dismissThresholds: const <SlideActionType, double>{},
+    this.dismissThresholds = const <SlideActionType, double>{},
     this.onResize,
     this.onDismissed,
-    this.resizeDuration: _kResizeDuration,
-    this.crossAxisEndOffset: 0.0,
+    this.resizeDuration = _kResizeDuration,
+    this.crossAxisEndOffset = 0.0,
     this.onWillDismiss,
+    this.closeOnCanceled = false,
   }) : assert(dismissThresholds != null);
 
   /// The offset threshold the item has to be dragged in order to be considered
@@ -95,6 +96,11 @@ abstract class SlideToDismissDelegate {
   ///
   /// If null, the widget will always be dismissed.
   final SlideActionWillBeDismissed onWillDismiss;
+
+  /// Specifies to close this slidable after canceling dismiss.
+  ///
+  /// Defaults to false.
+  final bool closeOnCanceled;
 
   /// Called when the widget changes size (i.e., when contracting before being dismissed).
   final VoidCallback onResize;
@@ -133,9 +139,10 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
         const <SlideActionType, double>{},
     VoidCallback onResize,
     DismissSlideActionCallback onDismissed,
-    Duration resizeDuration: _kResizeDuration,
-    double crossAxisEndOffset: 0.0,
+    Duration resizeDuration = _kResizeDuration,
+    double crossAxisEndOffset = 0.0,
     SlideActionWillBeDismissed onWillDismiss,
+    bool closeOnCanceled = false,
   }) : super(
           dismissThresholds: dismissThresholds,
           onResize: onResize,
@@ -143,6 +150,7 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
           resizeDuration: resizeDuration,
           crossAxisEndOffset: crossAxisEndOffset,
           onWillDismiss: onWillDismiss,
+          closeOnCanceled: closeOnCanceled,
         );
 
   Widget buildActionsWhileDismissing(
@@ -623,7 +631,6 @@ class Slidable extends StatefulWidget {
     Duration movementDuration = _kMovementDuration,
     Axis direction = Axis.horizontal,
     bool closeOnScroll = true,
-    bool closeOnCanceledDismiss = false,
     bool enabled = true,
     SlideToDismissDelegate slideToDismissDelegate,
     SlidableController controller,
@@ -639,7 +646,6 @@ class Slidable extends StatefulWidget {
           movementDuration: movementDuration,
           direction: direction,
           closeOnScroll: closeOnScroll,
-          closeOnCanceledDismiss: closeOnCanceledDismiss,
           enabled: enabled,
           slideToDismissDelegate: slideToDismissDelegate,
           controller: controller,
@@ -671,7 +677,6 @@ class Slidable extends StatefulWidget {
     this.movementDuration = _kMovementDuration,
     this.direction = Axis.horizontal,
     this.closeOnScroll = true,
-    this.closeOnCanceledDismiss = false,
     this.enabled = true,
     this.slideToDismissDelegate,
     this.controller,
@@ -733,11 +738,6 @@ class Slidable extends StatefulWidget {
   ///
   /// Defaults to true.
   final bool closeOnScroll;
-
-  /// Specifies to close this slidable after canceling dismiss.
-  ///
-  /// Defaults to false.
-  final bool closeOnCanceledDismiss;
 
   /// Whether this slidable is interactive.
   ///
@@ -1004,7 +1004,7 @@ class SlidableState extends State<Slidable>
         if (widget.slideToDismissDelegate.onWillDismiss == null ||
             await widget.slideToDismissDelegate.onWillDismiss(actionType)) {
           _startResizeAnimation();
-        } else if (widget.closeOnCanceledDismiss) {
+        } else if (widget.slideToDismissDelegate?.closeOnCanceled == true) {
           close();
         } else {
           open();

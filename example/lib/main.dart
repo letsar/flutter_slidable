@@ -182,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
       controller: slidableController,
       direction: direction,
       slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+        closeOnCanceled: true,
         onWillDismiss: (item.index != 10)
             ? null
             : (actionType) {

@@ -1,3 +1,7 @@
+## 0.4.4
+### Added
+* The `closeOnCanceled` parameter on `SlideToDismissDelegate` classes.
+
 ## 0.4.3
 ### Fixed
 * https://github.com/letsar/flutter_slidable/issues/23 (Issue with Drawer delegate when different action count).
@@ -9,7 +13,7 @@
 ## 0.4.1
 ### Added
 * The `SlidableController` class.
-* The `controller` argument on `Slidable` constructors to enable keeping only one `Slidable` open.
+* The `controller` parameter on `Slidable` constructors to enable keeping only one `Slidable` open.
 
 ## 0.4.0
 ### Added
@@ -22,7 +26,7 @@
 
 ## 0.3.2
 ### Added
-* The `enabled` argument on `Slidable` constructors to enable or disable the slide effect (enabled by default). 
+* The `enabled` parameter on `Slidable` constructors to enable or disable the slide effect (enabled by default). 
 
 ## 0.3.1
 ### Fixed
@@ -30,8 +34,8 @@
 
 ## 0.3.0
 ### Added
-* The `closeOnTap` argument on slide actions to close when a action has been tapped.
-* The `closeOnScroll` argument on `Slidable` to close when the nearest `Scrollable` starts to scroll.
+* The `closeOnTap` parameter on slide actions to close when a action has been tapped.
+* The `closeOnScroll` parameter on `Slidable` to close when the nearest `Scrollable` starts to scroll.
 * The static `Slidable.of` function.
 
 ### Changed

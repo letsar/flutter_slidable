@@ -27,7 +27,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.4.3"
+  flutter_slidable: "^0.4.4"
 ```
 
 In your library add the following import:
@@ -142,21 +142,21 @@ The slide actions stretch while the item is sliding:
 #### How to prevent my slide action to close after it has been tapped?
 
 By default, `SlideAction` and `IconSlideAction` close on tap.
-To prevent this, you can pass in `false` to the `closeOnTap` constructor argument.
+To prevent this, you can pass in `false` to the `closeOnTap` constructor parameter.
 
 #### How to prevent my Slidable to close after my list has scrolled?
 
 By default, a `Slidable` closes when the nearest `Scrollable` widget starts to scroll.
-To prevent this, you can pass in `false` to the `closeOnScroll` constructor argument.
+To prevent this, you can pass in `false` to the `closeOnScroll` constructor parameter.
 
 #### How can I dismiss my Slidable?
 
-In order to make your `Slidable` dismissible, you have to set the `slideToDismissDelegate` argument of the `Slidable` constructor.
+In order to make your `Slidable` dismissible, you have to set the `slideToDismissDelegate` parameter of the `Slidable` constructor.
 You can set any class that inherits `SlideToDismissDelegate`. For now there is only one built-in: `SlideToDismissDrawerDelegate`.
 
 The `actionType` passed to the `onDismissed` callback let you know which action has been dismissed.
 
-When a `Slidable` is dismissible, the `key` argument must not be null.
+When a `Slidable` is dismissible, the `key` parameter must not be null.
 
 Example:
 
@@ -221,7 +221,7 @@ slideToDismissDelegate: new SlideToDismissDrawerDelegate(
 
 #### How to let keep only one `Slidable` open?
 
-You have to set the `controller` argument of the `Slidable` constructors to a `SlidableController` instance:
+You have to set the `controller` parameter of the `Slidable` constructors to a `SlidableController` instance:
 
 ```dart
 final SlidableController slidableController = new SlidableController();

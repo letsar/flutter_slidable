@@ -1,3 +1,7 @@
+## 0.4.5
+### Added
+* The `foregroundColor` parameter on `IconSlideAction` class.
+
 ## 0.4.4
 ### Added
 * The `closeOnCanceled` parameter on `SlideToDismissDelegate` classes.

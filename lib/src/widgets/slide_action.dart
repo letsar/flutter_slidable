@@ -104,6 +104,7 @@ class IconSlideAction extends ClosableSlideAction {
     @required this.icon,
     this.caption,
     Color color,
+    this.foregroundColor,
     VoidCallback onTap,
     bool closeOnTap = _kCloseOnTap,
   })  : color = color ?? Colors.white,
@@ -122,9 +123,11 @@ class IconSlideAction extends ClosableSlideAction {
   /// Defaults to true.
   final Color color;
 
+  final Color foregroundColor;
+
   @override
   Widget buildAction(BuildContext context) {
-    final Color foregroundColor =
+    final Color estimatedColor =
         ThemeData.estimateBrightnessForColor(color) == Brightness.light
             ? Colors.black
             : Colors.white;
@@ -134,7 +137,7 @@ class IconSlideAction extends ClosableSlideAction {
       style: Theme.of(context)
           .primaryTextTheme
           .caption
-          .copyWith(color: foregroundColor),
+          .copyWith(color: foregroundColor ?? estimatedColor),
     );
     return Container(
       color: color,
@@ -145,7 +148,7 @@ class IconSlideAction extends ClosableSlideAction {
             new Flexible(
               child: new Icon(
                 icon,
-                color: foregroundColor,
+                color: foregroundColor ?? estimatedColor,
               ),
             ),
             new Flexible(child: textWidget),

@@ -829,11 +829,10 @@ class SlidableState extends State<Slidable>
 
   @override
   bool get wantKeepAlive =>
-      _overallMoveController?.isAnimating == true ||
-      _overallMoveController?.isCompleted == true ||
-      _actionsMoveController?.isAnimating == true ||
-      _actionsMoveController?.isCompleted == true ||
-      _resizeController?.isAnimating == true;
+      !widget.closeOnScroll &&
+      (_overallMoveController?.isAnimating == true ||
+          _actionsMoveController?.isAnimating == true ||
+          _resizeController?.isAnimating == true);
 
   /// The current actions that have to be shown.
   SlideActionDelegate get actionDelegate =>

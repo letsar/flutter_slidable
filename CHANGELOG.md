@@ -1,3 +1,7 @@
+## 0.4.6
+### Modified
+* Reduce the possibilities for the https://github.com/flutter/flutter/issues/11895 issue to happen.
+
 ## 0.4.5
 ### Added
 * The `foregroundColor` parameter on `IconSlideAction` class.

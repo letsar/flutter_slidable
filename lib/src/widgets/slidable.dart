@@ -812,6 +812,7 @@ class SlidableState extends State<Slidable>
   ScrollPosition _scrollPosition;
   bool _dragUnderway = false;
   Size _sizePriorToCollapse;
+  bool _dismissing = false;
 
   SlideActionType get actionType =>
       dragSign > 0 ? SlideActionType.primary : SlideActionType.secondary;
@@ -902,12 +903,15 @@ class SlidableState extends State<Slidable>
   }
 
   void close() {
-    _actionsMoveController.fling(velocity: -1.0);
-    _overallMoveController.fling(velocity: -1.0);
+    if (!_dismissing) {
+      _actionsMoveController.fling(velocity: -1.0);
+      _overallMoveController.fling(velocity: -1.0);
+    }
   }
 
   void dismiss({SlideActionType actionType}) {
     if (dismissible) {
+      _dismissing = true;
       actionType ??= this.actionType;
       if (actionType != this.actionType) {
         setState(() {
@@ -1003,10 +1007,13 @@ class SlidableState extends State<Slidable>
         if (widget.slideToDismissDelegate.onWillDismiss == null ||
             await widget.slideToDismissDelegate.onWillDismiss(actionType)) {
           _startResizeAnimation();
-        } else if (widget.slideToDismissDelegate?.closeOnCanceled == true) {
-          close();
         } else {
-          open();
+          _dismissing = false;
+          if (widget.slideToDismissDelegate?.closeOnCanceled == true) {
+            close();
+          } else {
+            open();
+          }
         }
       }
       updateKeepAlive();

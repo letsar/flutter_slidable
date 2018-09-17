@@ -1,3 +1,7 @@
+## 0.4.7
+### Fixed
+* https://github.com/letsar/flutter_slidable/issues/31 (Issue with dismiss animation).
+
 ## 0.4.6
 ### Modified
 * Reduce the possibilities for the https://github.com/flutter/flutter/issues/11895 issue to happen.

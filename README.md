@@ -27,7 +27,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.4.6"
+  flutter_slidable: "^0.4.7"
 ```
 
 In your library add the following import:
@@ -39,7 +39,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 For help getting started with Flutter, view the online [documentation](https://flutter.io/).
 
 ### Constructors
+
 You can create a `Slidable` in two different ways:
+
 * By calling the `Slidable` constructor and passing a list of slide actions.
 * By calling the `Slidable.builder` constructor and passing slide action builders, if you want special effects during the animation.
 

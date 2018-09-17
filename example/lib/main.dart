@@ -234,7 +234,32 @@ class _MyHomePageState extends State<MyHomePage> {
                         ? Colors.blue
                         : Colors.green),
                 icon: Icons.archive,
-                onTap: () => _showSnackBar(context, 'Archive'),
+                onTap: () async {
+                  var state = Slidable.of(context);
+                  var dismiss = await showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return new AlertDialog(
+                        title: new Text('Delete'),
+                        content: new Text('Item will be deleted'),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: new Text('Cancel'),
+                            onPressed: () => Navigator.of(context).pop(false),
+                          ),
+                          new FlatButton(
+                            child: new Text('Ok'),
+                            onPressed: () => Navigator.of(context).pop(true),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (dismiss) {
+                    state.dismiss();
+                  }
+                },
               );
             } else {
               return new IconSlideAction(

@@ -1,3 +1,7 @@
+## 0.4.8
+### Addded
+* onSlideAnimationChanged and onSlideIsOpenChanged on `SlidableController`.
+
 ## 0.4.7
 ### Fixed
 * https://github.com/letsar/flutter_slidable/issues/31 (Issue with dismiss animation).

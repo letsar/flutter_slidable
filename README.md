@@ -27,7 +27,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.4.7"
+  flutter_slidable: "^0.4.8"
 ```
 
 In your library add the following import:
@@ -233,7 +233,32 @@ new Slidable(
       controller: slidableController,
       ...
       );
-``` 
+```
+
+#### How can I animate an external widget at the same time as the active Slidable?
+
+You have to set the callbacks of a `SlidableController` instance:
+The `onSlideAnimationChanged` let you get the animation of the current Slidable.
+The `onSlideIsOpenChanged` let you know when the current Slidable opens and closes.
+
+```dart
+final SlidableController slidableController = new SlidableController(
+  onSlideAnimationChanged: handleSlideAnimationChanged,
+  onSlideIsOpenChanged: handleSlideIsOpenChanged,
+  );
+...
+  void handleSlideAnimationChanged(Animation<double> slideAnimation) {
+    setState(() {
+      _rotationAnimation = slideAnimation;
+    });
+  }
+
+  void handleSlideIsOpenChanged(bool isOpen) {
+    setState(() {
+      _fabColor = isOpen ? Colors.green : Colors.blue;
+    });
+  }
+```
 
 ## Changelog
 

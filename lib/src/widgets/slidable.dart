@@ -590,11 +590,45 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
 /// A controller that keep tracks of the active [SlidableState] and close
 /// the previous one.
 class SlidableController {
+  SlidableController({
+    this.onSlideAnimationChanged,
+    this.onSlideIsOpenChanged,
+  });
+
+  final ValueChanged<Animation<double>> onSlideAnimationChanged;
+  final ValueChanged<bool> onSlideIsOpenChanged;
+  bool _isSlideOpen;
+
+  Animation<double> _slideAnimation;
+
   SlidableState _activeState;
   SlidableState get activeState => _activeState;
   set activeState(SlidableState value) {
-    _activeState?.close();
+    _activeState?._flingAnimationControllers();
+
     _activeState = value;
+    if (onSlideAnimationChanged != null) {
+      _slideAnimation?.removeListener(_handleSlideIsOpenChanged);
+      if (onSlideIsOpenChanged != null) {
+        _slideAnimation = value?.overallMoveAnimation;
+        _slideAnimation?.addListener(_handleSlideIsOpenChanged);
+        if (_slideAnimation == null) {
+          _isSlideOpen = false;
+          onSlideIsOpenChanged(_isSlideOpen);
+        }
+      }
+      onSlideAnimationChanged(value?.overallMoveAnimation);
+    }
+  }
+
+  void _handleSlideIsOpenChanged() {
+    if (onSlideIsOpenChanged != null && _slideAnimation != null) {
+      final bool isOpen = _slideAnimation.value != 0.0;
+      if (isOpen != _isSlideOpen) {
+        _isSlideOpen = isOpen;
+        onSlideIsOpenChanged(_isSlideOpen);
+      }
+    }
   }
 }
 
@@ -903,6 +937,11 @@ class SlidableState extends State<Slidable>
   }
 
   void close() {
+    _flingAnimationControllers();
+    widget.controller?.activeState = null;
+  }
+
+  void _flingAnimationControllers() {
     if (!_dismissing) {
       _actionsMoveController.fling(velocity: -1.0);
       _overallMoveController.fling(velocity: -1.0);
@@ -1021,6 +1060,7 @@ class SlidableState extends State<Slidable>
   }
 
   void _handleDismiss() {
+    widget.controller?.activeState = null;
     final SlideToDismissDelegate slideToDismissDelegate =
         widget.slideToDismissDelegate;
     if (slideToDismissDelegate.onDismissed != null) {

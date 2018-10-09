@@ -27,7 +27,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final SlidableController slidableController = new SlidableController();
+  SlidableController slidableController;
   final List<_HomeItem> items = List.generate(
     20,
     (i) => new _HomeItem(
@@ -37,6 +37,30 @@ class _MyHomePageState extends State<MyHomePage> {
           _getAvatarColor(i),
         ),
   );
+
+  @protected
+  void initState() {
+    slidableController = new SlidableController(
+      onSlideAnimationChanged: handleSlideAnimationChanged,
+      onSlideIsOpenChanged: handleSlideIsOpenChanged,
+    );
+    super.initState();
+  }
+
+  Animation<double> _rotationAnimation;
+  Color _fabColor = Colors.blue;
+
+  void handleSlideAnimationChanged(Animation<double> slideAnimation) {
+    setState(() {
+      _rotationAnimation = slideAnimation;
+    });
+  }
+
+  void handleSlideIsOpenChanged(bool isOpen) {
+    setState(() {
+      _fabColor = isOpen ? Colors.green : Colors.blue;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +76,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? Axis.vertical
                   : Axis.horizontal),
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: _fabColor,
+        onPressed: null,
+        child: _rotationAnimation == null
+            ? Icon(Icons.add)
+            : RotationTransition(
+                turns: _rotationAnimation,
+                child: Icon(Icons.add),
+              ),
+      ),
     );
   }
 

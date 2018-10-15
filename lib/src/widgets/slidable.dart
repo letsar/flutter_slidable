@@ -173,8 +173,7 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
               final extentAnimations = Iterable.generate(count).map((index) {
                 return new Tween(
                   begin: actionExtent,
-                  end: totalExtent -
-                      (actionExtent * (ctx.state.actionCount - index)),
+                  end: totalExtent,
                 ).animate(
                   new CurvedAnimation(
                     parent: ctx.state.overallMoveAnimation,

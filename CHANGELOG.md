@@ -1,3 +1,7 @@
+## 0.4.9
+### Fixed
+* Fix the end extend of actions in dismiss animation (https://github.com/letsar/flutter_slidable/pull/38).
+
 ## 0.4.8
 ### Addded
 * onSlideAnimationChanged and onSlideIsOpenChanged on `SlidableController`.

@@ -416,34 +416,8 @@ class Slidable extends StatefulWidget {
   SlidableState createState() => SlidableState();
 }
 
-/// A view of a [SlidableState].
-abstract class SlidableStateView {
-  Animation<double> get overallMoveAnimation;
-
-  Animation<double> get actionsMoveAnimation;
-
-  double get dragSign;
-
-  /// The type of slide actions that are being shown.
-  SlideActionType get actionType;
-
-  int get actionCount;
-
-  double get totalActionsExtent;
-
-  /// The current actions that have to be shown.
-  SlideActionDelegate get actionDelegate;
-
-  bool get directionIsXAxis;
-
-  Slidable get widget;
-
-  SlidableRenderingMode get renderingMode;
-}
-
 class SlidableState extends State<Slidable>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable>
-    implements SlidableStateView {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable> {
   @override
   void initState() {
     super.initState();

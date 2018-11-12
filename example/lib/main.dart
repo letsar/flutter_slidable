@@ -107,49 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildVerticalListItem(BuildContext context, int index) {
-    final _HomeItem item = items[index];
-    return new Container(
-      color: Colors.white,
-      child: new ListTile(
-        leading: new CircleAvatar(
-          backgroundColor: item.color,
-          child: new Text('${item.index}'),
-          foregroundColor: Colors.white,
-        ),
-        title: new Text(item.title),
-        subtitle: new Text(item.subtitle),
-      ),
-    );
-  }
-
-  Widget _buildhorizontalListItem(BuildContext context, int index) {
-    final _HomeItem item = items[index];
-    return new Container(
-      color: Colors.white,
-      width: 160.0,
-      child: new Column(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          new Expanded(
-            child: new CircleAvatar(
-              backgroundColor: item.color,
-              child: new Text('${item.index}'),
-              foregroundColor: Colors.white,
-            ),
-          ),
-          new Expanded(
-            child: Center(
-              child: new Text(
-                item.subtitle,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _getSlidableWithLists(
       BuildContext context, int index, Axis direction) {
     final _HomeItem item = items[index];
@@ -173,8 +130,8 @@ class _MyHomePageState extends State<MyHomePage> {
       delegate: _getDelegate(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
-          ? _buildVerticalListItem(context, index)
-          : _buildhorizontalListItem(context, index),
+          ? VerticalListItem(items[index])
+          : HorizontalListItem(items[index]),
       actions: <Widget>[
         new IconSlideAction(
           caption: 'Archive',
@@ -254,8 +211,8 @@ class _MyHomePageState extends State<MyHomePage> {
       delegate: _getDelegate(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
-          ? _buildVerticalListItem(context, index)
-          : _buildhorizontalListItem(context, index),
+          ? VerticalListItem(items[index])
+          : HorizontalListItem(items[index]),
       actionDelegate: new SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation, renderingMode) {
@@ -380,6 +337,64 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _showSnackBar(BuildContext context, String text) {
     Scaffold.of(context).showSnackBar(SnackBar(content: new Text(text)));
+  }
+}
+
+class HorizontalListItem extends StatelessWidget {
+  HorizontalListItem(this.item);
+  final _HomeItem item;
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      color: Colors.white,
+      width: 160.0,
+      child: new Column(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          new Expanded(
+            child: new CircleAvatar(
+              backgroundColor: item.color,
+              child: new Text('${item.index}'),
+              foregroundColor: Colors.white,
+            ),
+          ),
+          new Expanded(
+            child: Center(
+              child: new Text(
+                item.subtitle,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class VerticalListItem extends StatelessWidget {
+  VerticalListItem(this.item);
+  final _HomeItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () =>
+          Slidable.of(context)?.renderingMode == SlidableRenderingMode.none
+              ? Slidable.of(context)?.open()
+              : Slidable.of(context)?.close(),
+      child: new Container(
+        color: Colors.white,
+        child: new ListTile(
+          leading: new CircleAvatar(
+            backgroundColor: item.color,
+            child: new Text('${item.index}'),
+            foregroundColor: Colors.white,
+          ),
+          title: new Text(item.title),
+          subtitle: new Text(item.subtitle),
+        ),
+      ),
+    );
   }
 }
 

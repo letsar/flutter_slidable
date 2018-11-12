@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/src/widgets/slidable.dart';
+import 'package:flutter_slidable/src/widgets/new_slidable.dart';
 
 const bool _kCloseOnTap = true;
 
@@ -28,11 +28,8 @@ abstract class ClosableSlideAction extends StatelessWidget {
   /// Calls [onTap] if not null and closes the closest [Slidable]
   /// that encloses the given context.
   void _handleCloseAfterTap(BuildContext context) {
-    if (onTap != null) {
-      onTap();
-    }
-
-    Slidable.of(context).close();
+    onTap?.call();
+    Slidable.of(context)?.close();
   }
 
   Widget build(BuildContext context) {
@@ -50,7 +47,7 @@ abstract class ClosableSlideAction extends StatelessWidget {
 class SlideAction extends ClosableSlideAction {
   /// Creates a slide action with a child.
   ///
-  /// The `color` argument is a shorthand for `decoration: new
+  /// The `color` argument is a shorthand for `decoration:
   /// BoxDecoration(color: color)`, which means you cannot supply both a `color`
   /// and a `decoration` argument. If you want to have both a `color` and a
   /// `decoration`, you can pass the color as the `color` argument to the
@@ -69,9 +66,9 @@ class SlideAction extends ClosableSlideAction {
         assert(
             color == null || decoration == null,
             'Cannot provide both a color and a decoration\n'
-            'The color argument is just a shorthand for "decoration: new BoxDecoration(color: color)".'),
-        decoration = decoration ??
-            (color != null ? new BoxDecoration(color: color) : null),
+            'The color argument is just a shorthand for "decoration:  BoxDecoration(color: color)".'),
+        decoration =
+            decoration ?? (color != null ? BoxDecoration(color: color) : null),
         super(
           key: key,
           onTap: onTap,
@@ -86,7 +83,7 @@ class SlideAction extends ClosableSlideAction {
   Widget buildAction(BuildContext context) {
     return Container(
       decoration: decoration,
-      child: new Center(
+      child: Center(
         child: child,
       ),
     );
@@ -131,7 +128,7 @@ class IconSlideAction extends ClosableSlideAction {
         ThemeData.estimateBrightnessForColor(color) == Brightness.light
             ? Colors.black
             : Colors.white;
-    final Text textWidget = new Text(
+    final Text textWidget = Text(
       caption ?? '',
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context)
@@ -141,17 +138,17 @@ class IconSlideAction extends ClosableSlideAction {
     );
     return Container(
       color: color,
-      child: new Center(
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            new Flexible(
-              child: new Icon(
+            Flexible(
+              child: Icon(
                 icon,
                 color: foregroundColor ?? estimatedColor,
               ),
             ),
-            new Flexible(child: textWidget),
+            Flexible(child: textWidget),
           ],
         ),
       ),

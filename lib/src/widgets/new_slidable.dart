@@ -357,6 +357,97 @@ class SlidableDelegateContext {
   }
 }
 
+class SlidableActionPane extends StatelessWidget {
+  /// Creates the actions for a [Slidable].
+  ///
+  /// The [fastThreshold] argument must be positive.
+  SlidableActionPane({
+    List<Widget> actions,
+    List<Widget> secondaryActions,
+    double fastThreshold,
+  }) : this.builder(
+          actionDelegate: SlideActionListDelegate(actions: actions),
+          secondaryActionDelegate:
+              SlideActionListDelegate(actions: secondaryActions),
+          fastThreshold: fastThreshold,
+        );
+
+  /// Creates the actions for a [Slidable].
+  ///
+  /// The [fastThreshold] argument must be positive.
+  SlidableActionPane.builder({
+    this.actionDelegate,
+    this.secondaryActionDelegate,
+    double fastThreshold,
+  })  : fastThreshold = fastThreshold ?? _kFastThreshold,
+        assert(fastThreshold == null || fastThreshold >= .0,
+            'fastThreshold must be positive');
+
+  /// The threshold used to know if a movement was fast and request to open/close the actions.
+  final double fastThreshold;
+
+  /// A delegate that builds slide actions that appears when the child has been dragged
+  /// down or to the right.
+  final SlideActionDelegate actionDelegate;
+
+  /// A delegate that builds slide actions that appears when the child has been dragged
+  /// up or to the left.
+  final SlideActionDelegate secondaryActionDelegate;
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container();
+  }
+}
+
+abstract class _SlidableActionPane extends StatelessWidget {
+  _SlidableActionPane({
+    @required this.slidableContext,
+    this.fastThreshold,
+  });
+
+  /// The threshold used to know if a movement was fast and request to open/close the actions.
+  final double fastThreshold;
+
+  final SlidableDelegateContext slidableContext;
+}
+
+class _SlidableStackActionPane extends StatelessWidget {
+  _SlidableStackActionPane({
+    Key key,
+    @required this.ctx,
+    @required this.actionPane,
+  })  : _animation = new Tween<Offset>(
+          begin: Offset.zero,
+          end: ctx
+              .createOffset(ctx.state.totalActionsExtent * ctx.state.dragSign),
+        ).animate(ctx.state.actionsMoveAnimation),
+        super(key: key);
+
+  final Widget actionPane;
+  final Animation<Offset> _animation;
+  final SlidableDelegateContext ctx;
+
+  @override
+  Widget build(BuildContext context) {
+    if (ctx.state.actionsMoveAnimation.isDismissed) {
+      return ctx.state.widget.child;
+    }
+
+    return Container(
+      child: Stack(
+        children: <Widget>[
+          actionPane,
+          SlideTransition(
+            position: _animation,
+            child: ctx.state.widget.child,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// A delegate that controls how the slide actions are displayed.
 ///
 /// See also:

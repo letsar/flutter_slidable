@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Slidable(
-                  delegate: SlidableScrollDelegate(),
+                  actionPane: SlidableScrollActionPane(),
                   actionExtentRatio: 0.25,
                   secondaryActions: <Widget>[
                     IconSlideAction(

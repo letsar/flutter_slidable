@@ -115,7 +115,8 @@ class _MyHomePageState extends State<MyHomePage> {
       key: new Key(item.title),
       controller: slidableController,
       direction: direction,
-      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+      dismissal: new SlidableDismissal(
+        dismissal: SlidableDrawerDismissal(),
         onDismissed: (actionType) {
           _showSnackBar(
               context,
@@ -127,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
       ),
-      delegate: _getDelegate(item.index),
+      actionPane: _getDelegate(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
           ? VerticalListItem(items[index])
@@ -172,7 +173,8 @@ class _MyHomePageState extends State<MyHomePage> {
       key: new Key(item.title),
       controller: slidableController,
       direction: direction,
-      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+      dismissal: new SlidableDismissal(
+        dismissal: SlidableDrawerDismissal(),
         closeOnCanceled: true,
         onWillDismiss: (item.index != 10)
             ? null
@@ -208,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
       ),
-      delegate: _getDelegate(item.index),
+      actionPane: _getDelegate(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
           ? VerticalListItem(items[index])
@@ -290,16 +292,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  static SlidableDelegate _getDelegate(int index) {
+  static Widget _getDelegate(int index) {
     switch (index % 4) {
       case 0:
-        return new SlidableBehindDelegate();
+        return new SlidableBehindActionPane();
       case 1:
-        return new SlidableStrechDelegate();
+        return new SlidableStrechActionPane();
       case 2:
-        return new SlidableScrollDelegate();
+        return new SlidableScrollActionPane();
       case 3:
-        return new SlidableDrawerDelegate();
+        return new SlidableDrawerActionPane();
       default:
         return null;
     }

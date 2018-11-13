@@ -574,8 +574,13 @@ class SlidableState extends State<Slidable>
   }
 
   void close() {
-    _flingAnimationController();
-    //widget.controller?.activeState = null;
+    if (!_overallMoveController.isDismissed) {
+      if (widget.controller?.activeState == this) {
+        widget.controller?.activeState = null;
+      } else {
+        _flingAnimationController();
+      }
+    }
   }
 
   void _flingAnimationController() {

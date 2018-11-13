@@ -100,7 +100,7 @@ class SlidableDrawerDismissal extends StatelessWidget {
 
     final animation = Tween<Offset>(
       begin: Offset.zero,
-      end: SlidableHelpers.createOffset(state, state.dragSign),
+      end: SlidableHelpers.createOffset(state, state.actionSign),
     ).animate(state.overallMoveAnimation);
 
     return Container(

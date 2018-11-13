@@ -9,7 +9,7 @@ class _SlidableStackActionPane extends StatelessWidget {
   })  : _animation = Tween<Offset>(
           begin: Offset.zero,
           end: SlidableHelpers.createOffset(
-              state, state.totalActionsExtent * state.dragSign),
+              state, state.totalActionsExtent * state.actionSign),
         ).animate(state.actionsMoveAnimation),
         super(key: key);
 
@@ -47,7 +47,7 @@ class SlidableStrechActionPane extends StatelessWidget {
 
     final animation = Tween<double>(
       begin: 0.0,
-      end: state.totalActionsExtent * state.dragSign,
+      end: state.totalActionsExtent * state.actionSign,
     ).animate(state.actionsMoveAnimation);
 
     return _SlidableStackActionPane(

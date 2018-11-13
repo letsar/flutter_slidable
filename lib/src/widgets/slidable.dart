@@ -193,14 +193,14 @@ abstract class SlidableHelpers {
 class _SlidableScope extends InheritedWidget {
   _SlidableScope({
     Key key,
-    @required this.state,
+    @required this.data,
     @required Widget child,
   }) : super(key: key, child: child);
 
-  final SlidableState state;
+  final SlidableData data;
 
   @override
-  bool updateShouldNotify(_SlidableScope oldWidget) => false;
+  bool updateShouldNotify(_SlidableScope oldWidget) => oldWidget.data != data;
 }
 
 /// A controller that keep tracks of the active [SlidableState] and close
@@ -409,11 +409,41 @@ class Slidable extends StatefulWidget {
   static SlidableState of(BuildContext context) {
     final _SlidableScope scope =
         context.inheritFromWidgetOfExactType(_SlidableScope);
-    return scope?.state;
+    return scope?.data?.state;
   }
 
   @override
   SlidableState createState() => SlidableState();
+}
+
+class SlidableData {
+  SlidableData({
+    @required this.actionType,
+    @required this.renderingMode,
+    @required this.state,
+  });
+
+  final SlideActionType actionType;
+  final SlidableRenderingMode renderingMode;
+  final SlidableState state;
+
+  @override
+  bool operator ==(dynamic other) {
+    if (other.runtimeType != runtimeType) return false;
+    final SlidableData typedOther = other;
+    return typedOther.actionType != actionType ||
+        typedOther.renderingMode != renderingMode ||
+        typedOther.state != state;
+  }
+
+  @override
+  int get hashCode {
+    return hashValues(
+      actionType,
+      renderingMode,
+      state,
+    );
+  }
 }
 
 class SlidableState extends State<Slidable>
@@ -441,7 +471,7 @@ class SlidableState extends State<Slidable>
   Animation<double> _resizeAnimation;
 
   double _dragExtent = 0.0;
-  double get dragSign => _actionType == SlideActionType.primary ? 1.0 : -1.0;
+  double get actionSign => _actionType == SlideActionType.primary ? 1.0 : -1.0;
 
   SlidableRenderingMode _renderingMode = SlidableRenderingMode.none;
   SlidableRenderingMode get renderingMode => _renderingMode;
@@ -545,7 +575,7 @@ class SlidableState extends State<Slidable>
 
   void close() {
     _flingAnimationController();
-    widget.controller?.activeState = null;
+    //widget.controller?.activeState = null;
   }
 
   void _flingAnimationController() {
@@ -717,69 +747,68 @@ class SlidableState extends State<Slidable>
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
-    if (!widget.enabled ||
+    Widget content = widget.child;
+
+    if (!(!widget.enabled ||
         ((widget.actionDelegate == null ||
                 widget.actionDelegate.actionCount == 0) &&
             (widget.secondaryActionDelegate == null ||
-                widget.secondaryActionDelegate.actionCount == 0))) {
-      return _SlidableScope(
-        state: this,
-        child: widget.child,
+                widget.secondaryActionDelegate.actionCount == 0)))) {
+      if (actionType == SlideActionType.primary &&
+              widget.actionDelegate != null &&
+              widget.actionDelegate.actionCount > 0 ||
+          actionType == SlideActionType.secondary &&
+              widget.secondaryActionDelegate != null &&
+              widget.secondaryActionDelegate.actionCount > 0) {
+        if (dismissible) {
+          content = widget.dismissal;
+
+          if (_resizeAnimation != null) {
+            // we've been dragged aside, and are now resizing.
+            assert(() {
+              if (_resizeAnimation.status != AnimationStatus.forward) {
+                assert(_resizeAnimation.status == AnimationStatus.completed);
+                throw FlutterError(
+                    'A dismissed Slidable widget is still part of the tree.\n'
+                    'Make sure to implement the onDismissed handler and to immediately remove the Slidable\n'
+                    'widget from the application once that handler has fired.');
+              }
+              return true;
+            }());
+
+            content = SizeTransition(
+              sizeFactor: _resizeAnimation,
+              axis: directionIsXAxis ? Axis.vertical : Axis.horizontal,
+              child: SizedBox(
+                width: _sizePriorToCollapse.width,
+                height: _sizePriorToCollapse.height,
+                child: content,
+              ),
+            );
+          }
+        } else {
+          content = widget.actionPane;
+        }
+      }
+
+      content = GestureDetector(
+        onHorizontalDragStart: directionIsXAxis ? _handleDragStart : null,
+        onHorizontalDragUpdate: directionIsXAxis ? _handleDragUpdate : null,
+        onHorizontalDragEnd: directionIsXAxis ? _handleDragEnd : null,
+        onVerticalDragStart: directionIsXAxis ? null : _handleDragStart,
+        onVerticalDragUpdate: directionIsXAxis ? null : _handleDragUpdate,
+        onVerticalDragEnd: directionIsXAxis ? null : _handleDragEnd,
+        behavior: HitTestBehavior.opaque,
+        child: content,
       );
     }
 
-    Widget content = widget.child;
-
-    if (actionType == SlideActionType.primary &&
-            widget.actionDelegate != null &&
-            widget.actionDelegate.actionCount > 0 ||
-        actionType == SlideActionType.secondary &&
-            widget.secondaryActionDelegate != null &&
-            widget.secondaryActionDelegate.actionCount > 0) {
-      if (dismissible) {
-        content = widget.dismissal;
-
-        if (_resizeAnimation != null) {
-          // we've been dragged aside, and are now resizing.
-          assert(() {
-            if (_resizeAnimation.status != AnimationStatus.forward) {
-              assert(_resizeAnimation.status == AnimationStatus.completed);
-              throw FlutterError(
-                  'A dismissed Slidable widget is still part of the tree.\n'
-                  'Make sure to implement the onDismissed handler and to immediately remove the Slidable\n'
-                  'widget from the application once that handler has fired.');
-            }
-            return true;
-          }());
-
-          return _SlidableScope(
-            state: this,
-            child: SizeTransition(
-                sizeFactor: _resizeAnimation,
-                axis: directionIsXAxis ? Axis.vertical : Axis.horizontal,
-                child: SizedBox(
-                  width: _sizePriorToCollapse.width,
-                  height: _sizePriorToCollapse.height,
-                  child: content,
-                )),
-          );
-        }
-      } else {
-        content = widget.actionPane;
-      }
-    }
-
-    return GestureDetector(
-      onHorizontalDragStart: directionIsXAxis ? _handleDragStart : null,
-      onHorizontalDragUpdate: directionIsXAxis ? _handleDragUpdate : null,
-      onHorizontalDragEnd: directionIsXAxis ? _handleDragEnd : null,
-      onVerticalDragStart: directionIsXAxis ? null : _handleDragStart,
-      onVerticalDragUpdate: directionIsXAxis ? null : _handleDragUpdate,
-      onVerticalDragEnd: directionIsXAxis ? null : _handleDragEnd,
-      behavior: HitTestBehavior.opaque,
-      child: _SlidableScope(
+    return _SlidableScope(
+      child: content,
+      data: SlidableData(
+        actionType: _actionType,
+        renderingMode: _renderingMode,
         state: this,
-        child: content,
       ),
     );
   }

@@ -142,54 +142,6 @@ class SlideActionListDelegate extends SlideActionDelegate {
       actions[index];
 }
 
-/// A handle to various properties useful while calling [SlidableDelegate.buildActions].
-///
-/// See also:
-///
-///  * [SlidableState], which create this object.
-///  * [SlidableDelegate] and other delegates inheriting it, which uses this object in [SlidableDelegate.buildActions].
-abstract class SlidableHelpers {
-  factory SlidableHelpers() => null;
-
-  /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
-  static List<Widget> buildActions(BuildContext context, SlidableState state) {
-    return List.generate(
-        state.actionCount,
-        (int index) => state.actionDelegate.build(
-              context,
-              index,
-              state.actionsMoveAnimation,
-              SlidableRenderingMode.slide,
-            ));
-  }
-
-  static Offset createOffset(SlidableState state, double value) {
-    return state.directionIsXAxis ? Offset(value, 0.0) : Offset(0.0, value);
-  }
-
-  static double getMaxExtent(SlidableState state, BoxConstraints constraints) {
-    return state.directionIsXAxis
-        ? constraints.maxWidth
-        : constraints.maxHeight;
-  }
-
-  static Positioned createPositioned(SlidableState state,
-      {Widget child, double extent, double position}) {
-    return Positioned(
-      left:
-          state.directionIsXAxis ? (state.showActions ? position : null) : 0.0,
-      right:
-          state.directionIsXAxis ? (state.showActions ? null : position) : 0.0,
-      top: state.directionIsXAxis ? 0.0 : (state.showActions ? position : null),
-      bottom:
-          state.directionIsXAxis ? 0.0 : (state.showActions ? null : position),
-      width: state.directionIsXAxis ? extent : null,
-      height: state.directionIsXAxis ? null : extent,
-      child: child,
-    );
-  }
-}
-
 class _SlidableScope extends InheritedWidget {
   _SlidableScope({
     Key key,
@@ -197,7 +149,7 @@ class _SlidableScope extends InheritedWidget {
     @required Widget child,
   }) : super(key: key, child: child);
 
-  final SlidableData data;
+  final _SlidableData data;
 
   @override
   bool updateShouldNotify(_SlidableScope oldWidget) => oldWidget.data != data;
@@ -416,8 +368,8 @@ class Slidable extends StatefulWidget {
   SlidableState createState() => SlidableState();
 }
 
-class SlidableData {
-  SlidableData({
+class _SlidableData {
+  _SlidableData({
     @required this.actionType,
     @required this.renderingMode,
     @required this.state,
@@ -430,7 +382,7 @@ class SlidableData {
   @override
   bool operator ==(dynamic other) {
     if (other.runtimeType != runtimeType) return false;
-    final SlidableData typedOther = other;
+    final _SlidableData typedOther = other;
     return typedOther.actionType != actionType ||
         typedOther.renderingMode != renderingMode ||
         typedOther.state != state;
@@ -459,6 +411,10 @@ class SlidableState extends State<Slidable>
       parent: _overallMoveController,
       curve: Interval(0.0, totalActionsExtent),
     )..addStatusListener(_handleShowAllActionsStatusChanged);
+    _dismissAnimation = CurvedAnimation(
+      parent: _overallMoveController,
+      curve: Interval(totalActionsExtent, 1.0),
+    )..addStatusListener(_handleShowAllActionsStatusChanged);
   }
 
   AnimationController _overallMoveController;
@@ -466,6 +422,9 @@ class SlidableState extends State<Slidable>
 
   Animation<double> _actionsMoveAnimation;
   Animation<double> get actionsMoveAnimation => _actionsMoveAnimation;
+
+  Animation<double> _dismissAnimation;
+  Animation<double> get dismissAnimation => _dismissAnimation;
 
   AnimationController _resizeController;
   Animation<double> _resizeAnimation;
@@ -493,6 +452,16 @@ class SlidableState extends State<Slidable>
       widget.dismissal?.dismissThresholds[actionType] ?? _kDismissThreshold;
 
   bool get dismissible => widget.dismissal != null && dismissThreshold < 1.0;
+
+  Alignment get alignment => Alignment(
+        directionIsXAxis ? -actionSign : 0.0,
+        directionIsXAxis ? 0.0 : -actionSign,
+      );
+
+  double get actionPaneWidthFactor =>
+      directionIsXAxis ? totalActionsExtent : null;
+  double get actionPaneHeightFactor =>
+      directionIsXAxis ? null : totalActionsExtent;
 
   @override
   bool get wantKeepAlive =>
@@ -810,11 +779,43 @@ class SlidableState extends State<Slidable>
 
     return _SlidableScope(
       child: content,
-      data: SlidableData(
+      data: _SlidableData(
         actionType: _actionType,
         renderingMode: _renderingMode,
         state: this,
       ),
+    );
+  }
+
+  /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
+  List<Widget> buildActions(BuildContext context) {
+    return List.generate(
+        actionCount,
+        (int index) => actionDelegate.build(
+              context,
+              index,
+              actionsMoveAnimation,
+              SlidableRenderingMode.slide,
+            ));
+  }
+
+  Offset createOffset(double value) {
+    return directionIsXAxis ? Offset(value, 0.0) : Offset(0.0, value);
+  }
+
+  double getMaxExtent(BoxConstraints constraints) {
+    return directionIsXAxis ? constraints.maxWidth : constraints.maxHeight;
+  }
+
+  Positioned createPositioned({Widget child, double extent, double position}) {
+    return Positioned(
+      left: directionIsXAxis ? (showActions ? position : null) : 0.0,
+      right: directionIsXAxis ? (showActions ? null : position) : 0.0,
+      top: directionIsXAxis ? 0.0 : (showActions ? position : null),
+      bottom: directionIsXAxis ? 0.0 : (showActions ? null : position),
+      width: directionIsXAxis ? extent : null,
+      height: directionIsXAxis ? null : extent,
+      child: child,
     );
   }
 }

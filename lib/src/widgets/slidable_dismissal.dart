@@ -98,66 +98,119 @@ class SlidableDrawerDismissal extends StatelessWidget {
   Widget build(BuildContext context) {
     final SlidableState state = Slidable.of(context);
 
+    final alignment = state.alignment;
+    final startOffset = Offset(alignment.x, alignment.y);
+    final positions = Iterable.generate(state.actionCount).map((index) {
+      return AlwaysStoppedAnimation(startOffset * (index - 1.0));
+    }).toList();
+
+    final positions2 = Iterable.generate(state.actionCount).map((index) {
+      return Tween<Offset>(
+        begin: startOffset * (index - 1.0),
+        end: startOffset * (index - 1.0),
+      ).animate(state.dismissAnimation);
+    }).toList();
+
+    final sizes = Iterable.generate(state.actionCount).map((index) {
+      return Tween<double>(
+        begin: state.widget.actionExtentRatio,
+        end: 1.0 -
+            state.widget.actionExtentRatio * (state.actionCount - index - 1),
+      ).animate(state.dismissAnimation);
+    }).toList();
+
     final animation = Tween<Offset>(
       begin: Offset.zero,
-      end: SlidableHelpers.createOffset(state, state.actionSign),
+      end: state.createOffset(state.actionSign),
     ).animate(state.overallMoveAnimation);
 
-    return Container(
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: LayoutBuilder(builder: (context, constraints) {
-              final count = state.actionCount;
-              final double totalExtent =
-                  SlidableHelpers.getMaxExtent(state, constraints);
-              final double actionExtent =
-                  totalExtent * state.widget.actionExtentRatio;
-
-              final extentAnimations = Iterable.generate(count).map((index) {
-                return Tween<double>(
-                  begin: actionExtent,
-                  end: totalExtent -
-                      (actionExtent * (state.actionCount - index - 1)),
-                ).animate(
-                  CurvedAnimation(
-                    parent: state.overallMoveAnimation,
-                    curve: Interval(state.totalActionsExtent, 1.0),
+    return Stack(
+      children: <Widget>[
+        Positioned.fill(
+          child: Stack(
+            alignment: state.alignment,
+            children: List.generate(
+              state.actionCount,
+              (index) {
+                int displayIndex =
+                    state.showActions ? state.actionCount - index - 1 : index;
+                return SlideTransition(
+                  position: positions2[index],
+                  child: SizeTransition(
+                    sizeFactor: sizes[index],
+                    axis: state.widget.direction,
+                    child: state.actionDelegate.build(
+                      context,
+                      displayIndex,
+                      state.actionsMoveAnimation,
+                      SlidableRenderingMode.slide,
+                    ),
                   ),
                 );
-              }).toList();
-
-              return AnimatedBuilder(
-                  animation: state.overallMoveAnimation,
-                  builder: (context, child) {
-                    return Stack(
-                      children: List.generate(state.actionCount, (index) {
-                        // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-                        int displayIndex = state.showActions
-                            ? state.actionCount - index - 1
-                            : index;
-                        return SlidableHelpers.createPositioned(
-                          state,
-                          position:
-                              actionExtent * (state.actionCount - index - 1),
-                          extent: extentAnimations[index].value,
-                          child: state.actionDelegate.build(
-                              context,
-                              displayIndex,
-                              state.actionsMoveAnimation,
-                              state.renderingMode),
-                        );
-                      }),
-                    );
-                  });
-            }),
+              },
+            ),
           ),
-          SlideTransition(
-            position: animation,
-            child: state.widget.child,
-          ),
-        ],
-      ),
+        ),
+        SlideTransition(
+          position: animation,
+          child: state.widget.child,
+        ),
+      ],
     );
+
+    // return Container(
+    //   child: Stack(
+    //     children: <Widget>[
+    //       Positioned.fill(
+    //         child: LayoutBuilder(builder: (context, constraints) {
+    //           final count = state.actionCount;
+    //           final double totalExtent = state.getMaxExtent(constraints);
+    //           final double actionExtent =
+    //               totalExtent * state.widget.actionExtentRatio;
+
+    //           final extentAnimations = Iterable.generate(count).map((index) {
+    //             return Tween<double>(
+    //               begin: actionExtent,
+    //               end: totalExtent -
+    //                   (actionExtent * (state.actionCount - index - 1)),
+    //             ).animate(
+    //               CurvedAnimation(
+    //                 parent: state.overallMoveAnimation,
+    //                 curve: Interval(state.totalActionsExtent, 1.0),
+    //               ),
+    //             );
+    //           }).toList();
+
+    //           return AnimatedBuilder(
+    //               animation: state.overallMoveAnimation,
+    //               builder: (context, child) {
+    //                 return Stack(
+    //                   children: List.generate(state.actionCount, (index) {
+    //                     // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
+    //                     int displayIndex = state.showActions
+    //                         ? state.actionCount - index - 1
+    //                         : index;
+    //                     return state.createPositioned(
+    //                       position:
+    //                           actionExtent * (state.actionCount - index - 1),
+    //                       extent: extentAnimations[index].value,
+    //                       child: state.actionDelegate.build(
+    //                           context,
+    //                           displayIndex,
+    //                           state.actionsMoveAnimation,
+    //                           state.renderingMode),
+    //                     );
+    //                   }),
+    //                 );
+    //               });
+    //         }),
+    //       ),
+    //       SlideTransition(
+    //         position: animation,
+    //         child: state.widget.child,
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 }

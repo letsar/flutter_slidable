@@ -348,7 +348,7 @@ class HorizontalListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Container(
-      color: Colors.white,
+      color: Colors.transparent,
       width: 160.0,
       child: new Column(
         mainAxisSize: MainAxisSize.max,
@@ -385,7 +385,7 @@ class VerticalListItem extends StatelessWidget {
               ? Slidable.of(context)?.open()
               : Slidable.of(context)?.close(),
       child: new Container(
-        color: Colors.white,
+        color: Colors.transparent,
         child: new ListTile(
           leading: new CircleAvatar(
             backgroundColor: item.color,

@@ -8,8 +8,7 @@ class _SlidableStackActionPane extends StatelessWidget {
     @required this.child,
   })  : _animation = Tween<Offset>(
           begin: Offset.zero,
-          end: SlidableHelpers.createOffset(
-              state, state.totalActionsExtent * state.actionSign),
+          end: state.createOffset(state.totalActionsExtent * state.actionSign),
         ).animate(state.actionsMoveAnimation),
         super(key: key);
 
@@ -23,16 +22,14 @@ class _SlidableStackActionPane extends StatelessWidget {
       return state.widget.child;
     }
 
-    return Container(
-      child: Stack(
-        children: <Widget>[
-          child,
-          SlideTransition(
-            position: _animation,
-            child: state.widget.child,
-          ),
-        ],
-      ),
+    return Stack(
+      children: <Widget>[
+        child,
+        SlideTransition(
+          position: _animation,
+          child: state.widget.child,
+        ),
+      ],
     );
   }
 }
@@ -47,34 +44,26 @@ class SlidableStrechActionPane extends StatelessWidget {
 
     final animation = Tween<double>(
       begin: 0.0,
-      end: state.totalActionsExtent * state.actionSign,
+      end: state.totalActionsExtent,
     ).animate(state.actionsMoveAnimation);
 
     return _SlidableStackActionPane(
       state: state,
       child: Positioned.fill(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return AnimatedBuilder(
-              animation: state.actionsMoveAnimation,
-              builder: (context, child) {
-                return Stack(
-                  children: <Widget>[
-                    SlidableHelpers.createPositioned(
-                      state,
-                      position: 0.0,
-                      extent: SlidableHelpers.getMaxExtent(state, constraints) *
-                          animation.value.abs(),
-                      child: Flex(
-                        direction: state.widget.direction,
-                        children: SlidableHelpers.buildActions(context, state)
-                            .map((a) => Expanded(child: a))
-                            .toList(),
-                      ),
-                    ),
-                  ],
-                );
-              },
+        child: AnimatedBuilder(
+          animation: state.actionsMoveAnimation,
+          builder: (context, child) {
+            return FractionallySizedBox(
+              alignment: state.alignment,
+              widthFactor: state.directionIsXAxis ? animation.value : null,
+              heightFactor: state.directionIsXAxis ? null : animation.value,
+              child: Flex(
+                direction: state.widget.direction,
+                children: state
+                    .buildActions(context)
+                    .map((a) => Expanded(child: a))
+                    .toList(),
+              ),
             );
           },
         ),
@@ -94,30 +83,17 @@ class SlidableBehindActionPane extends StatelessWidget {
     return _SlidableStackActionPane(
       state: state,
       child: Positioned.fill(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return AnimatedBuilder(
-              animation: state.actionsMoveAnimation,
-              builder: (context, child) {
-                return Stack(
-                  children: <Widget>[
-                    SlidableHelpers.createPositioned(
-                      state,
-                      position: 0.0,
-                      extent: SlidableHelpers.getMaxExtent(state, constraints) *
-                          state.totalActionsExtent,
-                      child: Flex(
-                        direction: state.widget.direction,
-                        children: SlidableHelpers.buildActions(context, state)
-                            .map((a) => Expanded(child: a))
-                            .toList(),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
+        child: FractionallySizedBox(
+          alignment: state.alignment,
+          widthFactor: state.actionPaneWidthFactor,
+          heightFactor: state.actionPaneHeightFactor,
+          child: Flex(
+            direction: state.widget.direction,
+            children: state
+                .buildActions(context)
+                .map((a) => Expanded(child: a))
+                .toList(),
+          ),
         ),
       ),
     );
@@ -132,41 +108,29 @@ class SlidableScrollActionPane extends StatelessWidget {
   Widget build(BuildContext context) {
     final SlidableState state = Slidable.of(context);
 
+    final alignment = state.alignment;
+    final animation = Tween<Offset>(
+      begin: Offset(alignment.x, alignment.y),
+      end: Offset.zero,
+    ).animate(state.actionsMoveAnimation);
+
     return _SlidableStackActionPane(
       state: state,
       child: Positioned.fill(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final double totalExtent =
-                SlidableHelpers.getMaxExtent(state, constraints) *
-                    state.totalActionsExtent;
-
-            final animation = Tween<double>(
-              begin: -totalExtent,
-              end: 0.0,
-            ).animate(state.actionsMoveAnimation);
-
-            return AnimatedBuilder(
-              animation: state.actionsMoveAnimation,
-              builder: (context, child) {
-                return Stack(
-                  children: <Widget>[
-                    SlidableHelpers.createPositioned(
-                      state,
-                      position: animation.value,
-                      extent: totalExtent,
-                      child: Flex(
-                        direction: state.widget.direction,
-                        children: SlidableHelpers.buildActions(context, state)
-                            .map((a) => Expanded(child: a))
-                            .toList(),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
+        child: FractionallySizedBox(
+          alignment: state.alignment,
+          widthFactor: state.actionPaneWidthFactor,
+          heightFactor: state.actionPaneHeightFactor,
+          child: SlideTransition(
+            position: animation,
+            child: Flex(
+              direction: state.widget.direction,
+              children: state
+                  .buildActions(context)
+                  .map((a) => Expanded(child: a))
+                  .toList(),
+            ),
+          ),
         ),
       ),
     );
@@ -181,54 +145,45 @@ class SlidableDrawerActionPane extends StatelessWidget {
   Widget build(BuildContext context) {
     final SlidableState state = Slidable.of(context);
 
+    final alignment = state.alignment;
+    final startOffset = Offset(alignment.x, alignment.y);
+    final animations = Iterable.generate(state.actionCount).map((index) {
+      return Tween<Offset>(
+        begin: startOffset,
+        end: startOffset * (index - 1.0),
+      ).animate(state.actionsMoveAnimation);
+    }).toList();
+
     return _SlidableStackActionPane(
       state: state,
       child: Positioned.fill(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final count = state.actionCount;
-            final bool showActions = state.showActions;
-            final Animation<double> actionsMoveAnimation =
-                state.actionsMoveAnimation;
-            final double actionExtent =
-                SlidableHelpers.getMaxExtent(state, constraints) *
-                    state.widget.actionExtentRatio;
-            final SlideActionDelegate actionDelegate = state.actionDelegate;
-
-            final animations = Iterable.generate(count).map((index) {
-              return Tween<double>(
-                begin: -actionExtent,
-                end: (count - index - 1) * actionExtent,
-              ).animate(actionsMoveAnimation);
-            }).toList();
-
-            return AnimatedBuilder(
-              animation: actionsMoveAnimation,
-              builder: (context, child) {
-                return Stack(
-                  children: List.generate(
-                    count,
-                    (index) {
-                      // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-                      int displayIndex =
-                          showActions ? count - index - 1 : index;
-                      return SlidableHelpers.createPositioned(
-                        state,
-                        position: animations[index].value,
-                        extent: actionExtent,
-                        child: actionDelegate.build(
-                          context,
-                          displayIndex,
-                          actionsMoveAnimation,
-                          SlidableRenderingMode.slide,
-                        ),
-                      );
-                    },
+        child: Stack(
+          alignment: state.alignment,
+          children: List.generate(
+            state.actionCount,
+            (index) {
+              int displayIndex =
+                  state.showActions ? state.actionCount - index - 1 : index;
+              return FractionallySizedBox(
+                alignment: state.alignment,
+                widthFactor: state.directionIsXAxis
+                    ? state.widget.actionExtentRatio
+                    : null,
+                heightFactor: state.directionIsXAxis
+                    ? null
+                    : state.widget.actionExtentRatio,
+                child: SlideTransition(
+                  position: animations[index],
+                  child: state.actionDelegate.build(
+                    context,
+                    displayIndex,
+                    state.actionsMoveAnimation,
+                    SlidableRenderingMode.slide,
                   ),
-                );
-              },
-            );
-          },
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

@@ -98,70 +98,10 @@ class SlidableDrawerDismissal extends StatelessWidget {
   Widget build(BuildContext context) {
     final SlidableState state = Slidable.of(context);
 
-    final alignment = state.alignment;
-    final startOffset = Offset(alignment.x, alignment.y);
-    final positions = Iterable.generate(state.actionCount).map((index) {
-      return AlwaysStoppedAnimation(startOffset * (index - 1.0));
-    }).toList();
-
-    final positions2 = Iterable.generate(state.actionCount).map((index) {
-      return Tween<Offset>(
-        begin: startOffset * (index - 1.0),
-        end: startOffset * (index - 1.0),
-      ).animate(state.dismissAnimation);
-    }).toList();
-
-    final sizes = Iterable.generate(state.actionCount).map((index) {
-      return Tween<double>(
-        begin: state.widget.actionExtentRatio,
-        end: 1.0 -
-            state.widget.actionExtentRatio * (state.actionCount - index - 1),
-      ).animate(state.dismissAnimation);
-    }).toList();
-
-    // final animation = Tween<Offset>(
-    //   begin: Offset.zero,
-    //   end: state.createOffset(state.actionSign),
-    // ).animate(state.overallMoveAnimation);
-
     final animation = Tween<Offset>(
       begin: Offset.zero,
       end: state.createOffset(state.actionSign),
     ).animate(state.overallMoveAnimation);
-
-    // return Stack(
-    //   children: <Widget>[
-    //     Positioned.fill(
-    //       child: Stack(
-    //         alignment: state.alignment,
-    //         children: List.generate(
-    //           state.actionCount,
-    //           (index) {
-    //             int displayIndex =
-    //                 state.showActions ? state.actionCount - index - 1 : index;
-    //             return SlideTransition(
-    //               position: positions2[index],
-    //               child: SizeTransition(
-    //                 sizeFactor: sizes[index],
-    //                 axis: state.widget.direction,
-    //                 child: state.actionDelegate.build(
-    //                   context,
-    //                   displayIndex,
-    //                   state.actionsMoveAnimation,
-    //                   SlidableRenderingMode.slide,
-    //                 ),
-    //               ),
-    //             );
-    //           },
-    //         ),
-    //       ),
-    //     ),
-    //     SlideTransition(
-    //       position: animation,
-    //       child: state.widget.child,
-    //     ),
-    //   ],
-    // );
 
     return Stack(
       children: <Widget>[

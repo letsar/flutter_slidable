@@ -1,6 +1,6 @@
 import 'package:flutter_slidable/src/widgets/slidable_action_pane.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:test/test.dart' as test;
+import 'package:test/test.dart' show fail;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -102,7 +102,7 @@ Offset getOffset(AxisDirection gestureDirection, double value) {
     case AxisDirection.down:
       return Offset(0.0, value);
     default:
-      test.fail('unsupported gestureDirection');
+      fail('unsupported gestureDirection');
   }
 }
 
@@ -217,7 +217,7 @@ void checkAction(
       actualExtent = tester.getSize(finder).height;
       break;
     default:
-      test.fail('unsupported gestureDirection');
+      fail('unsupported gestureDirection');
   }
   expect(actualEdge.roundToDouble(), expectedEdge.roundToDouble(),
       reason: 'edges are not'
@@ -431,7 +431,7 @@ class _CheckActionValues {
 }
 
 void main() {
-  test.setUp(() {});
+  setUp(() {});
 
   // Tests all delegates dragging half of total action extents.
   testSlidableDelegate(const SlidableStrechActionPane(),

@@ -790,13 +790,14 @@ class SlidableState extends State<Slidable>
   /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
   List<Widget> buildActions(BuildContext context) {
     return List.generate(
-        actionCount,
-        (int index) => actionDelegate.build(
-              context,
-              index,
-              actionsMoveAnimation,
-              SlidableRenderingMode.slide,
-            ));
+      actionCount,
+      (int index) => actionDelegate.build(
+            context,
+            index,
+            actionsMoveAnimation,
+            SlidableRenderingMode.slide,
+          ),
+    );
   }
 
   Offset createOffset(double value) {

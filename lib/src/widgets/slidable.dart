@@ -126,8 +126,8 @@ abstract class SlideToDismissDelegate {
     }
   }
 
-  Widget buildActionsWhileDismissing(
-      BuildContext context, SlidableDelegateContext ctx);
+  Widget buildActionsWhileDismissing(BuildContext context,
+      SlidableDelegateContext ctx);
 }
 
 /// A delegate that creates slide actions that are displayed like drawers
@@ -136,7 +136,7 @@ abstract class SlideToDismissDelegate {
 class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
   const SlideToDismissDrawerDelegate({
     Map<SlideActionType, double> dismissThresholds:
-        const <SlideActionType, double>{},
+    const <SlideActionType, double>{},
     VoidCallback onResize,
     DismissSlideActionCallback onDismissed,
     Duration resizeDuration = _kResizeDuration,
@@ -144,17 +144,17 @@ class SlideToDismissDrawerDelegate extends SlideToDismissDelegate {
     SlideActionWillBeDismissed onWillDismiss,
     bool closeOnCanceled = false,
   }) : super(
-          dismissThresholds: dismissThresholds,
-          onResize: onResize,
-          onDismissed: onDismissed,
-          resizeDuration: resizeDuration,
-          crossAxisEndOffset: crossAxisEndOffset,
-          onWillDismiss: onWillDismiss,
-          closeOnCanceled: closeOnCanceled,
-        );
+    dismissThresholds: dismissThresholds,
+    onResize: onResize,
+    onDismissed: onDismissed,
+    resizeDuration: resizeDuration,
+    crossAxisEndOffset: crossAxisEndOffset,
+    onWillDismiss: onWillDismiss,
+    closeOnCanceled: closeOnCanceled,
+  );
 
-  Widget buildActionsWhileDismissing(
-      BuildContext context, SlidableDelegateContext ctx) {
+  Widget buildActionsWhileDismissing(BuildContext context,
+      SlidableDelegateContext ctx) {
     final animation = new Tween(
       begin: Offset.zero,
       end: ctx.createOffset(ctx.state.dragSign),
@@ -274,7 +274,7 @@ class SlideActionBuilderDelegate extends SlideActionDelegate {
 
   @override
   Widget build(BuildContext context, int index, Animation<double> animation,
-          SlidableRenderingMode step) =>
+      SlidableRenderingMode step) =>
       builder(context, index, animation, step);
 }
 
@@ -305,7 +305,7 @@ class SlideActionListDelegate extends SlideActionDelegate {
 
   @override
   Widget build(BuildContext context, int index, Animation<double> animation,
-          SlidableRenderingMode step) =>
+      SlidableRenderingMode step) =>
       actions[index];
 }
 
@@ -316,9 +316,7 @@ class SlideActionListDelegate extends SlideActionDelegate {
 ///  * [SlidableState], which create this object.
 ///  * [SlidableDelegate] and other delegates inheriting it, which uses this object in [SlidableDelegate.buildActions].
 class SlidableDelegateContext {
-  const SlidableDelegateContext(
-    this.state,
-  );
+  const SlidableDelegateContext(this.state,);
 
   final SlidableStateView state;
 
@@ -328,8 +326,9 @@ class SlidableDelegateContext {
   List<Widget> buildActions(BuildContext context) {
     return List.generate(
         state.actionCount,
-        (int index) => state.actionDelegate.build(context, index,
-            state.actionsMoveAnimation, SlidableRenderingMode.slide));
+            (int index) =>
+            state.actionDelegate.build(context, index,
+                state.actionsMoveAnimation, SlidableRenderingMode.slide));
   }
 
   Offset createOffset(double value) {
@@ -375,9 +374,10 @@ abstract class SlidableDelegate {
   /// The [fastThreshold] argument must be positive.
   const SlidableDelegate({
     double fastThreshold,
-  })  : fastThreshold = fastThreshold ?? _kFastThreshold,
+  })
+      : fastThreshold = fastThreshold ?? _kFastThreshold,
         assert(fastThreshold == null || fastThreshold >= .0,
-            'fastThreshold must be positive');
+        'fastThreshold must be positive');
 
   /// The threshold used to know if a movement was fast and request to open/close the actions.
   final double fastThreshold;
@@ -425,8 +425,8 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
   const SlidableStrechDelegate({
     double fastThreshold,
   }) : super(
-          fastThreshold: fastThreshold,
-        );
+    fastThreshold: fastThreshold,
+  );
 
   @override
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
@@ -445,7 +445,7 @@ class SlidableStrechDelegate extends SlidableStackDelegate {
                   ctx.createPositioned(
                     position: 0.0,
                     extent:
-                        ctx.getMaxExtent(constraints) * animation.value.abs(),
+                    ctx.getMaxExtent(constraints) * animation.value.abs(),
                     child: new Flex(
                       direction: ctx.state.widget.direction,
                       children: ctx
@@ -467,8 +467,8 @@ class SlidableBehindDelegate extends SlidableStackDelegate {
   const SlidableBehindDelegate({
     double fastThreshold,
   }) : super(
-          fastThreshold: fastThreshold,
-        );
+    fastThreshold: fastThreshold,
+  );
 
   @override
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
@@ -479,7 +479,7 @@ class SlidableBehindDelegate extends SlidableStackDelegate {
             ctx.createPositioned(
               position: 0.0,
               extent:
-                  ctx.getMaxExtent(constraints) * ctx.state.totalActionsExtent,
+              ctx.getMaxExtent(constraints) * ctx.state.totalActionsExtent,
               child: new Flex(
                 direction: ctx.state.widget.direction,
                 children: ctx
@@ -500,8 +500,8 @@ class SlidableScrollDelegate extends SlidableStackDelegate {
   const SlidableScrollDelegate({
     double fastThreshold,
   }) : super(
-          fastThreshold: fastThreshold,
-        );
+    fastThreshold: fastThreshold,
+  );
 
   @override
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
@@ -544,8 +544,8 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
   const SlidableDrawerDelegate({
     double fastThreshold,
   }) : super(
-          fastThreshold: fastThreshold,
-        );
+    fastThreshold: fastThreshold,
+  );
 
   @override
   Widget buildStackActions(BuildContext context, SlidableDelegateContext ctx) {
@@ -591,6 +591,7 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
 /// A controller that keep tracks of the active [SlidableState] and close
 /// the previous one.
 class SlidableController {
+
   SlidableController({
     this.onSlideAnimationChanged,
     this.onSlideIsOpenChanged,
@@ -603,7 +604,9 @@ class SlidableController {
   Animation<double> _slideAnimation;
 
   SlidableState _activeState;
+
   SlidableState get activeState => _activeState;
+
   set activeState(SlidableState value) {
     _activeState?._flingAnimationControllers();
 
@@ -670,21 +673,21 @@ class Slidable extends StatefulWidget {
     SlideToDismissDelegate slideToDismissDelegate,
     SlidableController controller,
   }) : this.builder(
-          key: key,
-          child: child,
-          delegate: delegate,
-          actionDelegate: new SlideActionListDelegate(actions: actions),
-          secondaryActionDelegate:
-              new SlideActionListDelegate(actions: secondaryActions),
-          showAllActionsThreshold: showAllActionsThreshold,
-          actionExtentRatio: actionExtentRatio,
-          movementDuration: movementDuration,
-          direction: direction,
-          closeOnScroll: closeOnScroll,
-          enabled: enabled,
-          slideToDismissDelegate: slideToDismissDelegate,
-          controller: controller,
-        );
+    key: key,
+    child: child,
+    delegate: delegate,
+    actionDelegate: new SlideActionListDelegate(actions: actions),
+    secondaryActionDelegate:
+    new SlideActionListDelegate(actions: secondaryActions),
+    showAllActionsThreshold: showAllActionsThreshold,
+    actionExtentRatio: actionExtentRatio,
+    movementDuration: movementDuration,
+    direction: direction,
+    closeOnScroll: closeOnScroll,
+    enabled: enabled,
+    slideToDismissDelegate: slideToDismissDelegate,
+    controller: controller,
+  );
 
   /// Creates a widget that can be slid.
   ///
@@ -715,22 +718,23 @@ class Slidable extends StatefulWidget {
     this.enabled = true,
     this.slideToDismissDelegate,
     this.controller,
-  })  : assert(delegate != null),
+  })
+      : assert(delegate != null),
         assert(direction != null),
         assert(
-            showAllActionsThreshold != null &&
-                showAllActionsThreshold >= .0 &&
-                showAllActionsThreshold <= 1.0,
-            'showAllActionsThreshold must be between 0.0 and 1.0'),
+        showAllActionsThreshold != null &&
+            showAllActionsThreshold >= .0 &&
+            showAllActionsThreshold <= 1.0,
+        'showAllActionsThreshold must be between 0.0 and 1.0'),
         assert(
-            actionExtentRatio != null &&
-                actionExtentRatio >= .0 &&
-                actionExtentRatio <= 1.0,
-            'actionExtentRatio must be between 0.0 and 1.0'),
+        actionExtentRatio != null &&
+            actionExtentRatio >= .0 &&
+            actionExtentRatio <= 1.0,
+        'actionExtentRatio must be between 0.0 and 1.0'),
         assert(closeOnScroll != null),
         assert(enabled != null),
         assert(slideToDismissDelegate == null || key != null,
-            'a key must be provided if slideToDismissDelegate is set'),
+        'a key must be provided if slideToDismissDelegate is set'),
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -822,26 +826,30 @@ class SlidableState extends State<Slidable>
   void initState() {
     super.initState();
     _overallMoveController =
-        new AnimationController(duration: widget.movementDuration, vsync: this)
-          ..addStatusListener(_handleDismissStatusChanged);
+    new AnimationController(duration: widget.movementDuration, vsync: this)
+      ..addStatusListener(_handleDismissStatusChanged);
     _actionsMoveController =
-        new AnimationController(duration: widget.movementDuration, vsync: this)
-          ..addStatusListener(_handleShowAllActionsStatusChanged);
+    new AnimationController(duration: widget.movementDuration, vsync: this)
+      ..addStatusListener(_handleShowAllActionsStatusChanged);
   }
 
   AnimationController _overallMoveController;
+
   Animation<double> get overallMoveAnimation => _overallMoveController.view;
 
   AnimationController _actionsMoveController;
+
   Animation<double> get actionsMoveAnimation => _actionsMoveController.view;
 
   AnimationController _resizeController;
   Animation<double> _resizeAnimation;
 
   double _dragExtent = 0.0;
+
   double get dragSign => _dragExtent.sign == 0 ? 1.0 : _dragExtent.sign;
 
   SlidableRenderingMode _renderingMode = SlidableRenderingMode.none;
+
   SlidableRenderingMode get renderingMode => _renderingMode;
 
   ScrollPosition _scrollPosition;
@@ -858,7 +866,7 @@ class SlidableState extends State<Slidable>
 
   double get dismissThreshold =>
       widget.slideToDismissDelegate.dismissThresholds[actionType] ??
-      _kDismissThreshold;
+          _kDismissThreshold;
 
   bool get dismissible =>
       widget.slideToDismissDelegate != null && dismissThreshold < 1.0;
@@ -866,9 +874,9 @@ class SlidableState extends State<Slidable>
   @override
   bool get wantKeepAlive =>
       !widget.closeOnScroll &&
-      (_overallMoveController?.isAnimating == true ||
-          _actionsMoveController?.isAnimating == true ||
-          _resizeController?.isAnimating == true);
+          (_overallMoveController?.isAnimating == true ||
+              _actionsMoveController?.isAnimating == true ||
+              _resizeController?.isAnimating == true);
 
   /// The current actions that have to be shown.
   SlideActionDelegate get actionDelegate =>
@@ -906,7 +914,9 @@ class SlidableState extends State<Slidable>
 
   void _addScrollingNotifierListener() {
     if (widget.closeOnScroll) {
-      _scrollPosition = Scrollable.of(context)?.position;
+      _scrollPosition = Scrollable
+          .of(context)
+          ?.position;
       if (_scrollPosition != null)
         _scrollPosition.isScrollingNotifier.addListener(_isScrollingListener);
     }
@@ -926,6 +936,13 @@ class SlidableState extends State<Slidable>
     _removeScrollingNotifierListener();
     widget.controller?._activeState = null;
     super.dispose();
+  }
+
+  void flingToOpen(SlideActionType actionType) {
+    _dragExtent = actionType == SlideActionType.primary ? 1.0 : -1.0;
+    widget.controller?.activeState = this;
+    _actionsMoveController.fling(velocity: 1.0);
+    _overallMoveController.fling(velocity: 1.0);
   }
 
   void open() {
@@ -1032,7 +1049,8 @@ class SlidableState extends State<Slidable>
     // Make sure to rebuild a last time, otherwise the slide action could
     // be scrambled.
     if (status == AnimationStatus.completed ||
-        status == AnimationStatus.dismissed) {
+        status == AnimationStatus.dismissed ||
+        status == AnimationStatus.forward) {
       setState(() {});
     }
 
@@ -1112,7 +1130,7 @@ class SlidableState extends State<Slidable>
 
     if (!widget.enabled ||
         ((widget.actionDelegate == null ||
-                widget.actionDelegate.actionCount == 0) &&
+            widget.actionDelegate.actionCount == 0) &&
             (widget.secondaryActionDelegate == null ||
                 widget.secondaryActionDelegate.actionCount == 0))) {
       return widget.child;
@@ -1121,8 +1139,8 @@ class SlidableState extends State<Slidable>
     Widget content = widget.child;
 
     if (actionType == SlideActionType.primary &&
-            widget.actionDelegate != null &&
-            widget.actionDelegate.actionCount > 0 ||
+        widget.actionDelegate != null &&
+        widget.actionDelegate.actionCount > 0 ||
         actionType == SlideActionType.secondary &&
             widget.secondaryActionDelegate != null &&
             widget.secondaryActionDelegate.actionCount > 0) {
@@ -1140,8 +1158,8 @@ class SlidableState extends State<Slidable>
               assert(_resizeAnimation.status == AnimationStatus.completed);
               throw new FlutterError(
                   'A dismissed Slidable widget is still part of the tree.\n'
-                  'Make sure to implement the onDismissed handler and to immediately remove the Slidable\n'
-                  'widget from the application once that handler has fired.');
+                      'Make sure to implement the onDismissed handler and to immediately remove the Slidable\n'
+                      'widget from the application once that handler has fired.');
             }
             return true;
           }());

@@ -75,8 +75,14 @@ class SlideAction extends ClosableSlideAction {
           closeOnTap: closeOnTap,
         );
 
+  /// The decoration to paint behind the [child].
+  ///
+  /// A shorthand for specifying just a solid color is available in the
+  /// constructor: set the `color` argument instead of the `decoration`
+  /// argument.
   final Decoration decoration;
 
+  /// The [child] contained by the slide action.
   final Widget child;
 
   @override
@@ -111,8 +117,10 @@ class IconSlideAction extends ClosableSlideAction {
           closeOnTap: closeOnTap,
         );
 
+  /// The icon to show.
   final IconData icon;
 
+  /// The caption below the icon.
   final String caption;
 
   /// The background color.
@@ -120,6 +128,7 @@ class IconSlideAction extends ClosableSlideAction {
   /// Defaults to true.
   final Color color;
 
+  /// The color used for [icon] and [caption].
   final Color foregroundColor;
 
   @override

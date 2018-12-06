@@ -17,7 +17,7 @@ const Duration _kResizeDuration = const Duration(milliseconds: 300);
 ///  while the item is dismissing.///
 class SlidableDismissal extends StatelessWidget {
   const SlidableDismissal({
-    @required this.dismissal,
+    @required this.child,
     this.dismissThresholds = const <SlideActionType, double>{},
     this.onResize,
     this.onDismissed,
@@ -71,7 +71,8 @@ class SlidableDismissal extends StatelessWidget {
   /// it is positive or negative.
   final double crossAxisEndOffset;
 
-  final Widget dismissal;
+  /// The widget to show when the [Slidable] enters dismiss mode.
+  final Widget child;
 
   Widget build(BuildContext context) {
     final SlidableState state = Slidable.of(context);
@@ -80,7 +81,7 @@ class SlidableDismissal extends StatelessWidget {
       animation: state.overallMoveAnimation,
       builder: (BuildContext context, Widget child) {
         if (state.overallMoveAnimation.value > state.totalActionsExtent) {
-          return dismissal;
+          return child;
         } else {
           return state.widget.actionPane;
         }
@@ -89,7 +90,7 @@ class SlidableDismissal extends StatelessWidget {
   }
 }
 
-/// A delegate that creates slide actions that are displayed like drawers
+/// A specific dismissal that creates slide actions that are displayed like drawers
 /// while the item is dismissing.
 /// The further slide action will grow faster than the other ones.
 class SlidableDrawerDismissal extends StatelessWidget {

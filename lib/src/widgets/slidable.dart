@@ -398,6 +398,9 @@ class _SlidableData {
   }
 }
 
+/// The state of [Slidable] widget.
+/// You can open or close the [Slidable] by calling the corresponding methods of
+/// this object.
 class SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable> {
   @override
@@ -526,6 +529,9 @@ class SlidableState extends State<Slidable>
     super.dispose();
   }
 
+  /// Opens the [Slidable].
+  /// By default it's open the [SlideActionType.primary] action pane, but you
+  /// can modify this by setting [actionType].
   void open({SlideActionType actionType}) {
     widget.controller?.activeState = this;
 
@@ -542,6 +548,7 @@ class SlidableState extends State<Slidable>
     );
   }
 
+  /// Closes this [Slidable].
   void close() {
     if (!_overallMoveController.isDismissed) {
       if (widget.controller?.activeState == this) {
@@ -558,6 +565,9 @@ class SlidableState extends State<Slidable>
     }
   }
 
+  /// Dismisses this [Slidable].
+  /// By default it's dismiss by showing the [SlideActionType.primary] action pane, but you
+  /// can modify this by setting [actionType].
   void dismiss({SlideActionType actionType}) {
     if (dismissible) {
       _dismissing = true;
@@ -800,14 +810,17 @@ class SlidableState extends State<Slidable>
     );
   }
 
+  /// Gets the the given offset related to the current direction.
   Offset createOffset(double value) {
     return directionIsXAxis ? Offset(value, 0.0) : Offset(0.0, value);
   }
 
+  /// Gets the maximum extent in the current direction.
   double getMaxExtent(BoxConstraints constraints) {
     return directionIsXAxis ? constraints.maxWidth : constraints.maxHeight;
   }
 
+  /// Creates a positioned related to the current direction and showed actions.
   Positioned createPositioned({Widget child, double extent, double position}) {
     return Positioned(
       left: directionIsXAxis ? (showActions ? position : null) : 0.0,

@@ -325,13 +325,13 @@ class _MyHomePageState extends State<MyHomePage> {
   static String _getSubtitle(int index) {
     switch (index % 4) {
       case 0:
-        return 'SlidableBehindDelegate';
+        return 'SlidableBehindActionPane';
       case 1:
-        return 'SlidableStrechDelegate';
+        return 'SlidableStrechActionPane';
       case 2:
-        return 'SlidableScrollDelegate';
+        return 'SlidableScrollActionPane';
       case 3:
-        return 'SlidableDrawerDelegate';
+        return 'SlidableDrawerActionPane';
       default:
         return null;
     }

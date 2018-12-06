@@ -79,6 +79,7 @@ class SlidableDismissal extends StatelessWidget {
 
     return AnimatedBuilder(
       animation: state.overallMoveAnimation,
+      child: child,
       builder: (BuildContext context, Widget child) {
         if (state.overallMoveAnimation.value > state.totalActionsExtent) {
           return child;

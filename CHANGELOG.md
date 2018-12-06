@@ -1,3 +1,8 @@
+## 0.5.0
+### Modified
+* Change the SlidableDelegate to a widget. The field is renamed `actionPane`.
+* Change the SlideToDismissDelegate to a SlidableDismissal widget that takes another widget as a child. The field is renamed `dismissal`.
+
 ## 0.4.9
 ### Fixed
 * Fix the end extend of actions in dismiss animation (https://github.com/letsar/flutter_slidable/pull/38).

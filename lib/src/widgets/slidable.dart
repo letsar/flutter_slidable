@@ -938,20 +938,20 @@ class SlidableState extends State<Slidable>
     super.dispose();
   }
 
-  void flingToOpen(SlideActionType actionType) {
-    _dragExtent = actionType == SlideActionType.primary ? 1.0 : -1.0;
-    widget.controller?.activeState = this;
-    _actionsMoveController.fling(velocity: 1.0);
-    _overallMoveController.fling(velocity: 1.0);
-  }
-
-  void open() {
-    _actionsMoveController.fling(velocity: 1.0);
-    _overallMoveController.animateTo(
-      totalActionsExtent,
-      curve: Curves.easeIn,
-      duration: widget.movementDuration,
-    );
+  void open({SlideActionType actionType}) {
+    if (actionType != null) {
+      _dragExtent = actionType == SlideActionType.primary ? 1.0 : -1.0;
+      widget.controller?.activeState = this;
+      _actionsMoveController.fling(velocity: 1.0);
+      _overallMoveController.fling(velocity: 1.0);
+    } else {
+      _actionsMoveController.fling(velocity: 1.0);
+      _overallMoveController.animateTo(
+        totalActionsExtent,
+        curve: Curves.easeIn,
+        duration: widget.movementDuration,
+      );
+    }
   }
 
   void close() {

@@ -540,12 +540,13 @@ class SlidableState extends State<Slidable>
         _actionType = actionType;
       });
     }
-
-    _overallMoveController.animateTo(
-      totalActionsExtent,
-      curve: Curves.easeIn,
-      duration: widget.movementDuration,
-    );
+    if (actionCount > 0) {
+      _overallMoveController.animateTo(
+        totalActionsExtent,
+        curve: Curves.easeIn,
+        duration: widget.movementDuration,
+      );
+    }
   }
 
   /// Closes this [Slidable].
@@ -612,7 +613,10 @@ class SlidableState extends State<Slidable>
       _actionType = _dragExtent.sign >= 0
           ? SlideActionType.primary
           : SlideActionType.secondary;
-      _overallMoveController.value = _dragExtent.abs() / _overallDragAxisExtent;
+      if (actionCount > 0) {
+        _overallMoveController.value =
+            _dragExtent.abs() / _overallDragAxisExtent;
+      }
     });
   }
 

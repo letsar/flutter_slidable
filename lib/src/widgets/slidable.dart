@@ -410,6 +410,14 @@ class SlidableState extends State<Slidable>
         AnimationController(duration: widget.movementDuration, vsync: this)
           ..addStatusListener(_handleDismissStatusChanged)
           ..addListener(_handleOverallPositionChanged);
+    _initAnimations();
+  }
+
+  void _initAnimations() {
+    _actionsMoveAnimation
+        ?.removeStatusListener(_handleShowAllActionsStatusChanged);
+    _dismissAnimation?.removeStatusListener(_handleShowAllActionsStatusChanged);
+
     _actionsMoveAnimation = CurvedAnimation(
       parent: _overallMoveController,
       curve: Interval(0.0, totalActionsExtent),
@@ -433,7 +441,7 @@ class SlidableState extends State<Slidable>
   Animation<double> _resizeAnimation;
 
   double _dragExtent = 0.0;
-  double get actionSign => _actionType == SlideActionType.primary ? 1.0 : -1.0;
+  double get actionSign => actionType == SlideActionType.primary ? 1.0 : -1.0;
 
   SlidableRenderingMode _renderingMode = SlidableRenderingMode.none;
   SlidableRenderingMode get renderingMode => _renderingMode;
@@ -445,6 +453,11 @@ class SlidableState extends State<Slidable>
 
   SlideActionType _actionType = SlideActionType.primary;
   SlideActionType get actionType => _actionType;
+  set actionType(SlideActionType value) {
+    _actionType = value;
+    _initAnimations();
+  }
+
   bool get showActions => actionType == SlideActionType.primary;
 
   int get actionCount => actionDelegate?.actionCount ?? 0;
@@ -537,7 +550,7 @@ class SlidableState extends State<Slidable>
 
     if (actionType != null && _actionType != actionType) {
       setState(() {
-        _actionType = actionType;
+        this.actionType = actionType;
       });
     }
     if (actionCount > 0) {
@@ -575,7 +588,7 @@ class SlidableState extends State<Slidable>
       actionType ??= _actionType;
       if (actionType != _actionType) {
         setState(() {
-          _actionType = actionType;
+          this.actionType = actionType;
         });
       }
 
@@ -610,7 +623,7 @@ class SlidableState extends State<Slidable>
     final double delta = details.primaryDelta;
     _dragExtent += delta;
     setState(() {
-      _actionType = _dragExtent.sign >= 0
+      actionType = _dragExtent.sign >= 0
           ? SlideActionType.primary
           : SlideActionType.secondary;
       if (actionCount > 0) {
@@ -794,7 +807,7 @@ class SlidableState extends State<Slidable>
     return _SlidableScope(
       child: content,
       data: _SlidableData(
-        actionType: _actionType,
+        actionType: actionType,
         renderingMode: _renderingMode,
         state: this,
       ),

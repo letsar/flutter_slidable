@@ -75,16 +75,16 @@ class SlidableDismissal extends StatelessWidget {
   final Widget child;
 
   Widget build(BuildContext context) {
-    final SlidableState state = Slidable.of(context);
+    final SlidableData data = SlidableData.of(context);
 
     return AnimatedBuilder(
-      animation: state.overallMoveAnimation,
+      animation: data.overallMoveAnimation,
       child: child,
       builder: (BuildContext context, Widget child) {
-        if (state.overallMoveAnimation.value > state.totalActionsExtent) {
+        if (data.overallMoveAnimation.value > data.totalActionsExtent) {
           return child;
         } else {
-          return state.widget.actionPane;
+          return data.state.widget.actionPane;
         }
       },
     );
@@ -98,50 +98,48 @@ class SlidableDrawerDismissal extends StatelessWidget {
   const SlidableDrawerDismissal({Key key}) : super(key: key);
 
   Widget build(BuildContext context) {
-    final SlidableState state = Slidable.of(context);
+    final SlidableData data = SlidableData.of(context);
 
     final animation = Tween<Offset>(
       begin: Offset.zero,
-      end: state.createOffset(state.actionSign),
-    ).animate(state.overallMoveAnimation);
+      end: data.createOffset(data.actionSign),
+    ).animate(data.overallMoveAnimation);
 
     return Stack(
       children: <Widget>[
         Positioned.fill(
           child: LayoutBuilder(builder: (context, constraints) {
-            final count = state.actionCount;
-            final double totalExtent = state.getMaxExtent(constraints);
-            final double actionExtent =
-                totalExtent * state.widget.actionExtentRatio;
+            final count = data.actionCount;
+            final double totalExtent = data.getMaxExtent(constraints);
+            final double actionExtent = totalExtent * data.actionExtentRatio;
 
             final extentAnimations = Iterable.generate(count).map((index) {
               return Tween<double>(
                 begin: actionExtent,
                 end: totalExtent -
-                    (actionExtent * (state.actionCount - index - 1)),
+                    (actionExtent * (data.actionCount - index - 1)),
               ).animate(
                 CurvedAnimation(
-                  parent: state.overallMoveAnimation,
-                  curve: Interval(state.totalActionsExtent, 1.0),
+                  parent: data.overallMoveAnimation,
+                  curve: Interval(data.totalActionsExtent, 1.0),
                 ),
               );
             }).toList();
 
             return AnimatedBuilder(
-                animation: state.overallMoveAnimation,
+                animation: data.overallMoveAnimation,
                 builder: (context, child) {
                   return Stack(
-                    children: List.generate(state.actionCount, (index) {
+                    children: List.generate(data.actionCount, (index) {
                       // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-                      int displayIndex = state.showActions
-                          ? state.actionCount - index - 1
+                      int displayIndex = data.showActions
+                          ? data.actionCount - index - 1
                           : index;
-                      return state.createPositioned(
-                        position:
-                            actionExtent * (state.actionCount - index - 1),
+                      return data.createPositioned(
+                        position: actionExtent * (data.actionCount - index - 1),
                         extent: extentAnimations[index].value,
-                        child: state.actionDelegate.build(context, displayIndex,
-                            state.actionsMoveAnimation, state.renderingMode),
+                        child: data.actionDelegate.build(context, displayIndex,
+                            data.actionsMoveAnimation, data.renderingMode),
                       );
                     }),
                   );
@@ -150,7 +148,7 @@ class SlidableDrawerDismissal extends StatelessWidget {
         ),
         SlideTransition(
           position: animation,
-          child: state.widget.child,
+          child: data.child,
         ),
       ],
     );

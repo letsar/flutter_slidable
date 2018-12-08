@@ -4,22 +4,22 @@ import 'package:flutter_slidable/src/widgets/slidable.dart';
 class _SlidableStackActionPane extends StatelessWidget {
   _SlidableStackActionPane({
     Key key,
-    @required this.state,
+    @required this.data,
     @required this.child,
   })  : _animation = Tween<Offset>(
           begin: Offset.zero,
-          end: state.createOffset(state.totalActionsExtent * state.actionSign),
-        ).animate(state.actionsMoveAnimation),
+          end: data.createOffset(data.totalActionsExtent * data.actionSign),
+        ).animate(data.actionsMoveAnimation),
         super(key: key);
 
   final Widget child;
-  final SlidableState state;
+  final SlidableData data;
   final Animation<Offset> _animation;
 
   @override
   Widget build(BuildContext context) {
-    if (state.actionsMoveAnimation.isDismissed) {
-      return state.widget.child;
+    if (data.actionsMoveAnimation.isDismissed) {
+      return data.child;
     }
 
     return Stack(
@@ -27,7 +27,7 @@ class _SlidableStackActionPane extends StatelessWidget {
         child,
         SlideTransition(
           position: _animation,
-          child: state.widget.child,
+          child: data.child,
         ),
       ],
     );
@@ -40,26 +40,26 @@ class SlidableStrechActionPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SlidableState state = Slidable.of(context);
+    final SlidableData data = SlidableData.of(context);
 
     final animation = Tween<double>(
       begin: 0.0,
-      end: state.totalActionsExtent,
-    ).animate(state.actionsMoveAnimation);
+      end: data.totalActionsExtent,
+    ).animate(data.actionsMoveAnimation);
 
     return _SlidableStackActionPane(
-      state: state,
+      data: data,
       child: Positioned.fill(
         child: AnimatedBuilder(
-          animation: state.actionsMoveAnimation,
+          animation: data.actionsMoveAnimation,
           builder: (context, child) {
             return FractionallySizedBox(
-              alignment: state.alignment,
-              widthFactor: state.directionIsXAxis ? animation.value : null,
-              heightFactor: state.directionIsXAxis ? null : animation.value,
+              alignment: data.alignment,
+              widthFactor: data.directionIsXAxis ? animation.value : null,
+              heightFactor: data.directionIsXAxis ? null : animation.value,
               child: Flex(
-                direction: state.widget.direction,
-                children: state
+                direction: data.direction,
+                children: data
                     .buildActions(context)
                     .map((a) => Expanded(child: a))
                     .toList(),
@@ -78,18 +78,18 @@ class SlidableBehindActionPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SlidableState state = Slidable.of(context);
+    final SlidableData data = SlidableData.of(context);
 
     return _SlidableStackActionPane(
-      state: state,
+      data: data,
       child: Positioned.fill(
         child: FractionallySizedBox(
-          alignment: state.alignment,
-          widthFactor: state.actionPaneWidthFactor,
-          heightFactor: state.actionPaneHeightFactor,
+          alignment: data.alignment,
+          widthFactor: data.actionPaneWidthFactor,
+          heightFactor: data.actionPaneHeightFactor,
           child: Flex(
-            direction: state.widget.direction,
-            children: state
+            direction: data.direction,
+            children: data
                 .buildActions(context)
                 .map((a) => Expanded(child: a))
                 .toList(),
@@ -106,26 +106,26 @@ class SlidableScrollActionPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SlidableState state = Slidable.of(context);
+    final SlidableData data = SlidableData.of(context);
 
-    final alignment = state.alignment;
+    final alignment = data.alignment;
     final animation = Tween<Offset>(
       begin: Offset(alignment.x, alignment.y),
       end: Offset.zero,
-    ).animate(state.actionsMoveAnimation);
+    ).animate(data.actionsMoveAnimation);
 
     return _SlidableStackActionPane(
-      state: state,
+      data: data,
       child: Positioned.fill(
         child: FractionallySizedBox(
-          alignment: state.alignment,
-          widthFactor: state.actionPaneWidthFactor,
-          heightFactor: state.actionPaneHeightFactor,
+          alignment: data.alignment,
+          widthFactor: data.actionPaneWidthFactor,
+          heightFactor: data.actionPaneHeightFactor,
           child: SlideTransition(
             position: animation,
             child: Flex(
-              direction: state.widget.direction,
-              children: state
+              direction: data.direction,
+              children: data
                   .buildActions(context)
                   .map((a) => Expanded(child: a))
                   .toList(),
@@ -143,41 +143,39 @@ class SlidableDrawerActionPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SlidableState state = Slidable.of(context);
+    final SlidableData data = SlidableData.of(context);
 
-    final alignment = state.alignment;
+    final alignment = data.alignment;
     final startOffset = Offset(alignment.x, alignment.y);
-    final animations = Iterable.generate(state.actionCount).map((index) {
+    final animations = Iterable.generate(data.actionCount).map((index) {
       return Tween<Offset>(
         begin: startOffset,
         end: startOffset * (index - 1.0),
-      ).animate(state.actionsMoveAnimation);
+      ).animate(data.actionsMoveAnimation);
     }).toList();
 
     return _SlidableStackActionPane(
-      state: state,
+      data: data,
       child: Positioned.fill(
         child: Stack(
-          alignment: state.alignment,
+          alignment: data.alignment,
           children: List.generate(
-            state.actionCount,
+            data.actionCount,
             (index) {
               int displayIndex =
-                  state.showActions ? state.actionCount - index - 1 : index;
+                  data.showActions ? data.actionCount - index - 1 : index;
               return FractionallySizedBox(
-                alignment: state.alignment,
-                widthFactor: state.directionIsXAxis
-                    ? state.widget.actionExtentRatio
-                    : null,
-                heightFactor: state.directionIsXAxis
-                    ? null
-                    : state.widget.actionExtentRatio,
+                alignment: data.alignment,
+                widthFactor:
+                    data.directionIsXAxis ? data.actionExtentRatio : null,
+                heightFactor:
+                    data.directionIsXAxis ? null : data.actionExtentRatio,
                 child: SlideTransition(
                   position: animations[index],
-                  child: state.actionDelegate.build(
+                  child: data.actionDelegate.build(
                     context,
                     displayIndex,
-                    state.actionsMoveAnimation,
+                    data.actionsMoveAnimation,
                     SlidableRenderingMode.slide,
                   ),
                 ),

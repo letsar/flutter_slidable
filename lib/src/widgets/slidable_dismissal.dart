@@ -84,7 +84,7 @@ class SlidableDismissal extends StatelessWidget {
         if (data.overallMoveAnimation.value > data.totalActionsExtent) {
           return child;
         } else {
-          return data.state.widget.actionPane;
+          return data.slidable.actionPane;
         }
       },
     );
@@ -148,7 +148,7 @@ class SlidableDrawerDismissal extends StatelessWidget {
         ),
         SlideTransition(
           position: animation,
-          child: data.child,
+          child: data.slidable.child,
         ),
       ],
     );

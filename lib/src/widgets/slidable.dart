@@ -145,14 +145,120 @@ class SlideActionListDelegate extends SlideActionDelegate {
 class _SlidableScope extends InheritedWidget {
   _SlidableScope({
     Key key,
-    @required this.data,
+    @required this.state,
     @required Widget child,
   }) : super(key: key, child: child);
 
-  final SlidableData data;
+  final SlidableState state;
 
   @override
-  bool updateShouldNotify(_SlidableScope oldWidget) => oldWidget.data != data;
+  bool updateShouldNotify(_SlidableScope oldWidget) => oldWidget.state != state;
+}
+
+class SlidableData extends InheritedWidget {
+  SlidableData({
+    Key key,
+    @required this.actionType,
+    @required this.renderingMode,
+    @required this.totalActionsExtent,
+    @required this.dismissThreshold,
+    @required this.dismissible,
+    @required this.actionDelegate,
+    @required this.overallMoveAnimation,
+    @required this.actionsMoveAnimation,
+    @required this.dismissAnimation,
+    @required this.slidable,
+    @required this.actionExtentRatio,
+    @required this.direction,
+    @required Widget child,
+  }) : super(key: key, child: child);
+
+  final SlideActionType actionType;
+  final SlidableRenderingMode renderingMode;
+  final double totalActionsExtent;
+  final double dismissThreshold;
+  final bool dismissible;
+
+  /// The current actions that have to be shown.
+  final SlideActionDelegate actionDelegate;
+  final Animation<double> overallMoveAnimation;
+  final Animation<double> actionsMoveAnimation;
+  final Animation<double> dismissAnimation;
+  final Slidable slidable;
+
+  /// Relative ratio between one slide action and the extent of the child.
+  final double actionExtentRatio;
+
+  /// The direction in which this widget can be slid.
+  final Axis direction;
+
+  bool get showActions => actionType == SlideActionType.primary;
+  int get actionCount => actionDelegate?.actionCount ?? 0;
+  double get actionSign => actionType == SlideActionType.primary ? 1.0 : -1.0;
+  bool get directionIsXAxis => direction == Axis.horizontal;
+  Alignment get alignment => Alignment(
+        directionIsXAxis ? -actionSign : 0.0,
+        directionIsXAxis ? 0.0 : -actionSign,
+      );
+  double get actionPaneWidthFactor =>
+      directionIsXAxis ? totalActionsExtent : null;
+  double get actionPaneHeightFactor =>
+      directionIsXAxis ? null : totalActionsExtent;
+
+  /// The data from the closest instance of this class that encloses the given context.
+  static SlidableData of(BuildContext context) {
+    return context.inheritFromWidgetOfExactType(SlidableData);
+  }
+
+  /// Gets the the given offset related to the current direction.
+  Offset createOffset(double value) {
+    return directionIsXAxis ? Offset(value, 0.0) : Offset(0.0, value);
+  }
+
+  /// Gets the maximum extent in the current direction.
+  double getMaxExtent(BoxConstraints constraints) {
+    return directionIsXAxis ? constraints.maxWidth : constraints.maxHeight;
+  }
+
+  /// Creates a positioned related to the current direction and showed actions.
+  Positioned createPositioned({Widget child, double extent, double position}) {
+    return Positioned(
+      left: directionIsXAxis ? (showActions ? position : null) : 0.0,
+      right: directionIsXAxis ? (showActions ? null : position) : 0.0,
+      top: directionIsXAxis ? 0.0 : (showActions ? position : null),
+      bottom: directionIsXAxis ? 0.0 : (showActions ? null : position),
+      width: directionIsXAxis ? extent : null,
+      height: directionIsXAxis ? null : extent,
+      child: child,
+    );
+  }
+
+  /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
+  List<Widget> buildActions(BuildContext context) {
+    return List.generate(
+      actionCount,
+      (int index) => actionDelegate.build(
+            context,
+            index,
+            actionsMoveAnimation,
+            SlidableRenderingMode.slide,
+          ),
+    );
+  }
+
+  bool updateShouldNotify(SlidableData oldWidget) =>
+      (oldWidget.actionType != actionType) ||
+      (oldWidget.renderingMode != renderingMode) ||
+      (oldWidget.totalActionsExtent != totalActionsExtent) ||
+      (oldWidget.dismissThreshold != dismissThreshold) ||
+      (oldWidget.dismissible != dismissible) ||
+      (oldWidget.actionDelegate != actionDelegate) ||
+      (oldWidget.overallMoveAnimation != overallMoveAnimation) ||
+      (oldWidget.actionsMoveAnimation != actionsMoveAnimation) ||
+      (oldWidget.dismissAnimation != dismissAnimation) ||
+      (oldWidget.slidable != slidable) ||
+      (oldWidget.actionExtentRatio != actionExtentRatio) ||
+      (oldWidget.direction != direction);
 }
 
 /// A controller that keep tracks of the active [SlidableState] and close
@@ -361,143 +467,11 @@ class Slidable extends StatefulWidget {
   static SlidableState of(BuildContext context) {
     final _SlidableScope scope =
         context.inheritFromWidgetOfExactType(_SlidableScope);
-    return scope?.data?.state;
+    return scope?.state;
   }
 
   @override
   SlidableState createState() => SlidableState();
-}
-
-class SlidableData {
-  SlidableData({
-    @required this.actionType,
-    @required this.renderingMode,
-    @required this.totalActionsExtent,
-    @required this.dismissThreshold,
-    @required this.dismissible,
-    @required this.actionDelegate,
-    @required this.overallMoveAnimation,
-    @required this.actionsMoveAnimation,
-    @required this.dismissAnimation,
-    @required this.child,
-    @required this.actionExtentRatio,
-    @required this.direction,
-    @required this.state,
-  });
-
-  final SlideActionType actionType;
-  final SlidableRenderingMode renderingMode;
-  final double totalActionsExtent;
-  final double dismissThreshold;
-  final bool dismissible;
-
-  /// The current actions that have to be shown.
-  final SlideActionDelegate actionDelegate;
-  final Animation<double> overallMoveAnimation;
-  final Animation<double> actionsMoveAnimation;
-  final Animation<double> dismissAnimation;
-  final SlidableState state;
-  final Widget child;
-
-  /// Relative ratio between one slide action and the extent of the child.
-  final double actionExtentRatio;
-
-  /// The direction in which this widget can be slid.
-  final Axis direction;
-
-  bool get showActions => actionType == SlideActionType.primary;
-  int get actionCount => actionDelegate?.actionCount ?? 0;
-  double get actionSign => actionType == SlideActionType.primary ? 1.0 : -1.0;
-  bool get directionIsXAxis => direction == Axis.horizontal;
-  Alignment get alignment => Alignment(
-        directionIsXAxis ? -actionSign : 0.0,
-        directionIsXAxis ? 0.0 : -actionSign,
-      );
-  double get actionPaneWidthFactor =>
-      directionIsXAxis ? totalActionsExtent : null;
-  double get actionPaneHeightFactor =>
-      directionIsXAxis ? null : totalActionsExtent;
-
-  /// The data from the closest instance of this class that encloses the given context.
-  static SlidableData of(BuildContext context) {
-    final _SlidableScope scope =
-        context.inheritFromWidgetOfExactType(_SlidableScope);
-    return scope?.data;
-  }
-
-  /// Gets the the given offset related to the current direction.
-  Offset createOffset(double value) {
-    return directionIsXAxis ? Offset(value, 0.0) : Offset(0.0, value);
-  }
-
-  /// Gets the maximum extent in the current direction.
-  double getMaxExtent(BoxConstraints constraints) {
-    return directionIsXAxis ? constraints.maxWidth : constraints.maxHeight;
-  }
-
-  /// Creates a positioned related to the current direction and showed actions.
-  Positioned createPositioned({Widget child, double extent, double position}) {
-    return Positioned(
-      left: directionIsXAxis ? (showActions ? position : null) : 0.0,
-      right: directionIsXAxis ? (showActions ? null : position) : 0.0,
-      top: directionIsXAxis ? 0.0 : (showActions ? position : null),
-      bottom: directionIsXAxis ? 0.0 : (showActions ? null : position),
-      width: directionIsXAxis ? extent : null,
-      height: directionIsXAxis ? null : extent,
-      child: child,
-    );
-  }
-
-  /// Builds the slide actions using the active [SlideActionDelegate]'s builder.
-  List<Widget> buildActions(BuildContext context) {
-    return List.generate(
-      actionCount,
-      (int index) => actionDelegate.build(
-            context,
-            index,
-            actionsMoveAnimation,
-            SlidableRenderingMode.slide,
-          ),
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (other.runtimeType != runtimeType) return false;
-    final SlidableData typedOther = other;
-    return (typedOther.actionType == actionType) &&
-        (typedOther.renderingMode == renderingMode) &&
-        (typedOther.totalActionsExtent == totalActionsExtent) &&
-        (typedOther.dismissThreshold == dismissThreshold) &&
-        (typedOther.dismissible == dismissible) &&
-        (typedOther.actionDelegate == actionDelegate) &&
-        (typedOther.overallMoveAnimation == overallMoveAnimation) &&
-        (typedOther.actionsMoveAnimation == actionsMoveAnimation) &&
-        (typedOther.dismissAnimation == dismissAnimation) &&
-        (typedOther.child == child) &&
-        (typedOther.actionExtentRatio == actionExtentRatio) &&
-        (typedOther.direction == direction) &&
-        (typedOther.state == state);
-  }
-
-  @override
-  int get hashCode {
-    return hashValues(
-      actionType,
-      renderingMode,
-      totalActionsExtent,
-      dismissThreshold,
-      dismissible,
-      actionDelegate,
-      overallMoveAnimation,
-      actionsMoveAnimation,
-      dismissAnimation,
-      child,
-      actionExtentRatio,
-      direction,
-      state,
-    );
-  }
 }
 
 /// The state of [Slidable] widget.
@@ -891,8 +865,8 @@ class SlidableState extends State<Slidable>
     }
 
     return _SlidableScope(
-      child: content,
-      data: SlidableData(
+      state: this,
+      child: SlidableData(
         actionType: actionType,
         renderingMode: _renderingMode,
         totalActionsExtent: _totalActionsExtent,
@@ -902,10 +876,10 @@ class SlidableState extends State<Slidable>
         overallMoveAnimation: overallMoveAnimation,
         actionsMoveAnimation: _actionsMoveAnimation,
         dismissAnimation: _dismissAnimation,
-        child: widget.child,
+        slidable: widget,
         actionExtentRatio: widget.actionExtentRatio,
         direction: widget.direction,
-        state: this,
+        child: content,
       ),
     );
   }

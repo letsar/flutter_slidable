@@ -19,7 +19,7 @@ class _SlidableStackActionPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.actionsMoveAnimation.isDismissed) {
-      return data.child;
+      return data.slidable.child;
     }
 
     return Stack(
@@ -27,7 +27,7 @@ class _SlidableStackActionPane extends StatelessWidget {
         child,
         SlideTransition(
           position: _animation,
-          child: data.child,
+          child: data.slidable.child,
         ),
       ],
     );

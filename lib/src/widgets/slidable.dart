@@ -1171,7 +1171,19 @@ class SlidableState extends State<Slidable>
       onVerticalDragUpdate: directionIsXAxis ? null : _handleDragUpdate,
       onVerticalDragEnd: directionIsXAxis ? null : _handleDragEnd,
       behavior: HitTestBehavior.opaque,
-      child: content,
+      child: new GestureDetector(
+        onTap: () {
+          close();
+          if (content is MainViewInSlidable) {
+            (content as MainViewInSlidable).callCloseOnTap();
+          }
+        },
+        child: content,
+      ),
     );
   }
+}
+
+abstract class MainViewInSlidable {
+  void callCloseOnTap();
 }

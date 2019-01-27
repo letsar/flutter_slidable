@@ -13,8 +13,8 @@ const Duration _kResizeDuration = const Duration(milliseconds: 300);
 ///
 /// See also:
 ///
-///  * [SlideToDismissDrawerDelegate], which creates slide actions that are displayed like drawers
-///  while the item is dismissing.///
+///  * [SlidableDrawerDismissal], which creates slide actions that are displayed like drawers
+///  while the item is dismissing.
 class SlidableDismissal extends StatelessWidget {
   const SlidableDismissal({
     @required this.child,

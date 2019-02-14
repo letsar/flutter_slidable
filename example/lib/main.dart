@@ -41,9 +41,15 @@ class _MyHomePageState extends State<MyHomePage> {
   @protected
   void initState() {
     slidableController = new SlidableController(
-      onSlideAnimationChanged: handleSlideAnimationChanged,
-      onSlideIsOpenChanged: handleSlideIsOpenChanged,
-    );
+        onSlideAnimationChanged: handleSlideAnimationChanged,
+        onSlideIsOpenChanged: handleSlideIsOpenChanged,
+        onSliding: (x) {
+          print("actionType : " +
+              (x > 0 ? "primary(left to right)" : "secondary (right to left)"));
+          print(x.toString());
+        },
+        onDragStart: () => {print("drag start")},
+        onDragEnd: () => {print("drag end")});
     super.initState();
   }
 

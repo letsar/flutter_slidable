@@ -591,14 +591,20 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
 /// A controller that keep tracks of the active [SlidableState] and close
 /// the previous one.
 class SlidableController {
-  SlidableController({
-    this.onSlideAnimationChanged,
-    this.onSlideIsOpenChanged,
-  });
+  SlidableController(
+      {this.onSlideAnimationChanged,
+      this.onSlideIsOpenChanged,
+      this.onSliding,
+      this.onDragStart,
+      this.onDragEnd});
 
   final ValueChanged<Animation<double>> onSlideAnimationChanged;
   final ValueChanged<bool> onSlideIsOpenChanged;
   bool _isSlideOpen;
+
+  Function(double) onSliding;
+  Function onDragStart;
+  Function onDragEnd;
 
   Animation<double> _slideAnimation;
 
@@ -985,6 +991,9 @@ class SlidableState extends State<Slidable>
     if (_actionsMoveController.isAnimating) {
       _actionsMoveController.stop();
     }
+    if (widget.controller != null && widget.controller.onDragStart != null) {
+      widget.controller.onDragStart();
+    }
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
@@ -1001,11 +1010,20 @@ class SlidableState extends State<Slidable>
           ? SlidableRenderingMode.dismiss
           : SlidableRenderingMode.slide;
     });
+    if (widget.controller != null && widget.controller.onSliding != null) {
+      widget.controller.onSliding(actionType == SlideActionType.primary
+          ? _overallMoveController.value
+          : -_overallMoveController.value);
+    }
   }
 
   void _handleDragEnd(DragEndDetails details) {
     if (widget.controller != null && widget.controller.activeState != this) {
       return;
+    }
+
+    if (widget.controller != null && widget.controller.onDragEnd != null) {
+      widget.controller.onDragEnd();
     }
 
     _dragUnderway = false;

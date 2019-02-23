@@ -107,7 +107,7 @@ class IconSlideAction extends ClosableSlideAction {
     this.foregroundColor,
     VoidCallback onTap,
     bool closeOnTap = _kCloseOnTap,
-  })  : color = color ?? Colors.white,
+  })  : color = color ?? Colors.transparent,
         super(
           key: key,
           onTap: onTap,

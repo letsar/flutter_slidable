@@ -101,13 +101,16 @@ class IconSlideAction extends ClosableSlideAction {
   /// The [closeOnTap] argument must not be null.
   const IconSlideAction({
     Key key,
-    @required this.icon,
+    this.icon,
+    this.iconWidget,
     this.caption,
     Color color,
     this.foregroundColor,
     VoidCallback onTap,
     bool closeOnTap = _kCloseOnTap,
   })  : color = color ?? Colors.white,
+        assert(icon != null || iconWidget != null,
+            'Either set icon or iconWidget.'),
         super(
           key: key,
           onTap: onTap,
@@ -115,6 +118,7 @@ class IconSlideAction extends ClosableSlideAction {
         );
 
   final IconData icon;
+  final Widget iconWidget;
 
   final String caption;
 
@@ -131,28 +135,47 @@ class IconSlideAction extends ClosableSlideAction {
         ThemeData.estimateBrightnessForColor(color) == Brightness.light
             ? Colors.black
             : Colors.white;
-    final Text textWidget = new Text(
-      caption ?? '',
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context)
-          .primaryTextTheme
-          .caption
-          .copyWith(color: foregroundColor ?? estimatedColor),
-    );
+
+    final List<Widget> widgets = [];
+
+    if (icon != null) {
+      widgets.add(
+        Flexible(
+          child: new Icon(
+            icon,
+            color: foregroundColor ?? estimatedColor,
+          ),
+        ),
+      );
+    }
+
+    if (iconWidget != null) {
+      widgets.add(
+        Flexible(child: iconWidget),
+      );
+    }
+
+    if (caption != null) {
+      widgets.add(
+        Flexible(
+          child: Text(
+            caption,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context)
+                .primaryTextTheme
+                .caption
+                .copyWith(color: foregroundColor ?? estimatedColor),
+          ),
+        ),
+      );
+    }
+
     return Container(
       color: color,
       child: new Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            new Flexible(
-              child: new Icon(
-                icon,
-                color: foregroundColor ?? estimatedColor,
-              ),
-            ),
-            new Flexible(child: textWidget),
-          ],
+          children: widgets,
         ),
       ),
     );

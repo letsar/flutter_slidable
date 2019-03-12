@@ -588,7 +588,7 @@ class SlidableDrawerDelegate extends SlidableStackDelegate {
   }
 }
 
-/// A controller that keep tracks of the active [SlidableState] and close
+/// A controller that keeps tracks of the active [SlidableState] and closes
 /// the previous one.
 class SlidableController {
   SlidableController({
@@ -1015,7 +1015,8 @@ class SlidableState extends State<Slidable>
 
     if (dismissible && overallMoveAnimation.value > totalActionsExtent) {
       // We are in a dismiss state.
-      if (overallMoveAnimation.value >= dismissThreshold) {
+      if (overallMoveAnimation.value >= dismissThreshold ||
+        (shouldOpen && fast)) {
         dismiss();
       } else {
         open();

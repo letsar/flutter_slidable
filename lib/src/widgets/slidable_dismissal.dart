@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_slidable/src/widgets/fractionnally_aligned_sized_box.dart';
 import 'package:flutter_slidable/src/widgets/slidable.dart';
 
 const Duration _kResizeDuration = const Duration(milliseconds: 300);
@@ -105,47 +106,97 @@ class SlidableDrawerDismissal extends StatelessWidget {
       end: data.createOffset(data.actionSign),
     ).animate(data.overallMoveAnimation);
 
+    final count = data.actionCount;
+
+    final extentAnimations = Iterable.generate(count).map((index) {
+      return Tween<double>(
+        begin: data.actionExtentRatio,
+        end: 1 - data.actionExtentRatio * (data.actionCount - index - 1),
+      ).animate(
+        CurvedAnimation(
+          parent: data.overallMoveAnimation,
+          curve: Interval(data.totalActionsExtent, 1.0),
+        ),
+      );
+    }).toList();
+
     return Stack(
       children: <Widget>[
-        Positioned.fill(
-          child: LayoutBuilder(builder: (context, constraints) {
-            final count = data.actionCount;
-            final double totalExtent = data.getMaxExtent(constraints);
-            final double actionExtent = totalExtent * data.actionExtentRatio;
+        AnimatedBuilder(
+            animation: data.overallMoveAnimation,
+            builder: (context, child) {
+              return Positioned.fill(
+                child: Stack(
+                  children: List.generate(data.actionCount, (index) {
+                    // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
+                    int displayIndex =
+                        data.showActions ? data.actionCount - index - 1 : index;
 
-            final extentAnimations = Iterable.generate(count).map((index) {
-              return Tween<double>(
-                begin: actionExtent,
-                end: totalExtent -
-                    (actionExtent * (data.actionCount - index - 1)),
-              ).animate(
-                CurvedAnimation(
-                  parent: data.overallMoveAnimation,
-                  curve: Interval(data.totalActionsExtent, 1.0),
+                    return data.createFractionallyAlignedSizedBox(
+                      positionFactor: data.actionExtentRatio *
+                          (data.actionCount - index - 1),
+                      extentFactor: extentAnimations[index].value,
+                      child: data.actionDelegate.build(context, displayIndex,
+                          data.actionsMoveAnimation, data.renderingMode),
+                    );
+                  }),
                 ),
               );
-            }).toList();
+              // return Stack(
+              //   children: List.generate(data.actionCount, (index) {
+              //     // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
+              //     int displayIndex =
+              //         data.showActions ? data.actionCount - index - 1 : index;
 
-            return AnimatedBuilder(
-                animation: data.overallMoveAnimation,
-                builder: (context, child) {
-                  return Stack(
-                    children: List.generate(data.actionCount, (index) {
-                      // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-                      int displayIndex = data.showActions
-                          ? data.actionCount - index - 1
-                          : index;
-                      return data.createPositioned(
-                        position: actionExtent * (data.actionCount - index - 1),
-                        extent: extentAnimations[index].value,
-                        child: data.actionDelegate.build(context, displayIndex,
-                            data.actionsMoveAnimation, data.renderingMode),
-                      );
-                    }),
-                  );
-                });
-          }),
-        ),
+              //     return data.createFractionallyAlignedSizedBox(
+              //       positionFactor:
+              //           data.actionExtentRatio * (data.actionCount - index - 1),
+              //       extentFactor: extentAnimations[index].value,
+              //       child: data.actionDelegate.build(context, displayIndex,
+              //           data.actionsMoveAnimation, data.renderingMode),
+              //     );
+              //   }),
+              // );
+            }),
+        // Positioned.fill(
+        //   child: LayoutBuilder(builder: (context, constraints) {
+        //     final count = data.actionCount;
+        //     final double totalExtent = data.getMaxExtent(constraints);
+        //     final double actionExtent = totalExtent * data.actionExtentRatio;
+
+        //     final extentAnimations = Iterable.generate(count).map((index) {
+        //       return Tween<double>(
+        //         begin: actionExtent,
+        //         end: totalExtent -
+        //             (actionExtent * (data.actionCount - index - 1)),
+        //       ).animate(
+        //         CurvedAnimation(
+        //           parent: data.overallMoveAnimation,
+        //           curve: Interval(data.totalActionsExtent, 1.0),
+        //         ),
+        //       );
+        //     }).toList();
+
+        //     return AnimatedBuilder(
+        //         animation: data.overallMoveAnimation,
+        //         builder: (context, child) {
+        //           return Stack(
+        //             children: List.generate(data.actionCount, (index) {
+        //               // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
+        //               int displayIndex = data.showActions
+        //                   ? data.actionCount - index - 1
+        //                   : index;
+        //               return data.createPositioned(
+        //                 position: actionExtent * (data.actionCount - index - 1),
+        //                 extent: extentAnimations[index].value,
+        //                 child: data.actionDelegate.build(context, displayIndex,
+        //                     data.actionsMoveAnimation, data.renderingMode),
+        //               );
+        //             }),
+        //           );
+        //         });
+        //   }),
+        // ),
         SlideTransition(
           position: animation,
           child: data.slidable.child,

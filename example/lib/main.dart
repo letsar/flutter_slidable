@@ -133,20 +133,20 @@ class _MyHomePageState extends State<MyHomePage> {
       child: direction == Axis.horizontal
           ? VerticalListItem(items[index])
           : HorizontalListItem(items[index]),
-      // actions: <Widget>[
-      //   IconSlideAction(
-      //     caption: 'Archive',
-      //     color: Colors.blue,
-      //     icon: Icons.archive,
-      //     onTap: () => _showSnackBar(context, 'Archive'),
-      //   ),
-      //   IconSlideAction(
-      //     caption: 'Share',
-      //     color: Colors.indigo,
-      //     icon: Icons.share,
-      //     onTap: () => _showSnackBar(context, 'Share'),
-      //   ),
-      // ],
+      actions: <Widget>[
+        IconSlideAction(
+          caption: 'Archive',
+          color: Colors.blue,
+          icon: Icons.archive,
+          onTap: () => _showSnackBar(context, 'Archive'),
+        ),
+        IconSlideAction(
+          caption: 'Share',
+          color: Colors.indigo,
+          icon: Icons.share,
+          onTap: () => _showSnackBar(context, 'Share'),
+        ),
+      ],
       secondaryActions: <Widget>[
         IconSlideAction(
           caption: 'More',

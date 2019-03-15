@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_slidable/src/widgets/fractionnally_aligned_sized_box.dart';
 import 'package:flutter_slidable/src/widgets/slidable_dismissal.dart';
 
 const double _kActionsExtentRatio = 0.25;
@@ -221,7 +222,11 @@ class SlidableData extends InheritedWidget {
   }
 
   /// Creates a positioned related to the current direction and showed actions.
-  Positioned createPositioned({Widget child, double extent, double position}) {
+  Positioned createPositioned({
+    Widget child,
+    double extent,
+    double position,
+  }) {
     return Positioned(
       left: directionIsXAxis ? (showActions ? position : null) : 0.0,
       right: directionIsXAxis ? (showActions ? null : position) : 0.0,
@@ -229,6 +234,25 @@ class SlidableData extends InheritedWidget {
       bottom: directionIsXAxis ? 0.0 : (showActions ? null : position),
       width: directionIsXAxis ? extent : null,
       height: directionIsXAxis ? null : extent,
+      child: child,
+    );
+  }
+
+  FractionallyAlignedSizedBox createFractionallyAlignedSizedBox({
+    Widget child,
+    double extentFactor,
+    double positionFactor,
+  }) {
+    return FractionallyAlignedSizedBox(
+      leftFactor:
+          directionIsXAxis ? (showActions ? positionFactor : null) : 0.0,
+      rightFactor:
+          directionIsXAxis ? (showActions ? null : positionFactor) : 0.0,
+      topFactor: directionIsXAxis ? 0.0 : (showActions ? positionFactor : null),
+      bottomFactor:
+          directionIsXAxis ? 0.0 : (showActions ? null : positionFactor),
+      widthFactor: directionIsXAxis ? extentFactor : null,
+      heightFactor: directionIsXAxis ? null : extentFactor,
       child: child,
     );
   }

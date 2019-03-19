@@ -11,7 +11,7 @@ A Flutter implementation of slidable list item with directional slide actions th
 
 * Accepts primary (left/top) and secondary (right/bottom) widget lists as slide actions.
 * Can be dismissed.
-* 4 built-in layouts.
+* 4 built-in action panes.
 * 2 built-in slide action widgets.
 * 1 built-in dismiss animation.
 * You can easily create you custom layouts and animations.
@@ -27,7 +27,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  flutter_slidable: "^0.4.9"
+  flutter_slidable: "^0.5.0"
 ```
 
 In your library add the following import:
@@ -48,7 +48,7 @@ You can create a `Slidable` in two different ways:
 A `Slidable` needs multiple things:
 
 * Slide actions (see below for details). They can be any widget. For convenience, this package has 2 built-in side action widgets.
-* A delegate. This is what controls the layout and the animation of the slide menu.
+* A slide action pane widget. This is what controls the layout and the animation of the slide menu.
 * An extent ratio between a slide action extent and the item extent.
 * A child.
 
@@ -58,29 +58,29 @@ The `secondaryActions` contains the slide actions that appear when the child has
 A `direction` parameter lets you choose if you want actions to appear when you slide horizontally (default) or vertically.
 
 ```dart
-new Slidable(
-  delegate: new SlidableDrawerDelegate(),
+Slidable(
+  actionPane: SlidableDrawerActionPane(),
   actionExtentRatio: 0.25,
-  child: new Container(
+  child: Container(
     color: Colors.white,
-    child: new ListTile(
-      leading: new CircleAvatar(
+    child: ListTile(
+      leading: CircleAvatar(
         backgroundColor: Colors.indigoAccent,
-        child: new Text('$3'),
+        child: Text('$3'),
         foregroundColor: Colors.white,
       ),
-      title: new Text('Tile n°$3'),
-      subtitle: new Text('SlidableDrawerDelegate'),
+      title: Text('Tile n°$3'),
+      subtitle: Text('SlidableDrawerDelegate'),
     ),
   ),
   actions: <Widget>[
-    new IconSlideAction(
+    IconSlideAction(
       caption: 'Archive',
       color: Colors.blue,
       icon: Icons.archive,
       onTap: () => _showSnackBar('Archive'),
     ),
-    new IconSlideAction(
+    IconSlideAction(
       caption: 'Share',
       color: Colors.indigo,
       icon: Icons.share,
@@ -88,13 +88,13 @@ new Slidable(
     ),
   ],
   secondaryActions: <Widget>[
-    new IconSlideAction(
+    IconSlideAction(
       caption: 'More',
       color: Colors.black45,
       icon: Icons.more_horiz,
       onTap: () => _showSnackBar('More'),
     ),
-    new IconSlideAction(
+    IconSlideAction(
       caption: 'Delete',
       color: Colors.red,
       icon: Icons.delete,
@@ -111,29 +111,29 @@ This package comes with 2 kinds of slide actions:
 * `SlideAction`, which is the most flexible. You can choose a background color, or any decoration, and it takes any widget as a child.
 * `IconSlideAction`, which requires an icon. It can have a background color and a caption below the icon.
 
-### Built-in delegates
+### Built-in action panes
 
-This package comes with 4 kinds of delegates:
+This package comes with 4 kinds of action panes:
 
-#### SlidableBehindDelegate
+#### SlidableBehindActionPane
 
 The slide actions stay behind the item while it's sliding:
 
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_behind.gif)
 
-#### SlidableScrollDelegate
+#### SlidableScrollActionPane
 
 The slide actions follow the item while it's sliding:
 
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_scroll.gif)
 
-#### SlidableDrawerDelegate
+#### SlidableDrawerActionPane
 
 The slide actions animate like drawers while the item is sliding:
 
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_drawer.gif)
 
-#### SlidableStrechDelegate
+#### SlidableStrechActionPane
 
 The slide actions stretch while the item is sliding:
 
@@ -153,8 +153,8 @@ To prevent this, you can pass in `false` to the `closeOnScroll` constructor para
 
 #### How can I dismiss my Slidable?
 
-In order to make your `Slidable` dismissible, you have to set the `slideToDismissDelegate` parameter of the `Slidable` constructor.
-You can set any class that inherits `SlideToDismissDelegate`. For now there is only one built-in: `SlideToDismissDrawerDelegate`.
+In order to make your `Slidable` dismissible, you have to set the `dismissal` parameter of the `Slidable` constructor and provide a child.
+You can set any widget as a child of `SlidableDismissal`. For the moment there is only one built-in: `SlidableDrawerDismissal`.
 
 The `actionType` passed to the `onDismissed` callback let you know which action has been dismissed.
 
@@ -163,7 +163,8 @@ When a `Slidable` is dismissible, the `key` parameter must not be null.
 Example:
 
 ``` dart
-slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+dismissal: SlidableDismissal(
+  child: SlidableDrawerDismissal(),
   onDismissed: (actionType) {
     _showSnackBar(
         context,
@@ -180,7 +181,7 @@ slideToDismissDelegate: new SlideToDismissDrawerDelegate(
 #### How can I prevent to dismiss one side but not the other?
 
 If you only want one side to be dismissible, you can set the associated threshold to 1.0 or more.
-For example, if you don't want the first primary action to be dismissed, you will set the following thresholds on the `slideToDismissDelegate`:
+For example, if you don't want the first primary action to be dismissed, you will set the following thresholds on the `dismissal`:
 
 ``` dart
 dismissThresholds: <SlideActionType, double>{
@@ -190,26 +191,27 @@ dismissThresholds: <SlideActionType, double>{
 
 #### How to let the user cancel a dismissal?
 
-You can let the user confirm the dismissal by setting the `onWillDismiss` callback on the `slideToDismissDelegate`.
+You can let the user confirm the dismissal by setting the `onWillDismiss` callback on the `dismissal`.
 
 Example:
 
 ```dart
-slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+dismissal: SlidableDismissal(
+  child: SlidableDrawerDismissal(),
   onWillDismiss: (actionType) {
           return showDialog<bool>(
             context: context,
             builder: (context) {
-              return new AlertDialog(
-                title: new Text('Delete'),
-                content: new Text('Item will be deleted'),
+              return AlertDialog(
+                title: Text('Delete'),
+                content: Text('Item will be deleted'),
                 actions: <Widget>[
-                  new FlatButton(
-                    child: new Text('Cancel'),
+                  FlatButton(
+                    child: Text('Cancel'),
                     onPressed: () => Navigator.of(context).pop(false),
                   ),
-                  new FlatButton(
-                    child: new Text('Ok'),
+                  FlatButton(
+                    child: Text('Ok'),
                     onPressed: () => Navigator.of(context).pop(true),
                   ),
                 ],
@@ -226,10 +228,10 @@ slideToDismissDelegate: new SlideToDismissDrawerDelegate(
 You have to set the `controller` parameter of the `Slidable` constructors to a `SlidableController` instance:
 
 ```dart
-final SlidableController slidableController = new SlidableController();
+final SlidableController slidableController = SlidableController();
 ...
-new Slidable(
-      key: new Key(item.title),
+Slidable(
+      key: Key(item.title),
       controller: slidableController,
       ...
       );
@@ -242,7 +244,7 @@ The `onSlideAnimationChanged` let you get the animation of the current Slidable.
 The `onSlideIsOpenChanged` let you know when the current Slidable opens and closes.
 
 ```dart
-final SlidableController slidableController = new SlidableController(
+final SlidableController slidableController = SlidableController(
   onSlideAnimationChanged: handleSlideAnimationChanged,
   onSlideIsOpenChanged: handleSlideIsOpenChanged,
   );
@@ -260,6 +262,13 @@ final SlidableController slidableController = new SlidableController(
   }
 ```
 
+#### How can I open the Slidable programmatically?
+
+You can open or close the `Slidable` programmatically by calling the `open` or `close` method of the `SlidableState`.
+The easiest way get the `SlidableState` from a child is to call `Slidable.of(context)`.
+
+The `open` method has an optional parameter called `actionType` that let you choose which action pane to open.
+
 ## Changelog
 
 Please see the [Changelog](https://github.com/letsar/flutter_slidable/blob/master/CHANGELOG.md) page to know what's recently changed.
@@ -269,4 +278,4 @@ Please see the [Changelog](https://github.com/letsar/flutter_slidable/blob/maste
 Feel free to contribute to this project.
 
 If you find a bug or want a feature, but don't know how to fix/implement it, please fill an [issue](https://github.com/letsar/flutter_slidable/issues).  
-If you fixed a bug or implemented a new feature, please send a [pull request](https://github.com/letsar/flutter_slidable/pulls).
+If you fixed a bug or implemented a feature, please send a [pull request](https://github.com/letsar/flutter_slidable/pulls).

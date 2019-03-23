@@ -104,13 +104,16 @@ class IconSlideAction extends ClosableSlideAction {
   /// The [closeOnTap] argument must not be null.
   const IconSlideAction({
     Key key,
-    @required this.icon,
+    this.icon,
+    this.iconWidget,
     this.caption,
     Color color,
     this.foregroundColor,
     VoidCallback onTap,
     bool closeOnTap = _kCloseOnTap,
   })  : color = color ?? Colors.white,
+        assert(icon != null || iconWidget != null,
+            'Either set icon or iconWidget.'),
         super(
           key: key,
           onTap: onTap,
@@ -119,6 +122,11 @@ class IconSlideAction extends ClosableSlideAction {
 
   /// The icon to show.
   final IconData icon;
+
+  /// A custom widget to represent the icon.
+  /// If both [icon] and [iconWidget] are set, they will be shown at the same
+  /// time.
+  final Widget iconWidget;
 
   /// The caption below the icon.
   final String caption;
@@ -137,28 +145,47 @@ class IconSlideAction extends ClosableSlideAction {
         ThemeData.estimateBrightnessForColor(color) == Brightness.light
             ? Colors.black
             : Colors.white;
-    final Text textWidget = Text(
-      caption ?? '',
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context)
-          .primaryTextTheme
-          .caption
-          .copyWith(color: foregroundColor ?? estimatedColor),
-    );
+
+    final List<Widget> widgets = [];
+
+    if (icon != null) {
+      widgets.add(
+        Flexible(
+          child: new Icon(
+            icon,
+            color: foregroundColor ?? estimatedColor,
+          ),
+        ),
+      );
+    }
+
+    if (iconWidget != null) {
+      widgets.add(
+        Flexible(child: iconWidget),
+      );
+    }
+
+    if (caption != null) {
+      widgets.add(
+        Flexible(
+          child: Text(
+            caption,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context)
+                .primaryTextTheme
+                .caption
+                .copyWith(color: foregroundColor ?? estimatedColor),
+          ),
+        ),
+      );
+    }
+
     return Container(
       color: color,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Flexible(
-              child: Icon(
-                icon,
-                color: foregroundColor ?? estimatedColor,
-              ),
-            ),
-            Flexible(child: textWidget),
-          ],
+          children: widgets,
         ),
       ),
     );

@@ -102,6 +102,7 @@ class IconSlideAction extends ClosableSlideAction {
   const IconSlideAction({
     Key key,
     @required this.icon,
+    this.sizeIcon,
     this.caption,
     Color color,
     this.foregroundColor,
@@ -115,7 +116,7 @@ class IconSlideAction extends ClosableSlideAction {
         );
 
   final IconData icon;
-
+  final double sizeIcon;
   final String caption;
 
   /// The background color.
@@ -148,6 +149,7 @@ class IconSlideAction extends ClosableSlideAction {
             new Flexible(
               child: new Icon(
                 icon,
+                size: sizeIcon,
                 color: foregroundColor ?? estimatedColor,
               ),
             ),

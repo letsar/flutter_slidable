@@ -131,14 +131,17 @@ class IconSlideAction extends ClosableSlideAction {
         ThemeData.estimateBrightnessForColor(color) == Brightness.light
             ? Colors.black
             : Colors.white;
-    final Text textWidget = new Text(
-      caption ?? '',
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context)
-          .primaryTextTheme
-          .caption
-          .copyWith(color: foregroundColor ?? estimatedColor),
-    );
+    Widget textWidget = Container(width: 0, height: 0);
+    if (caption != null) {
+      textWidget = new Text(
+        caption,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context)
+            .primaryTextTheme
+            .caption
+            .copyWith(color: foregroundColor ?? estimatedColor),
+      );
+    }
     return Container(
       color: color,
       child: new Center(

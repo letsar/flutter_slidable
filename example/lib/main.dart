@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: 'Flutter Slidable Demo',
-      theme: new ThemeData(
+      theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new MyHomePage(title: 'Flutter Slidable Demo'),
+      home: MyHomePage(title: 'Flutter Slidable Demo'),
     );
   }
 }
@@ -23,14 +23,14 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => new _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   SlidableController slidableController;
   final List<_HomeItem> items = List.generate(
     20,
-    (i) => new _HomeItem(
+    (i) => _HomeItem(
           i,
           'Tile n°$i',
           _getSubtitle(i),
@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @protected
   void initState() {
-    slidableController = new SlidableController(
+    slidableController = SlidableController(
       onSlideAnimationChanged: handleSlideAnimationChanged,
       onSlideIsOpenChanged: handleSlideIsOpenChanged,
     );
@@ -64,12 +64,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
       ),
-      body: new Center(
-        child: new OrientationBuilder(
+      body: Center(
+        child: OrientationBuilder(
           builder: (context, orientation) => _buildList(
               context,
               orientation == Orientation.portrait
@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildList(BuildContext context, Axis direction) {
-    return new ListView.builder(
+    return ListView.builder(
       scrollDirection: direction,
       itemBuilder: (context, index) {
         final Axis slidableDirection =
@@ -107,58 +107,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildVerticalListItem(BuildContext context, int index) {
-    final _HomeItem item = items[index];
-    return new Container(
-      color: Colors.white,
-      child: new ListTile(
-        leading: new CircleAvatar(
-          backgroundColor: item.color,
-          child: new Text('${item.index}'),
-          foregroundColor: Colors.white,
-        ),
-        title: new Text(item.title),
-        subtitle: new Text(item.subtitle),
-      ),
-    );
-  }
-
-  Widget _buildhorizontalListItem(BuildContext context, int index) {
-    final _HomeItem item = items[index];
-    return new Container(
-      color: Colors.white,
-      width: 160.0,
-      child: new Column(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          new Expanded(
-            child: new CircleAvatar(
-              backgroundColor: item.color,
-              child: new Text('${item.index}'),
-              foregroundColor: Colors.white,
-            ),
-          ),
-          new Expanded(
-            child: Center(
-              child: new Text(
-                item.subtitle,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _getSlidableWithLists(
       BuildContext context, int index, Axis direction) {
     final _HomeItem item = items[index];
     //final int t = index;
-    return new Slidable(
-      key: new Key(item.title),
+    return Slidable(
+      key: Key(item.title),
       controller: slidableController,
       direction: direction,
-      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+      dismissal: SlidableDismissal(
+        child: SlidableDrawerDismissal(),
         onDismissed: (actionType) {
           _showSnackBar(
               context,
@@ -170,19 +128,19 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
       ),
-      delegate: _getDelegate(item.index),
+      actionPane: _getActionPane(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
-          ? _buildVerticalListItem(context, index)
-          : _buildhorizontalListItem(context, index),
+          ? VerticalListItem(items[index])
+          : HorizontalListItem(items[index]),
       actions: <Widget>[
-        new IconSlideAction(
+        IconSlideAction(
           caption: 'Archive',
           color: Colors.blue,
           icon: Icons.archive,
           onTap: () => _showSnackBar(context, 'Archive'),
         ),
-        new IconSlideAction(
+        IconSlideAction(
           caption: 'Share',
           color: Colors.indigo,
           icon: Icons.share,
@@ -190,14 +148,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
       secondaryActions: <Widget>[
-        new IconSlideAction(
+        IconSlideAction(
           caption: 'More',
           color: Colors.grey.shade200,
           icon: Icons.more_horiz,
           onTap: () => _showSnackBar(context, 'More'),
           closeOnTap: false,
         ),
-        new IconSlideAction(
+        IconSlideAction(
           caption: 'Delete',
           color: Colors.red,
           icon: Icons.delete,
@@ -211,11 +169,12 @@ class _MyHomePageState extends State<MyHomePage> {
       BuildContext context, int index, Axis direction) {
     final _HomeItem item = items[index];
 
-    return new Slidable.builder(
-      key: new Key(item.title),
+    return Slidable.builder(
+      key: Key(item.title),
       controller: slidableController,
       direction: direction,
-      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
+      dismissal: SlidableDismissal(
+        child: SlidableDrawerDismissal(),
         closeOnCanceled: true,
         onWillDismiss: (item.index != 10)
             ? null
@@ -223,16 +182,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 return showDialog<bool>(
                   context: context,
                   builder: (context) {
-                    return new AlertDialog(
-                      title: new Text('Delete'),
-                      content: new Text('Item will be deleted'),
+                    return AlertDialog(
+                      title: Text('Delete'),
+                      content: Text('Item will be deleted'),
                       actions: <Widget>[
-                        new FlatButton(
-                          child: new Text('Cancel'),
+                        FlatButton(
+                          child: Text('Cancel'),
                           onPressed: () => Navigator.of(context).pop(false),
                         ),
-                        new FlatButton(
-                          child: new Text('Ok'),
+                        FlatButton(
+                          child: Text('Ok'),
                           onPressed: () => Navigator.of(context).pop(true),
                         ),
                       ],
@@ -251,16 +210,16 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
       ),
-      delegate: _getDelegate(item.index),
+      actionPane: _getActionPane(item.index),
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
-          ? _buildVerticalListItem(context, index)
-          : _buildhorizontalListItem(context, index),
-      actionDelegate: new SlideActionBuilderDelegate(
+          ? VerticalListItem(items[index])
+          : HorizontalListItem(items[index]),
+      actionDelegate: SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation, renderingMode) {
             if (index == 0) {
-              return new IconSlideAction(
+              return IconSlideAction(
                 caption: 'Archive',
                 color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.blue.withOpacity(animation.value)
@@ -273,16 +232,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   var dismiss = await showDialog<bool>(
                     context: context,
                     builder: (context) {
-                      return new AlertDialog(
-                        title: new Text('Delete'),
-                        content: new Text('Item will be deleted'),
+                      return AlertDialog(
+                        title: Text('Delete'),
+                        content: Text('Item will be deleted'),
                         actions: <Widget>[
-                          new FlatButton(
-                            child: new Text('Cancel'),
+                          FlatButton(
+                            child: Text('Cancel'),
                             onPressed: () => Navigator.of(context).pop(false),
                           ),
-                          new FlatButton(
-                            child: new Text('Ok'),
+                          FlatButton(
+                            child: Text('Ok'),
                             onPressed: () => Navigator.of(context).pop(true),
                           ),
                         ],
@@ -296,7 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               );
             } else {
-              return new IconSlideAction(
+              return IconSlideAction(
                 caption: 'Share',
                 color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.indigo.withOpacity(animation.value)
@@ -306,11 +265,11 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             }
           }),
-      secondaryActionDelegate: new SlideActionBuilderDelegate(
+      secondaryActionDelegate: SlideActionBuilderDelegate(
           actionCount: 2,
           builder: (context, index, animation, renderingMode) {
             if (index == 0) {
-              return new IconSlideAction(
+              return IconSlideAction(
                 caption: 'More',
                 color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.grey.shade200.withOpacity(animation.value)
@@ -320,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 closeOnTap: false,
               );
             } else {
-              return new IconSlideAction(
+              return IconSlideAction(
                 caption: 'Delete',
                 color: renderingMode == SlidableRenderingMode.slide
                     ? Colors.red.withOpacity(animation.value)
@@ -333,16 +292,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  static SlidableDelegate _getDelegate(int index) {
+  static Widget _getActionPane(int index) {
     switch (index % 4) {
       case 0:
-        return new SlidableBehindDelegate();
+        return SlidableBehindActionPane();
       case 1:
-        return new SlidableStrechDelegate();
+        return SlidableStrechActionPane();
       case 2:
-        return new SlidableScrollDelegate();
+        return SlidableScrollActionPane();
       case 3:
-        return new SlidableDrawerDelegate();
+        return SlidableDrawerActionPane();
       default:
         return null;
     }
@@ -366,20 +325,78 @@ class _MyHomePageState extends State<MyHomePage> {
   static String _getSubtitle(int index) {
     switch (index % 4) {
       case 0:
-        return 'SlidableBehindDelegate';
+        return 'SlidableBehindActionPane';
       case 1:
-        return 'SlidableStrechDelegate';
+        return 'SlidableStrechActionPane';
       case 2:
-        return 'SlidableScrollDelegate';
+        return 'SlidableScrollActionPane';
       case 3:
-        return 'SlidableDrawerDelegate';
+        return 'SlidableDrawerActionPane';
       default:
         return null;
     }
   }
 
   void _showSnackBar(BuildContext context, String text) {
-    Scaffold.of(context).showSnackBar(SnackBar(content: new Text(text)));
+    Scaffold.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+}
+
+class HorizontalListItem extends StatelessWidget {
+  HorizontalListItem(this.item);
+  final _HomeItem item;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      width: 160.0,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Expanded(
+            child: CircleAvatar(
+              backgroundColor: item.color,
+              child: Text('${item.index}'),
+              foregroundColor: Colors.white,
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                item.subtitle,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class VerticalListItem extends StatelessWidget {
+  VerticalListItem(this.item);
+  final _HomeItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () =>
+          Slidable.of(context)?.renderingMode == SlidableRenderingMode.none
+              ? Slidable.of(context)?.open()
+              : Slidable.of(context)?.close(),
+      child: Container(
+        color: Colors.white,
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: item.color,
+            child: Text('${item.index}'),
+            foregroundColor: Colors.white,
+          ),
+          title: Text(item.title),
+          subtitle: Text(item.subtitle),
+        ),
+      ),
+    );
   }
 }
 

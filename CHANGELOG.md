@@ -1,9 +1,18 @@
+## 0.5.0
+### Added
+* `iconWidget` parameter for SlideAction which allows full customization of the
+  displayed icon.
+
+### Modified
+* Change the SlidableDelegate to a widget. The field is renamed `actionPane`.
+* Change the SlideToDismissDelegate to a SlidableDismissal widget that takes another widget as a child. The field is renamed `dismissal`.
+
 ## 0.4.9
 ### Fixed
 * Fix the end extend of actions in dismiss animation (https://github.com/letsar/flutter_slidable/pull/38).
 
 ## 0.4.8
-### Addded
+### Added
 * onSlideAnimationChanged and onSlideIsOpenChanged on `SlidableController`.
 
 ## 0.4.7

@@ -558,8 +558,13 @@ class SlidableState extends State<Slidable>
 
   double get _totalActionsExtent => widget.actionExtentRatio * (_actionCount);
 
-  double get _dismissThreshold =>
-      widget.dismissal?.dismissThresholds[actionType] ?? _kDismissThreshold;
+  double get _dismissThreshold {
+    if (widget.dismissal == null) {
+      return _kDismissThreshold;
+    }
+    return widget.dismissal?.dismissThresholds[actionType] ??
+        _kDismissThreshold;
+  }
 
   bool get _dismissible => widget.dismissal != null && _dismissThreshold < 1.0;
 

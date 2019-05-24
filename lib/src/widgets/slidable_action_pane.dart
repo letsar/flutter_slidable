@@ -164,14 +164,14 @@ class SlidableDrawerActionPane extends StatelessWidget {
             (index) {
               int displayIndex =
                   data.showActions ? data.actionCount - index - 1 : index;
-              return FractionallySizedBox(
-                alignment: data.alignment,
-                widthFactor:
-                    data.directionIsXAxis ? data.actionExtentRatio : null,
-                heightFactor:
-                    data.directionIsXAxis ? null : data.actionExtentRatio,
-                child: SlideTransition(
-                  position: animations[index],
+              return SlideTransition(
+                position: animations[index],
+                child: FractionallySizedBox(
+                  alignment: data.alignment,
+                  widthFactor:
+                      data.directionIsXAxis ? data.actionExtentRatio : null,
+                  heightFactor:
+                      data.directionIsXAxis ? null : data.actionExtentRatio,
                   child: data.actionDelegate.build(
                     context,
                     displayIndex,

@@ -150,7 +150,7 @@ class SlidableDrawerActionPane extends StatelessWidget {
     final animations = Iterable.generate(data.actionCount).map((index) {
       return Tween<Offset>(
         begin: startOffset,
-        end: startOffset * (index - 1.0),
+        end: startOffset * (index - data.actionCount + 1.0),
       ).animate(data.actionsMoveAnimation);
     }).toList();
 

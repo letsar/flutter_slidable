@@ -1,3 +1,7 @@
+## 0.5.1
+### Fixed
+* Fix SlidableDrawerActionPane onTap issue (https://github.com/letsar/flutter_slidable/pull/73).
+
 ## 0.5.0
 ### Added
 * `iconWidget` parameter for SlideAction which allows full customization of the

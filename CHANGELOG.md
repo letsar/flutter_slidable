@@ -1,3 +1,7 @@
+## 0.5.2
+### Fixed
+* Add check for null value in dismissal field, in getter for _dismissThreshold (https://github.com/letsar/flutter_slidable/pull/72).
+
 ## 0.5.1
 ### Fixed
 * Fix SlidableDrawerActionPane onTap issue (https://github.com/letsar/flutter_slidable/pull/73).

@@ -1,6 +1,10 @@
+## 0.5.3
+### Fixed
+* Fix SlidableDrawerActionPane when different than 2 actions (https://github.com/letsar/flutter_slidable/pull/74).
+
 ## 0.5.2
 ### Fixed
-* Add check for null value in dismissal field, in getter for _dismissThreshold (https://github.com/letsar/flutter_slidable/pull/72).
+* Add check for null value in dismissal field, in getter for _dismissThreshold (https://github.com/letsar/flutter_slidable/pull/71).
 
 ## 0.5.1
 ### Fixed

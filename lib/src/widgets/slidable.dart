@@ -364,6 +364,7 @@ class Slidable extends StatefulWidget {
     Axis direction = Axis.horizontal,
     bool closeOnScroll = true,
     bool enabled = true,
+    SlideActionType initiallyOpen,
     SlidableDismissal dismissal,
     SlidableController controller,
     double fastThreshold,
@@ -380,6 +381,7 @@ class Slidable extends StatefulWidget {
           direction: direction,
           closeOnScroll: closeOnScroll,
           enabled: enabled,
+          initiallyOpen: initiallyOpen,
           dismissal: dismissal,
           controller: controller,
           fastThreshold: fastThreshold,
@@ -412,6 +414,7 @@ class Slidable extends StatefulWidget {
     this.direction = Axis.horizontal,
     this.closeOnScroll = true,
     this.enabled = true,
+    this.initiallyOpen,
     this.dismissal,
     this.controller,
     double fastThreshold,
@@ -435,7 +438,6 @@ class Slidable extends StatefulWidget {
             'fastThreshold must be positive'),
         fastThreshold = fastThreshold ?? _kFastThreshold,
         super(key: key);
-
   /// The widget below this widget in the tree.
   final Widget child;
 
@@ -484,6 +486,9 @@ class Slidable extends StatefulWidget {
   /// Defaults to true.
   final bool enabled;
 
+  ///Whether this widget is open initially
+  final SlideActionType initiallyOpen;
+
   /// The threshold used to know if a movement was fast and request to open/close the actions.
   final double fastThreshold;
 
@@ -511,6 +516,9 @@ class SlidableState extends State<Slidable>
           ..addStatusListener(_handleDismissStatusChanged)
           ..addListener(_handleOverallPositionChanged);
     _initAnimations();
+    if(widget.initiallyOpen != null) {
+      _initOpen(widget.initiallyOpen);
+    }
   }
 
   void _initAnimations() {
@@ -628,17 +636,27 @@ class SlidableState extends State<Slidable>
     super.dispose();
   }
 
-  /// Opens the [Slidable].
-  /// By default it's open the [SlideActionType.primary] action pane, but you
-  /// can modify this by setting [actionType].
-  void open({SlideActionType actionType}) {
-    widget.controller?.activeState = this;
-
+  void _setActionType(actionType) {
     if (actionType != null && _actionType != actionType) {
       setState(() {
         this.actionType = actionType;
       });
     }
+  }
+
+  void _initOpen(SlideActionType actionType) {
+    _setActionType(actionType);
+    if (_actionCount > 0) {
+      _overallMoveController.value = _totalActionsExtent;
+    }
+  }
+
+  /// Opens the [Slidable].
+  /// By default it's open the [SlideActionType.primary] action pane, but you
+  /// can modify this by setting [actionType].
+  void open({SlideActionType actionType}) {
+    widget.controller?.activeState = this;
+    _setActionType(actionType);
     if (_actionCount > 0) {
       _overallMoveController.animateTo(
         _totalActionsExtent,

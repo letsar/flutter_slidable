@@ -713,8 +713,15 @@ class SlidableState extends State<Slidable>
           ? SlideActionType.primary
           : SlideActionType.secondary;
       if (_actionCount > 0) {
-        _overallMoveController.value =
-            _dragExtent.abs() / _overallDragAxisExtent;
+        if (_dismissible && !widget.dismissal.dragDismissible) {
+          // If the widget is not dismissible by dragging, clamp drag result
+          // so the widget doesn't slide past [_totalActionsExtent].
+          _overallMoveController.value = (_dragExtent.abs() / _overallDragAxisExtent)
+              .clamp(0.0, _totalActionsExtent);
+        } else {
+          _overallMoveController.value =
+              _dragExtent.abs() / _overallDragAxisExtent;
+        }
       }
     });
   }

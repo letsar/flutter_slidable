@@ -26,7 +26,16 @@ class SlidableDismissal extends StatelessWidget {
     this.crossAxisEndOffset = 0.0,
     this.onWillDismiss,
     this.closeOnCanceled = false,
+    this.dragDismissible = true,
   }) : assert(dismissThresholds != null);
+
+  /// Specifies if the widget can be dismissed by sliding.
+  ///
+  /// Setting to false makes the widget dismissible only by
+  /// calling [Slidable.dismiss()].
+  ///
+  /// Defaults to true.
+  final bool dragDismissible;
 
   /// The offset threshold the item has to be dragged in order to be considered
   /// dismissed.

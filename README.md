@@ -269,6 +269,12 @@ The easiest way get the `SlidableState` from a child is to call `Slidable.of(con
 
 The `open` method has an optional parameter called `actionType` that let you choose which action pane to open.
 
+#### How can I dismiss the Slidable programmatically?
+
+Similar to opening or closing, you can dismiss the `Slidable` programmatically by calling the `dismiss` method of the `SlidableState`.
+
+If you want to use the `dismiss` method without allowing your user to slide to dismiss, you can set the `dragDismissible` parameter of the `SlidableDismissal` constructor to `false`.
+
 ## Changelog
 
 Please see the [Changelog](https://github.com/letsar/flutter_slidable/blob/master/CHANGELOG.md) page to know what's recently changed.

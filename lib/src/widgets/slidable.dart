@@ -134,6 +134,7 @@ class SlideActionListDelegate extends SlideActionDelegate {
   /// The slide actions.
   final List<Widget> actions;
 
+  /// The number of actions.
   @override
   int get actionCount => actions?.length ?? 0;
 
@@ -156,6 +157,7 @@ class _SlidableScope extends InheritedWidget {
   bool updateShouldNotify(_SlidableScope oldWidget) => oldWidget.state != state;
 }
 
+/// The data used by a [Slidable].
 class SlidableData extends InheritedWidget {
   SlidableData({
     Key key,
@@ -174,17 +176,35 @@ class SlidableData extends InheritedWidget {
     @required Widget child,
   }) : super(key: key, child: child);
 
+  /// The type of slide action that is currently been showed by the [Slidable].
   final SlideActionType actionType;
+
+  /// The rendering mode in which the [Slidable] is.
   final SlidableRenderingMode renderingMode;
+
+  /// The total extent of all the actions
   final double totalActionsExtent;
+
+  /// The offset threshold the item has to be dragged in order to be considered
+  /// dismissed.
   final double dismissThreshold;
+
+  /// Indicates whether the [Slidable] can be dismissed.
   final bool dismissible;
 
   /// The current actions that have to be shown.
   final SlideActionDelegate actionDelegate;
+
+  /// Animation for the whole movement.
   final Animation<double> overallMoveAnimation;
+
+  /// Animation for the actions.
   final Animation<double> actionsMoveAnimation;
+
+  /// Dismiss animation.
   final Animation<double> dismissAnimation;
+
+  /// The slidable.
   final Slidable slidable;
 
   /// Relative ratio between one slide action and the extent of the child.
@@ -193,16 +213,31 @@ class SlidableData extends InheritedWidget {
   /// The direction in which this widget can be slid.
   final Axis direction;
 
+  /// Indicates whether the primary actions are currently shown.
   bool get showActions => actionType == SlideActionType.primary;
+
+  /// The number of actions.
   int get actionCount => actionDelegate?.actionCount ?? 0;
+
+  /// If the [actionType] is [SlideActionType.primary] returns 1, -1 otherwise.
   double get actionSign => actionType == SlideActionType.primary ? 1.0 : -1.0;
+
+  /// Indicates wheter the direction is horizontal.
   bool get directionIsXAxis => direction == Axis.horizontal;
+
+  /// The alignment of the actions.
   Alignment get alignment => Alignment(
         directionIsXAxis ? -actionSign : 0.0,
         directionIsXAxis ? 0.0 : -actionSign,
       );
+
+  /// If the [direction] is horizontal, returns the [totalActionsExtent]
+  /// otherwise null.
   double get actionPaneWidthFactor =>
       directionIsXAxis ? totalActionsExtent : null;
+
+  /// If the [direction] is vertical, returns the [totalActionsExtent]
+  /// otherwise null.
   double get actionPaneHeightFactor =>
       directionIsXAxis ? null : totalActionsExtent;
 
@@ -238,6 +273,7 @@ class SlidableData extends InheritedWidget {
     );
   }
 
+  /// Creates a [FractionallyAlignedSizedBox] related to the current direction and showed actions.
   FractionallyAlignedSizedBox createFractionallyAlignedSizedBox({
     Widget child,
     double extentFactor,
@@ -262,14 +298,16 @@ class SlidableData extends InheritedWidget {
     return List.generate(
       actionCount,
       (int index) => actionDelegate.build(
-            context,
-            index,
-            actionsMoveAnimation,
-            SlidableRenderingMode.slide,
-          ),
+        context,
+        index,
+        actionsMoveAnimation,
+        SlidableRenderingMode.slide,
+      ),
     );
   }
 
+  /// Whether the framework should notify widgets that inherit from this widget.
+  @override
   bool updateShouldNotify(SlidableData oldWidget) =>
       (oldWidget.actionType != actionType) ||
       (oldWidget.renderingMode != renderingMode) ||
@@ -288,19 +326,29 @@ class SlidableData extends InheritedWidget {
 /// A controller that keep tracks of the active [SlidableState] and close
 /// the previous one.
 class SlidableController {
+  /// Creates a controller that keep tracks of the active [SlidableState] and close
+  /// the previous one.
   SlidableController({
     this.onSlideAnimationChanged,
     this.onSlideIsOpenChanged,
   });
 
+  /// Function called when the animation changed.
   final ValueChanged<Animation<double>> onSlideAnimationChanged;
+
+  /// Function called when the [Slidable] open status changed.
   final ValueChanged<bool> onSlideIsOpenChanged;
+
   bool _isSlideOpen;
 
   Animation<double> _slideAnimation;
 
   SlidableState _activeState;
+
+  /// The state of the active [Slidable].
   SlidableState get activeState => _activeState;
+
+  /// Changes the state of the active [Slidable].
   set activeState(SlidableState value) {
     _activeState?._flingAnimationController();
 
@@ -559,8 +607,11 @@ class SlidableState extends State<Slidable>
   double get _totalActionsExtent => widget.actionExtentRatio * (_actionCount);
 
   double get _dismissThreshold {
-    if (widget.dismissal == null) return _kDismissThreshold;
-    else return widget.dismissal.dismissThresholds[actionType] ?? _kDismissThreshold;
+    if (widget.dismissal == null)
+      return _kDismissThreshold;
+    else
+      return widget.dismissal.dismissThresholds[actionType] ??
+          _kDismissThreshold;
   }
 
   bool get _dismissible => widget.dismissal != null && _dismissThreshold < 1.0;
@@ -716,8 +767,9 @@ class SlidableState extends State<Slidable>
         if (_dismissible && !widget.dismissal.dragDismissible) {
           // If the widget is not dismissible by dragging, clamp drag result
           // so the widget doesn't slide past [_totalActionsExtent].
-          _overallMoveController.value = (_dragExtent.abs() / _overallDragAxisExtent)
-              .clamp(0.0, _totalActionsExtent);
+          _overallMoveController.value =
+              (_dragExtent.abs() / _overallDragAxisExtent)
+                  .clamp(0.0, _totalActionsExtent);
         } else {
           _overallMoveController.value =
               _dragExtent.abs() / _overallDragAxisExtent;

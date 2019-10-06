@@ -1,3 +1,8 @@
+## 0.5.4
+### Added
+* Ripple effect when tapping on the IconSlideAction (https://github.com/letsar/flutter_slidable/pull/89)
+* Option to make the widget non-dismissible by dragging (https://github.com/letsar/flutter_slidable/pull/101)
+
 ## 0.5.3
 ### Fixed
 * Fix SlidableDrawerActionPane when different than 2 actions (https://github.com/letsar/flutter_slidable/pull/74).

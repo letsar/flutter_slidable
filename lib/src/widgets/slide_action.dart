@@ -18,7 +18,9 @@ abstract class ClosableSlideAction extends StatelessWidget {
   })  : assert(closeOnTap != null),
         super(key: key);
 
+  /// The background color of this action.
   final Color color;
+
   /// A tap has occurred.
   final VoidCallback onTap;
 
@@ -34,6 +36,7 @@ abstract class ClosableSlideAction extends StatelessWidget {
     Slidable.of(context)?.close();
   }
 
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Material(
@@ -46,6 +49,8 @@ abstract class ClosableSlideAction extends StatelessWidget {
     );
   }
 
+  /// Builds the action.
+  @protected
   Widget buildAction(BuildContext context);
 }
 
@@ -123,7 +128,7 @@ class IconSlideAction extends ClosableSlideAction {
             'Either set icon or iconWidget.'),
         super(
           key: key,
-	        color: color,
+          color: color,
           onTap: onTap,
           closeOnTap: closeOnTap,
         );
@@ -141,7 +146,7 @@ class IconSlideAction extends ClosableSlideAction {
 
   /// The background color.
   ///
-  /// Defaults to true.
+  /// Defaults to [Colors.white].
   final Color color;
 
   /// The color used for [icon] and [caption].

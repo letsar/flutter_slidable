@@ -1,10 +1,9 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/src/widgets/fractionnally_aligned_sized_box.dart';
 import 'package:flutter_slidable/src/widgets/slidable.dart';
 
 const Duration _kResizeDuration = const Duration(milliseconds: 300);
 
-/// A wiget that controls how the [Slidable] is dismissed.
+/// A widget that controls how the [Slidable] is dismissed.
 ///
 /// The [Slidable] widget calls the [onDismissed] callback either after its size has
 /// collapsed to zero (if [resizeDuration] is non-null) or immediately after
@@ -17,6 +16,7 @@ const Duration _kResizeDuration = const Duration(milliseconds: 300);
 ///  * [SlidableDrawerDismissal], which creates slide actions that are displayed like drawers
 ///  while the item is dismissing.
 class SlidableDismissal extends StatelessWidget {
+  /// Creates a widget that controls how the [Slidable] is dismissed.
   const SlidableDismissal({
     @required this.child,
     this.dismissThresholds = const <SlideActionType, double>{},
@@ -84,6 +84,7 @@ class SlidableDismissal extends StatelessWidget {
   /// The widget to show when the [Slidable] enters dismiss mode.
   final Widget child;
 
+  @override
   Widget build(BuildContext context) {
     final SlidableData data = SlidableData.of(context);
 
@@ -105,8 +106,11 @@ class SlidableDismissal extends StatelessWidget {
 /// while the item is dismissing.
 /// The further slide action will grow faster than the other ones.
 class SlidableDrawerDismissal extends StatelessWidget {
+  /// Creates a specific dismissal that creates slide actions that are displayed like drawers
+  /// while the item is dismissing.
   const SlidableDrawerDismissal({Key key}) : super(key: key);
 
+  @override
   Widget build(BuildContext context) {
     final SlidableData data = SlidableData.of(context);
 
@@ -151,61 +155,7 @@ class SlidableDrawerDismissal extends StatelessWidget {
                   }),
                 ),
               );
-              // return Stack(
-              //   children: List.generate(data.actionCount, (index) {
-              //     // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-              //     int displayIndex =
-              //         data.showActions ? data.actionCount - index - 1 : index;
-
-              //     return data.createFractionallyAlignedSizedBox(
-              //       positionFactor:
-              //           data.actionExtentRatio * (data.actionCount - index - 1),
-              //       extentFactor: extentAnimations[index].value,
-              //       child: data.actionDelegate.build(context, displayIndex,
-              //           data.actionsMoveAnimation, data.renderingMode),
-              //     );
-              //   }),
-              // );
             }),
-        // Positioned.fill(
-        //   child: LayoutBuilder(builder: (context, constraints) {
-        //     final count = data.actionCount;
-        //     final double totalExtent = data.getMaxExtent(constraints);
-        //     final double actionExtent = totalExtent * data.actionExtentRatio;
-
-        //     final extentAnimations = Iterable.generate(count).map((index) {
-        //       return Tween<double>(
-        //         begin: actionExtent,
-        //         end: totalExtent -
-        //             (actionExtent * (data.actionCount - index - 1)),
-        //       ).animate(
-        //         CurvedAnimation(
-        //           parent: data.overallMoveAnimation,
-        //           curve: Interval(data.totalActionsExtent, 1.0),
-        //         ),
-        //       );
-        //     }).toList();
-
-        //     return AnimatedBuilder(
-        //         animation: data.overallMoveAnimation,
-        //         builder: (context, child) {
-        //           return Stack(
-        //             children: List.generate(data.actionCount, (index) {
-        //               // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-        //               int displayIndex = data.showActions
-        //                   ? data.actionCount - index - 1
-        //                   : index;
-        //               return data.createPositioned(
-        //                 position: actionExtent * (data.actionCount - index - 1),
-        //                 extent: extentAnimations[index].value,
-        //                 child: data.actionDelegate.build(context, displayIndex,
-        //                     data.actionsMoveAnimation, data.renderingMode),
-        //               );
-        //             }),
-        //           );
-        //         });
-        //   }),
-        // ),
         SlideTransition(
           position: animation,
           child: data.slidable.child,

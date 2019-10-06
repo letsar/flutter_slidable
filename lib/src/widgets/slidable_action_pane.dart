@@ -102,6 +102,7 @@ class SlidableBehindActionPane extends StatelessWidget {
 
 /// An action pane that creates actions which follow the item while it's sliding.
 class SlidableScrollActionPane extends StatelessWidget {
+  /// Creates an action pane that creates actions which follow the item while it's sliding.
   const SlidableScrollActionPane({Key key}) : super(key: key);
 
   @override
@@ -139,6 +140,7 @@ class SlidableScrollActionPane extends StatelessWidget {
 
 /// An action pane that creates actions which animate like drawers while the item is sliding.
 class SlidableDrawerActionPane extends StatelessWidget {
+  /// Creates an action pane that creates actions which animate like drawers while the item is sliding.
   const SlidableDrawerActionPane({Key key}) : super(key: key);
 
   @override

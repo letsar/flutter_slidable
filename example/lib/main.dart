@@ -31,11 +31,11 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<_HomeItem> items = List.generate(
     20,
     (i) => _HomeItem(
-          i,
-          'Tile n°$i',
-          _getSubtitle(i),
-          _getAvatarColor(i),
-        ),
+      i,
+      'Tile n°$i',
+      _getSubtitle(i),
+      _getAvatarColor(i),
+    ),
   );
 
   @protected
@@ -148,6 +148,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
       secondaryActions: <Widget>[
+        Container(
+          height: 800,
+          color: Colors.green,
+          child: Text('a'),
+        ),
         IconSlideAction(
           caption: 'More',
           color: Colors.grey.shade200,

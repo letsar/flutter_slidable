@@ -1,6 +1,16 @@
 import 'package:flutter/widgets.dart';
 
+/// A widget that positions its child to a fraction of the total available space.
 class FractionallyAlignedSizedBox extends StatelessWidget {
+  /// Creates a widget that positions its child to a fraction of the total available space.
+  ///
+  /// Only two out of the three horizontal values ([leftFactor], [rightFactor],
+  /// [widthFactor]), and only two out of the three vertical values ([topFactor],
+  /// [bottomFactor], [heightFactor]), can be set. In each case, at least one of
+  /// the three must be null.
+  ///
+  /// If non-null, the [widthFactor] and [heightFactor] arguments must be
+  /// non-negative.
   FractionallyAlignedSizedBox({
     Key key,
     @required this.child,
@@ -18,12 +28,25 @@ class FractionallyAlignedSizedBox extends StatelessWidget {
         assert(heightFactor == null || heightFactor >= 0.0),
         super(key: key);
 
+  /// The relative distance that the child's left edge is inset from the left of the parent.
   final double leftFactor;
+
+  /// The relative distance that the child's top edge is inset from the top of the parent.
   final double topFactor;
+
+  /// The relative distance that the child's right edge is inset from the right of the parent.
   final double rightFactor;
+
+  /// The relative distance that the child's bottom edge is inset from the bottom of the parent.
   final double bottomFactor;
+
+  /// The child's width relative to its parent's width.
   final double widthFactor;
+
+  /// The child's height relative to its parent's height.
   final double heightFactor;
+
+  /// The widget below this widget in the tree.
   final Widget child;
 
   @override

@@ -12,11 +12,13 @@ abstract class ClosableSlideAction extends StatelessWidget {
   /// The [closeOnTap] argument must not be null.
   const ClosableSlideAction({
     Key key,
+    this.color,
     this.onTap,
     this.closeOnTap = _kCloseOnTap,
   })  : assert(closeOnTap != null),
         super(key: key);
 
+  final Color color;
   /// A tap has occurred.
   final VoidCallback onTap;
 
@@ -34,8 +36,13 @@ abstract class ClosableSlideAction extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: !closeOnTap ? onTap : () => _handleCloseAfterTap(context),
-      child: buildAction(context),
+      child: Material(
+        color: color,
+        child: InkWell(
+          onTap: !closeOnTap ? onTap : () => _handleCloseAfterTap(context),
+          child: buildAction(context),
+        ),
+      ),
     );
   }
 
@@ -116,6 +123,7 @@ class IconSlideAction extends ClosableSlideAction {
             'Either set icon or iconWidget.'),
         super(
           key: key,
+	        color: color,
           onTap: onTap,
           closeOnTap: closeOnTap,
         );
@@ -181,7 +189,6 @@ class IconSlideAction extends ClosableSlideAction {
     }
 
     return Container(
-      color: color,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

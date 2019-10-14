@@ -1,9 +1,35 @@
+## 0.5.4
+### Added
+* Ripple effect when tapping on the IconSlideAction (https://github.com/letsar/flutter_slidable/pull/89)
+* Option to make the widget non-dismissible by dragging (https://github.com/letsar/flutter_slidable/pull/101)
+
+## 0.5.3
+### Fixed
+* Fix SlidableDrawerActionPane when different than 2 actions (https://github.com/letsar/flutter_slidable/pull/74).
+
+## 0.5.2
+### Fixed
+* Add check for null value in dismissal field, in getter for _dismissThreshold (https://github.com/letsar/flutter_slidable/pull/71).
+
+## 0.5.1
+### Fixed
+* Fix SlidableDrawerActionPane onTap issue (https://github.com/letsar/flutter_slidable/pull/73).
+
+## 0.5.0
+### Added
+* `iconWidget` parameter for SlideAction which allows full customization of the
+  displayed icon.
+
+### Modified
+* Change the SlidableDelegate to a widget. The field is renamed `actionPane`.
+* Change the SlideToDismissDelegate to a SlidableDismissal widget that takes another widget as a child. The field is renamed `dismissal`.
+
 ## 0.4.9
 ### Fixed
 * Fix the end extend of actions in dismiss animation (https://github.com/letsar/flutter_slidable/pull/38).
 
 ## 0.4.8
-### Addded
+### Added
 * onSlideAnimationChanged and onSlideIsOpenChanged on `SlidableController`.
 
 ## 0.4.7

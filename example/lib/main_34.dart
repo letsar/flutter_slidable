@@ -7,7 +7,7 @@ class Data {
   final String url = 'https://via.placeholder.com/350x150';
 }
 
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 Future<Data> getData() async {
   await Future.delayed(Duration(seconds: 1));
@@ -18,12 +18,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: 'Flutter Slidable Demo',
-      theme: new ThemeData(
+      theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new MyHomePage(title: 'Flutter Slidable Demo'),
+      home: MyHomePage(title: 'Flutter Slidable Demo'),
     );
   }
 }
@@ -34,17 +34,17 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => new _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final SlidableController slidableController = new SlidableController();
+  final SlidableController slidableController = SlidableController();
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
       ),
       body: ListView.builder(
         itemCount: 20,
@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Slidable(
-                  delegate: SlidableScrollDelegate(),
+                  actionPane: SlidableScrollActionPane(),
                   actionExtentRatio: 0.25,
                   secondaryActions: <Widget>[
                     IconSlideAction(

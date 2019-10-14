@@ -1,4 +1,6 @@
+import 'package:flutter_slidable/src/widgets/slidable_action_pane.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart' show fail;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -22,11 +24,11 @@ SlideActionDelegate _buildActionDelegate(int index) {
   return SlideActionListDelegate(
     actions: <Widget>[
       SlideAction(
-        key: new ValueKey(getSlideActionBaseKey(index) + a0),
+        key: ValueKey(getSlideActionBaseKey(index) + a0),
         child: const Text('a0'),
       ),
       SlideAction(
-        key: new ValueKey(getSlideActionBaseKey(index) + a1),
+        key: ValueKey(getSlideActionBaseKey(index) + a1),
         child: const Text('a1'),
       ),
     ],
@@ -37,11 +39,11 @@ SlideActionDelegate _buildSecondaryActionDelegate(int index) {
   return SlideActionListDelegate(
     actions: <Widget>[
       SlideAction(
-        key: new ValueKey(getSlideActionBaseKey(index) + s0),
+        key: ValueKey(getSlideActionBaseKey(index) + s0),
         child: const Text('s0'),
       ),
       SlideAction(
-        key: new ValueKey(getSlideActionBaseKey(index) + s1),
+        key: ValueKey(getSlideActionBaseKey(index) + s1),
         child: const Text('s1'),
       ),
     ],
@@ -49,36 +51,36 @@ SlideActionDelegate _buildSecondaryActionDelegate(int index) {
 }
 
 Widget buildTest(
-  SlidableDelegate delegate, {
+  Widget actionPane, {
   TextDirection textDirection = TextDirection.ltr,
   Axis scrollDirection = Axis.vertical,
 }) {
-  return new Directionality(
+  return Directionality(
     textDirection: textDirection,
-    child: new StatefulBuilder(
+    child: StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
         Widget buildSlidableWidget(int item) {
-          return new Slidable.builder(
-            key: new ValueKey(item),
-            delegate: delegate,
+          return Slidable.builder(
+            key: ValueKey(item),
+            actionPane: actionPane,
             enabled: item != 3,
             direction: flipAxis(scrollDirection),
             actionExtentRatio: actionExtentRatio,
             actionDelegate: _buildActionDelegate(item),
             secondaryActionDelegate: _buildSecondaryActionDelegate(item),
-            child: new Container(
+            child: Container(
               width: scrollDirection == Axis.horizontal
                   ? itemExtent
                   : screenSize.width,
               height: scrollDirection == Axis.horizontal
                   ? screenSize.height
                   : itemExtent,
-              child: new Text('item $item'),
+              child: Text('item $item'),
             ),
           );
         }
 
-        return new ListView(
+        return ListView(
           scrollDirection: scrollDirection,
           itemExtent: itemExtent,
           children: List.generate(5, (int index) => buildSlidableWidget(index))
@@ -92,13 +94,13 @@ Widget buildTest(
 Offset getOffset(AxisDirection gestureDirection, double value) {
   switch (gestureDirection) {
     case AxisDirection.left:
-      return new Offset(-value, 0.0);
+      return Offset(-value, 0.0);
     case AxisDirection.right:
-      return new Offset(value, 0.0);
+      return Offset(value, 0.0);
     case AxisDirection.up:
-      return new Offset(0.0, -value);
+      return Offset(0.0, -value);
     case AxisDirection.down:
-      return new Offset(0.0, value);
+      return Offset(0.0, value);
     default:
       fail('unsupported gestureDirection');
   }
@@ -171,12 +173,12 @@ int getSlideActionBaseKey(int index) {
 void checkActions(int index,
     {List<int> visible = const <int>[], List<int> hidden = const <int>[]}) {
   for (int key in visible) {
-    expect(find.byKey(new ValueKey(getSlideActionBaseKey(index) + key)),
+    expect(find.byKey(ValueKey(getSlideActionBaseKey(index) + key)),
         findsOneWidget);
   }
   for (int key in hidden) {
-    expect(find.byKey(new ValueKey(getSlideActionBaseKey(index) + key)),
-        findsNothing);
+    expect(
+        find.byKey(ValueKey(getSlideActionBaseKey(index) + key)), findsNothing);
   }
 }
 
@@ -187,7 +189,7 @@ void checkAction(
     @required AxisDirection gestureDirection,
     @required double edgeRatio,
     @required double extentRatio}) {
-  Finder finder = find.byKey(new ValueKey(getSlideActionBaseKey(index) + key));
+  Finder finder = find.byKey(ValueKey(getSlideActionBaseKey(index) + key));
   double actualEdge;
   double actualExtent;
   final double fullExtent =
@@ -229,14 +231,14 @@ typedef List<_CheckActionValues> SlidableDelegateTestMethod(
     AxisDirection direction);
 
 void testSlidableDelegate(
-    SlidableDelegate delegate,
+    Widget actionPane,
     SlidableDelegateTestMethod slidableDelegateTestMethod,
     double endOffsetFactor) {
   final int index = 0;
 
   axisDirections.forEach((direction) {
     testSlidableDelegateScenario(
-      delegate,
+      actionPane,
       index,
       endOffsetFactor,
       slidableDelegateTestMethod,
@@ -252,23 +254,23 @@ List<_CheckActionValues> getSlidableStrechDelegateHalfValues(
   switch (direction) {
     case AxisDirection.right:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, .1, extentRatio),
-        new _CheckActionValues(a1, .2, extentRatio),
+        _CheckActionValues(a0, .1, extentRatio),
+        _CheckActionValues(a1, .2, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, .2, extentRatio),
-        new _CheckActionValues(s1, .1, extentRatio),
+        _CheckActionValues(s0, .2, extentRatio),
+        _CheckActionValues(s1, .1, extentRatio),
       ];
     case AxisDirection.down:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, .1, extentRatio),
-        new _CheckActionValues(a1, .2, extentRatio),
+        _CheckActionValues(a0, .1, extentRatio),
+        _CheckActionValues(a1, .2, extentRatio),
       ];
     case AxisDirection.up:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, .2, extentRatio),
-        new _CheckActionValues(s1, .1, extentRatio),
+        _CheckActionValues(s0, .2, extentRatio),
+        _CheckActionValues(s1, .1, extentRatio),
       ];
     default:
       return null;
@@ -283,23 +285,23 @@ List<_CheckActionValues> getSlidableBehindDelegateHalfValues(
   switch (direction) {
     case AxisDirection.right:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, actionExtentRatio, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio * 2, extentRatio),
+        _CheckActionValues(a0, actionExtentRatio, extentRatio),
+        _CheckActionValues(a1, actionExtentRatio * 2, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio * 2, extentRatio),
-        new _CheckActionValues(s1, actionExtentRatio, extentRatio),
+        _CheckActionValues(s0, actionExtentRatio * 2, extentRatio),
+        _CheckActionValues(s1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.down:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, actionExtentRatio, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio * 2, extentRatio),
+        _CheckActionValues(a0, actionExtentRatio, extentRatio),
+        _CheckActionValues(a1, actionExtentRatio * 2, extentRatio),
       ];
     case AxisDirection.up:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio * 2, extentRatio),
-        new _CheckActionValues(s1, actionExtentRatio, extentRatio),
+        _CheckActionValues(s0, actionExtentRatio * 2, extentRatio),
+        _CheckActionValues(s1, actionExtentRatio, extentRatio),
       ];
     default:
       return null;
@@ -313,23 +315,23 @@ List<_CheckActionValues> getSlidableScrollDelegateHalfValues(
   switch (direction) {
     case AxisDirection.right:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, .0, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
+        _CheckActionValues(a0, .0, extentRatio),
+        _CheckActionValues(a1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
-        new _CheckActionValues(s1, .0, extentRatio),
+        _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        _CheckActionValues(s1, .0, extentRatio),
       ];
     case AxisDirection.down:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, .0, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
+        _CheckActionValues(a0, .0, extentRatio),
+        _CheckActionValues(a1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.up:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
-        new _CheckActionValues(s1, .0, extentRatio),
+        _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        _CheckActionValues(s1, .0, extentRatio),
       ];
     default:
       return null;
@@ -343,23 +345,23 @@ List<_CheckActionValues> getSlidableDrawerDelegateHalfValues(
   switch (direction) {
     case AxisDirection.right:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, actionExtentRatio / 2, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
+        _CheckActionValues(a0, actionExtentRatio / 2, extentRatio),
+        _CheckActionValues(a1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.left:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
-        new _CheckActionValues(s1, actionExtentRatio / 2, extentRatio),
+        _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        _CheckActionValues(s1, actionExtentRatio / 2, extentRatio),
       ];
     case AxisDirection.down:
       return <_CheckActionValues>[
-        new _CheckActionValues(a0, actionExtentRatio / 2, extentRatio),
-        new _CheckActionValues(a1, actionExtentRatio, extentRatio),
+        _CheckActionValues(a0, actionExtentRatio / 2, extentRatio),
+        _CheckActionValues(a1, actionExtentRatio, extentRatio),
       ];
     case AxisDirection.up:
       return <_CheckActionValues>[
-        new _CheckActionValues(s0, actionExtentRatio, extentRatio),
-        new _CheckActionValues(s1, actionExtentRatio / 2, extentRatio),
+        _CheckActionValues(s0, actionExtentRatio, extentRatio),
+        _CheckActionValues(s1, actionExtentRatio / 2, extentRatio),
       ];
     default:
       return null;
@@ -367,7 +369,7 @@ List<_CheckActionValues> getSlidableDrawerDelegateHalfValues(
 }
 
 void testSlidableDelegateScenario(
-    SlidableDelegate delegate,
+    Widget actionPane,
     int index,
     double endOffsetFactor,
     SlidableDelegateTestMethod slidableDelegateTestMethod,
@@ -376,10 +378,10 @@ void testSlidableDelegateScenario(
 
   Axis scrollDirection = flipAxis(axisDirectionToAxis(direction));
   testWidgets(
-      'Drag shows half of ${delegate.runtimeType}, scrollDirection=$scrollDirection, '
+      'Drag shows half of ${actionPane.runtimeType}, scrollDirection=$scrollDirection, '
       'gestureDirection=$direction', (WidgetTester tester) async {
     await tester
-        .pumpWidget(buildTest(delegate, scrollDirection: scrollDirection));
+        .pumpWidget(buildTest(actionPane, scrollDirection: scrollDirection));
 
     checkActions(index, hidden: allActions);
 
@@ -432,17 +434,17 @@ void main() {
   setUp(() {});
 
   // Tests all delegates dragging half of total action extents.
-  testSlidableDelegate(const SlidableStrechDelegate(),
+  testSlidableDelegate(const SlidableStrechActionPane(),
       getSlidableStrechDelegateHalfValues, actionExtentRatio);
-  testSlidableDelegate(const SlidableBehindDelegate(),
+  testSlidableDelegate(const SlidableBehindActionPane(),
       getSlidableBehindDelegateHalfValues, actionExtentRatio);
-  testSlidableDelegate(const SlidableScrollDelegate(),
+  testSlidableDelegate(const SlidableScrollActionPane(),
       getSlidableScrollDelegateHalfValues, actionExtentRatio);
-  testSlidableDelegate(const SlidableDrawerDelegate(),
+  testSlidableDelegate(const SlidableDrawerActionPane(),
       getSlidableDrawerDelegateHalfValues, actionExtentRatio);
 
   testWidgets('Cannot slide if slidable disabled', (WidgetTester tester) async {
-    await tester.pumpWidget(buildTest(const SlidableBehindDelegate()));
+    await tester.pumpWidget(buildTest(const SlidableBehindActionPane()));
 
     checkActions(3, hidden: allActions);
 
@@ -453,7 +455,7 @@ void main() {
   });
 
   testWidgets('Close slidables when scroll', (WidgetTester tester) async {
-    await tester.pumpWidget(buildTest(const SlidableBehindDelegate()));
+    await tester.pumpWidget(buildTest(const SlidableBehindActionPane()));
 
     final int index = 1;
     checkActions(index, hidden: allActions);

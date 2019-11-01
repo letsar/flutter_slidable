@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter_slidable/src/widgets/slidable_action_pane.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test/test.dart' show fail;
@@ -55,38 +56,32 @@ Widget buildTest(
   TextDirection textDirection = TextDirection.ltr,
   Axis scrollDirection = Axis.vertical,
 }) {
+  Widget buildSlidableWidget(int item) {
+    return Slidable.builder(
+      key: ValueKey(item),
+      actionPane: actionPane,
+      enabled: item != 3,
+      direction: flipAxis(scrollDirection),
+      actionExtentRatio: actionExtentRatio,
+      actionDelegate: _buildActionDelegate(item),
+      secondaryActionDelegate: _buildSecondaryActionDelegate(item),
+      child: Container(
+        width:
+            scrollDirection == Axis.horizontal ? itemExtent : screenSize.width,
+        height:
+            scrollDirection == Axis.horizontal ? screenSize.height : itemExtent,
+        child: Text('item $item'),
+      ),
+    );
+  }
+
   return Directionality(
     textDirection: textDirection,
-    child: StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
-        Widget buildSlidableWidget(int item) {
-          return Slidable.builder(
-            key: ValueKey(item),
-            actionPane: actionPane,
-            enabled: item != 3,
-            direction: flipAxis(scrollDirection),
-            actionExtentRatio: actionExtentRatio,
-            actionDelegate: _buildActionDelegate(item),
-            secondaryActionDelegate: _buildSecondaryActionDelegate(item),
-            child: Container(
-              width: scrollDirection == Axis.horizontal
-                  ? itemExtent
-                  : screenSize.width,
-              height: scrollDirection == Axis.horizontal
-                  ? screenSize.height
-                  : itemExtent,
-              child: Text('item $item'),
-            ),
-          );
-        }
-
-        return ListView(
-          scrollDirection: scrollDirection,
-          itemExtent: itemExtent,
-          children: List.generate(5, (int index) => buildSlidableWidget(index))
-              .toList(),
-        );
-      },
+    child: ListView(
+      scrollDirection: scrollDirection,
+      itemExtent: itemExtent,
+      children:
+          List.generate(5, (int index) => buildSlidableWidget(index)).toList(),
     ),
   );
 }
@@ -131,8 +126,15 @@ Future<Null> dragElement(
       axisDirectionToAxis(gestureDirection) == Axis.horizontal
           ? screenSize.width
           : screenSize.height;
+
+  // Strange behavior, for horizontal sliding, the dragStart is called only
+  // after kDragSlopDefault offset.
+  // This is maybe an issue in flutter test.
+  final correction = axisDirectionToAxis(gestureDirection) == Axis.horizontal
+      ? kDragSlopDefault
+      : 0;
   final Offset delta =
-      getOffset(gestureDirection, endOffsetFactor * itemExtent);
+      getOffset(gestureDirection, endOffsetFactor * itemExtent + correction);
   await tester.drag(finder, delta);
 }
 
@@ -182,13 +184,14 @@ void checkActions(int index,
   }
 }
 
-void checkAction(
-    {@required int index,
-    @required int key,
-    @required WidgetTester tester,
-    @required AxisDirection gestureDirection,
-    @required double edgeRatio,
-    @required double extentRatio}) {
+void checkAction({
+  @required int index,
+  @required int key,
+  @required WidgetTester tester,
+  @required AxisDirection gestureDirection,
+  @required double edgeRatio,
+  @required double extentRatio,
+}) {
   Finder finder = find.byKey(ValueKey(getSlideActionBaseKey(index) + key));
   double actualEdge;
   double actualExtent;

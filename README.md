@@ -5,6 +5,9 @@ A Flutter implementation of slidable list item with directional slide actions th
 [![Pub](https://img.shields.io/pub/v/flutter_slidable.svg)](https://pub.dartlang.org/packages/flutter_slidable)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QTT34M25RDNL6)
 
+![Flutter Favorite](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/flutter_favorite_badge.png)
+**Slidable is now a [Flutter Favorite](https://flutter.dev/docs/development/packages-and-plugins/favorites) package!**
+
 ![Overview](https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/slidable_overview.gif)
 
 ## Features

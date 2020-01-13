@@ -17,10 +17,10 @@ A Flutter implementation of slidable list item with directional slide actions th
 * 4 built-in action panes.
 * 2 built-in slide action widgets.
 * 1 built-in dismiss animation.
-* You can easily create you custom layouts and animations.
+* You can easily create custom layouts and animations.
 * You can use a builder to create your slide actions if you want special effects during animation.
-* Close when a slide action has been tapped (overridable).
-* Close when the nearest `Scrollable` starts to scroll (overridable).
+* Closes when a slide action has been tapped (overridable).
+* Closes when the nearest `Scrollable` starts to scroll (overridable).
 * Option to disable the slide effect easily.
 
 ## Getting started

@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/widgets/slidable.dart';
 
 const bool _kCloseOnTap = true;
+const bool _enableRippleEffect = true;
 
 /// Abstract class for slide actions that can close after [onTap] occurred.
 abstract class ClosableSlideAction extends StatelessWidget {
@@ -15,6 +16,7 @@ abstract class ClosableSlideAction extends StatelessWidget {
     this.color,
     this.onTap,
     this.closeOnTap = _kCloseOnTap,
+    this.enableRippleEffect = _enableRippleEffect,
   })  : assert(closeOnTap != null),
         super(key: key);
 
@@ -29,6 +31,11 @@ abstract class ClosableSlideAction extends StatelessWidget {
   /// Defaults to true.
   final bool closeOnTap;
 
+  /// Determine if add ripple effect or not.
+  ///
+  /// Defaults to true.
+  final bool enableRippleEffect;
+
   /// Calls [onTap] if not null and closes the closest [Slidable]
   /// that encloses the given context.
   void _handleCloseAfterTap(BuildContext context) {
@@ -36,17 +43,31 @@ abstract class ClosableSlideAction extends StatelessWidget {
     Slidable.of(context)?.close();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Material(
+  Widget _buildAction(BuildContext context){
+    if(enableRippleEffect){
+      return GestureDetector(
+        child: Material(
+          color: color,
+          child: InkWell(
+            onTap: !closeOnTap ? onTap : () => _handleCloseAfterTap(context),
+            child: buildAction(context),
+          ),
+        ),
+      );
+    }else{
+      return Material(
         color: color,
-        child: InkWell(
+        child: GestureDetector(
           onTap: !closeOnTap ? onTap : () => _handleCloseAfterTap(context),
           child: buildAction(context),
         ),
-      ),
-    );
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildAction(context);
   }
 
   /// Builds the action.

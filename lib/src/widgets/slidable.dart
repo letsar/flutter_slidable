@@ -8,6 +8,8 @@ import 'package:flutter_slidable/src/widgets/slidable_dismissal.dart';
 const double _kActionsExtentRatio = 0.25;
 const double _kFastThreshold = 2500.0;
 const double _kDismissThreshold = 0.75;
+const double _minExtent = 0.50;
+
 const Curve _kResizeTimeCurve = const Interval(0.4, 1.0, curve: Curves.ease);
 const Duration _kMovementDuration = const Duration(milliseconds: 200);
 
@@ -463,6 +465,7 @@ class Slidable extends StatefulWidget {
     this.dismissal,
     this.controller,
     double fastThreshold,
+    double minExtent,
   })  : assert(actionPane != null),
         assert(direction != null),
         assert(
@@ -482,6 +485,7 @@ class Slidable extends StatefulWidget {
         assert(fastThreshold == null || fastThreshold >= .0,
             'fastThreshold must be positive'),
         fastThreshold = fastThreshold ?? _kFastThreshold,
+        minExtent = minExtent ?? _minExtent,
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -534,6 +538,9 @@ class Slidable extends StatefulWidget {
 
   /// The threshold used to know if a movement was fast and request to open/close the actions.
   final double fastThreshold;
+
+  /// Extent width for back gesture
+  final double minExtent;
 
   /// The state from the closest instance of this class that encloses the given context.
   static SlidableState of(BuildContext context) {
@@ -829,6 +836,22 @@ class SlidableState extends State<Slidable>
 
   void _handleDismissStatusChanged(AnimationStatus status) async {
     if (_dismissible) {
+      if (actionType == SlideActionType.primary) {
+        if ((status == AnimationStatus.completed || status == AnimationStatus.forward) && _overallMoveController.value >= widget.minExtent && !_dragUnderway) {
+          if (widget.dismissal.onWillDismiss == null || await widget.dismissal.onWillDismiss(actionType)) {
+            _startResizeAnimation();
+          } else {
+            _dismissing = false;
+            if (widget.dismissal?.closeOnCanceled == true) {
+              close();
+            } else {
+              open();
+            }
+          }
+        }
+        updateKeepAlive();
+        return;
+      }
       if (status == AnimationStatus.completed &&
           _overallMoveController.value == _overallMoveController.upperBound &&
           !_dragUnderway) {

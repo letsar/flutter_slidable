@@ -895,11 +895,10 @@ class SlidableState extends State<Slidable>
 
     Widget content = widget.child;
 
-    if (!(!widget.enabled ||
-        ((widget.actionDelegate == null ||
+    if (!((widget.actionDelegate == null ||
                 widget.actionDelegate.actionCount == 0) &&
             (widget.secondaryActionDelegate == null ||
-                widget.secondaryActionDelegate.actionCount == 0)))) {
+                widget.secondaryActionDelegate.actionCount == 0))) {
       if (actionType == SlideActionType.primary &&
               widget.actionDelegate != null &&
               widget.actionDelegate.actionCount > 0 ||
@@ -937,16 +936,20 @@ class SlidableState extends State<Slidable>
         }
       }
 
-      content = GestureDetector(
-        onHorizontalDragStart: _directionIsXAxis ? _handleDragStart : null,
-        onHorizontalDragUpdate: _directionIsXAxis ? _handleDragUpdate : null,
-        onHorizontalDragEnd: _directionIsXAxis ? _handleDragEnd : null,
-        onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
-        onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
-        onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
-        behavior: HitTestBehavior.opaque,
-        child: content,
-      );
+      content = widget.enabled
+          ? GestureDetector(
+              onHorizontalDragStart: _directionIsXAxis ? _handleDragStart : null,
+              onHorizontalDragUpdate: _directionIsXAxis ? _handleDragUpdate : null,
+              onHorizontalDragEnd: _directionIsXAxis ? _handleDragEnd : null,
+              onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
+              onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
+              onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
+              behavior: HitTestBehavior.opaque,
+              child: content,
+            )
+          : GestureDetector(
+              child: content,
+            );
     }
 
     return _SlidableScope(

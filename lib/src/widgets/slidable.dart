@@ -243,7 +243,7 @@ class SlidableData extends InheritedWidget {
 
   /// The data from the closest instance of this class that encloses the given context.
   static SlidableData of(BuildContext context) {
-    return context.inheritFromWidgetOfExactType(SlidableData);
+    return context.dependOnInheritedWidgetOfExactType<SlidableData>();
   }
 
   /// Gets the the given offset related to the current direction.
@@ -538,7 +538,7 @@ class Slidable extends StatefulWidget {
   /// The state from the closest instance of this class that encloses the given context.
   static SlidableState of(BuildContext context) {
     final _SlidableScope scope =
-        context.inheritFromWidgetOfExactType(_SlidableScope);
+        context.dependOnInheritedWidgetOfExactType<_SlidableScope>();
     return scope?.state;
   }
 

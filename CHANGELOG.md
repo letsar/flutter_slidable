@@ -1,3 +1,7 @@
+## 0.5.5
+### Fixed
+* Static Analysis issues
+
 ## 0.5.4
 ### Added
 * Ripple effect when tapping on the IconSlideAction (https://github.com/letsar/flutter_slidable/pull/89)

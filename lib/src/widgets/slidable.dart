@@ -598,6 +598,7 @@ class SlidableState extends State<Slidable>
   SlideActionType _actionType = SlideActionType.primary;
   SlideActionType get actionType => _actionType;
   set actionType(SlideActionType value) {
+    if (_actionType == value) return;
     _actionType = value;
     _initAnimations();
   }

@@ -6,7 +6,7 @@ import 'package:flutter_slidable/src/widgets/fractionnally_aligned_sized_box.dar
 import 'package:flutter_slidable/src/widgets/slidable_dismissal.dart';
 
 const double _kActionsExtentRatio = 0.25;
-const double _kFastThreshold = 2500.0;
+const double _kFastThreshold = 375.0;
 const double _kDismissThreshold = 0.75;
 const Curve _kResizeTimeCurve = const Interval(0.4, 1.0, curve: Curves.ease);
 const Duration _kMovementDuration = const Duration(milliseconds: 200);
@@ -795,8 +795,13 @@ class SlidableState extends State<Slidable>
       } else {
         open();
       }
-    } else if (_actionsMoveAnimation.value >= widget.showAllActionsThreshold ||
-        (shouldOpen && fast)) {
+    } else if(fast) {
+      if (shouldOpen) {
+        open();
+      } else {
+        close();
+      }
+    } else if (_actionsMoveAnimation.value >= widget.showAllActionsThreshold) {
       open();
     } else {
       close();

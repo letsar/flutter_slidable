@@ -278,6 +278,10 @@ Similar to opening or closing, you can dismiss the `Slidable` programmatically b
 
 If you want to use the `dismiss` method without allowing your user to slide to dismiss, you can set the `dragDismissible` parameter of the `SlidableDismissal` constructor to `false`.
 
+## Sponsoring
+
+I'm working on my packages on my free-time, but I don't have as much time as I would. If this package or any other package I created is helping you, please consider to sponsor me. By doing so, I will prioritize your issues or your pull-requests before the others. 
+
 ## Changelog
 
 Please see the [Changelog](https://github.com/letsar/flutter_slidable/blob/master/CHANGELOG.md) page to know what's recently changed.

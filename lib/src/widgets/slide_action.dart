@@ -79,7 +79,8 @@ class SlideAction extends ClosableSlideAction {
             color == null || decoration == null,
             'Cannot provide both a color and a decoration\n'
             'The color argument is just a shorthand for "decoration:  BoxDecoration(color: color)".'),
-        decoration = decoration ?? (color != null ? BoxDecoration(color: color) : null),
+        decoration =
+            decoration ?? (color != null ? BoxDecoration(color: color) : null),
         super(
           key: key,
           onTap: onTap,
@@ -124,7 +125,8 @@ class IconSlideAction extends ClosableSlideAction {
     VoidCallback onTap,
     bool closeOnTap = _kCloseOnTap,
   })  : color = color ?? Colors.white,
-        assert(icon != null || iconWidget != null, 'Either set icon or iconWidget.'),
+        assert(icon != null || iconWidget != null,
+            'Either set icon or iconWidget.'),
         super(
           key: key,
           color: color,
@@ -153,7 +155,10 @@ class IconSlideAction extends ClosableSlideAction {
 
   @override
   Widget buildAction(BuildContext context) {
-    final Color estimatedColor = ThemeData.estimateBrightnessForColor(color) == Brightness.light ? Colors.black : Colors.white;
+    final Color estimatedColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.light
+            ? Colors.black
+            : Colors.white;
 
     final List<Widget> widgets = [];
 
@@ -180,7 +185,10 @@ class IconSlideAction extends ClosableSlideAction {
           child: Text(
             caption,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).primaryTextTheme.caption.copyWith(color: foregroundColor ?? estimatedColor),
+            style: Theme.of(context)
+                .primaryTextTheme
+                .caption
+                .copyWith(color: foregroundColor ?? estimatedColor),
           ),
         ),
       );

@@ -1,3 +1,7 @@
+## 0.5.6
+### Fixed
+* Fixed color issue in SlideAction
+
 ## 0.5.5
 ### Fixed
 * Static Analysis issues

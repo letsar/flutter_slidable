@@ -400,38 +400,39 @@ class Slidable extends StatefulWidget {
   /// which means the item after the dismissed item would be synced with the
   /// state of the dismissed item. Using keys causes the widgets to sync
   /// according to their keys and avoids this pitfall.
-  Slidable({
-    Key key,
-    @required Widget child,
-    @required Widget actionPane,
-    List<Widget> actions,
-    List<Widget> secondaryActions,
-    double showAllActionsThreshold = 0.5,
-    double actionExtentRatio = _kActionsExtentRatio,
-    Duration movementDuration = _kMovementDuration,
-    Axis direction = Axis.horizontal,
-    bool closeOnScroll = true,
-    bool enabled = true,
-    SlidableDismissal dismissal,
-    SlidableController controller,
-    double fastThreshold,
-  }) : this.builder(
-          key: key,
-          child: child,
-          actionPane: actionPane,
-          actionDelegate: SlideActionListDelegate(actions: actions),
-          secondaryActionDelegate:
-              SlideActionListDelegate(actions: secondaryActions),
-          showAllActionsThreshold: showAllActionsThreshold,
-          actionExtentRatio: actionExtentRatio,
-          movementDuration: movementDuration,
-          direction: direction,
-          closeOnScroll: closeOnScroll,
-          enabled: enabled,
-          dismissal: dismissal,
-          controller: controller,
-          fastThreshold: fastThreshold,
-        );
+  Slidable(
+      {Key key,
+      @required Widget child,
+      @required Widget actionPane,
+      List<Widget> actions,
+      List<Widget> secondaryActions,
+      double showAllActionsThreshold = 0.5,
+      double actionExtentRatio = _kActionsExtentRatio,
+      Duration movementDuration = _kMovementDuration,
+      Axis direction = Axis.horizontal,
+      bool closeOnScroll = true,
+      bool enabled = true,
+      SlidableDismissal dismissal,
+      SlidableController controller,
+      double fastThreshold,
+      HitTestBehavior hitTestBehavior})
+      : this.builder(
+            key: key,
+            child: child,
+            actionPane: actionPane,
+            actionDelegate: SlideActionListDelegate(actions: actions),
+            secondaryActionDelegate:
+                SlideActionListDelegate(actions: secondaryActions),
+            showAllActionsThreshold: showAllActionsThreshold,
+            actionExtentRatio: actionExtentRatio,
+            movementDuration: movementDuration,
+            direction: direction,
+            closeOnScroll: closeOnScroll,
+            enabled: enabled,
+            dismissal: dismissal,
+            controller: controller,
+            fastThreshold: fastThreshold,
+            hitTestBehavior: hitTestBehavior);
 
   /// Creates a widget that can be slid.
   ///
@@ -462,7 +463,8 @@ class Slidable extends StatefulWidget {
     this.enabled = true,
     this.dismissal,
     this.controller,
-    double fastThreshold, this.hitTestBehavior,
+    double fastThreshold,
+    this.hitTestBehavior,
   })  : assert(actionPane != null),
         assert(direction != null),
         assert(
@@ -539,6 +541,8 @@ class Slidable extends StatefulWidget {
   /// The state from the closest instance of this class that encloses the given context.
 
   final HitTestBehavior hitTestBehavior;
+
+  /// Set custom hitTestBehavior of gesture detector
   static SlidableState of(BuildContext context) {
     final _SlidableScope scope =
         context.dependOnInheritedWidgetOfExactType<_SlidableScope>();

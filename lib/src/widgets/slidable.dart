@@ -484,7 +484,6 @@ class Slidable extends StatefulWidget {
         assert(fastThreshold == null || fastThreshold >= .0,
             'fastThreshold must be positive'),
         fastThreshold = fastThreshold ?? _kFastThreshold,
-        assert(hitTestBehavior != null),
         super(key: key);
 
   /// The widget below this widget in the tree.

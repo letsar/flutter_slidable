@@ -462,7 +462,7 @@ class Slidable extends StatefulWidget {
     this.enabled = true,
     this.dismissal,
     this.controller,
-    double fastThreshold,
+    double fastThreshold, this.hitTestBehavior,
   })  : assert(actionPane != null),
         assert(direction != null),
         assert(
@@ -482,6 +482,7 @@ class Slidable extends StatefulWidget {
         assert(fastThreshold == null || fastThreshold >= .0,
             'fastThreshold must be positive'),
         fastThreshold = fastThreshold ?? _kFastThreshold,
+        assert(hitTestBehavior != null),
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -536,6 +537,8 @@ class Slidable extends StatefulWidget {
   final double fastThreshold;
 
   /// The state from the closest instance of this class that encloses the given context.
+
+  final HitTestBehavior hitTestBehavior;
   static SlidableState of(BuildContext context) {
     final _SlidableScope scope =
         context.dependOnInheritedWidgetOfExactType<_SlidableScope>();
@@ -944,7 +947,9 @@ class SlidableState extends State<Slidable>
         onVerticalDragStart: _directionIsXAxis ? null : _handleDragStart,
         onVerticalDragUpdate: _directionIsXAxis ? null : _handleDragUpdate,
         onVerticalDragEnd: _directionIsXAxis ? null : _handleDragEnd,
-        behavior: HitTestBehavior.opaque,
+        behavior: widget.hitTestBehavior != null
+            ? widget.hitTestBehavior
+            : HitTestBehavior.opaque,
         child: content,
       );
     }

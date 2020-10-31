@@ -10,7 +10,7 @@ class Data {
 void main() => runApp(MyApp());
 
 Future<Data> getData() async {
-  await Future.delayed(Duration(seconds: 1));
+  await Future<void>.delayed(const Duration(seconds: 1));
   return Data();
 }
 

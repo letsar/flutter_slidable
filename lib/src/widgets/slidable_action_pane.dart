@@ -3,13 +3,13 @@ import 'package:flutter_slidable/src/widgets/slidable.dart';
 
 class _SlidableStackActionPane extends StatelessWidget {
   _SlidableStackActionPane({
-    Key key,
-    @required this.data,
-    @required this.child,
-  })  : _animation = Tween<Offset>(
+    Key? key,
+    required this.data,
+    required this.child,
+  })   : _animation = Tween<Offset>(
           begin: Offset.zero,
           end: data.createOffset(data.totalActionsExtent * data.actionSign),
-        ).animate(data.actionsMoveAnimation),
+        ).animate(data.actionsMoveAnimation!),
         super(key: key);
 
   final Widget child;
@@ -18,7 +18,7 @@ class _SlidableStackActionPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.actionsMoveAnimation.isDismissed) {
+    if (data.actionsMoveAnimation!.isDismissed) {
       return data.slidable.child;
     }
 
@@ -36,22 +36,23 @@ class _SlidableStackActionPane extends StatelessWidget {
 
 /// An action pane that creates actions which stretch while the item is sliding.
 class SlidableStrechActionPane extends StatelessWidget {
-  const SlidableStrechActionPane({Key key}) : super(key: key);
+  /// Creates a [SlidableStrechActionPane].
+  const SlidableStrechActionPane({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData data = SlidableData.of(context)!;
 
     final animation = Tween<double>(
-      begin: 0.0,
+      begin: 0,
       end: data.totalActionsExtent,
-    ).animate(data.actionsMoveAnimation);
+    ).animate(data.actionsMoveAnimation!);
 
     return _SlidableStackActionPane(
       data: data,
       child: Positioned.fill(
         child: AnimatedBuilder(
-          animation: data.actionsMoveAnimation,
+          animation: data.actionsMoveAnimation!,
           builder: (context, child) {
             return FractionallySizedBox(
               alignment: data.alignment,
@@ -74,11 +75,12 @@ class SlidableStrechActionPane extends StatelessWidget {
 
 /// An action pane that creates actions which stay behind the item while it's sliding.
 class SlidableBehindActionPane extends StatelessWidget {
-  const SlidableBehindActionPane({Key key}) : super(key: key);
+  /// Creates a [SlidableBehindActionPane].
+  const SlidableBehindActionPane({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData data = SlidableData.of(context)!;
 
     return _SlidableStackActionPane(
       data: data,
@@ -103,17 +105,17 @@ class SlidableBehindActionPane extends StatelessWidget {
 /// An action pane that creates actions which follow the item while it's sliding.
 class SlidableScrollActionPane extends StatelessWidget {
   /// Creates an action pane that creates actions which follow the item while it's sliding.
-  const SlidableScrollActionPane({Key key}) : super(key: key);
+  const SlidableScrollActionPane({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData data = SlidableData.of(context)!;
 
     final alignment = data.alignment;
     final animation = Tween<Offset>(
       begin: Offset(alignment.x, alignment.y),
       end: Offset.zero,
-    ).animate(data.actionsMoveAnimation);
+    ).animate(data.actionsMoveAnimation!);
 
     return _SlidableStackActionPane(
       data: data,
@@ -141,19 +143,19 @@ class SlidableScrollActionPane extends StatelessWidget {
 /// An action pane that creates actions which animate like drawers while the item is sliding.
 class SlidableDrawerActionPane extends StatelessWidget {
   /// Creates an action pane that creates actions which animate like drawers while the item is sliding.
-  const SlidableDrawerActionPane({Key key}) : super(key: key);
+  const SlidableDrawerActionPane({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData data = SlidableData.of(context)!;
 
     final alignment = data.alignment;
     final startOffset = Offset(alignment.x, alignment.y);
-    final animations = Iterable.generate(data.actionCount).map((index) {
+    final animations = Iterable<int>.generate(data.actionCount).map((index) {
       return Tween<Offset>(
         begin: startOffset,
         end: startOffset * (index - data.actionCount + 1.0),
-      ).animate(data.actionsMoveAnimation);
+      ).animate(data.actionsMoveAnimation!);
     }).toList();
 
     return _SlidableStackActionPane(
@@ -164,7 +166,7 @@ class SlidableDrawerActionPane extends StatelessWidget {
           children: List.generate(
             data.actionCount,
             (index) {
-              int displayIndex =
+              final displayIndex =
                   data.showActions ? data.actionCount - index - 1 : index;
               return SlideTransition(
                 position: animations[index],
@@ -174,7 +176,7 @@ class SlidableDrawerActionPane extends StatelessWidget {
                       data.directionIsXAxis ? data.actionExtentRatio : null,
                   heightFactor:
                       data.directionIsXAxis ? null : data.actionExtentRatio,
-                  child: data.actionDelegate.build(
+                  child: data.actionDelegate!.build(
                     context,
                     displayIndex,
                     data.actionsMoveAnimation,

@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderRadius: BorderRadius.circular(64.0),
                         child: RepaintBoundary(
                           child: Image(
-                            image: NetworkImage(snapshot.data.url),
+                            image: NetworkImage(snapshot.data!.url),
                           ),
                         ),
                       ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -27,7 +29,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  SlidableController slidableController;
+  late final SlidableController slidableController;
   final List<_HomeItem> items = List.generate(
     20,
     (i) => _HomeItem(
@@ -47,18 +49,18 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  Animation<double> _rotationAnimation;
+  Animation<double>? _rotationAnimation;
   Color _fabColor = Colors.blue;
 
-  void handleSlideAnimationChanged(Animation<double> slideAnimation) {
+  void handleSlideAnimationChanged(Animation<double>? slideAnimation) {
     setState(() {
       _rotationAnimation = slideAnimation;
     });
   }
 
-  void handleSlideIsOpenChanged(bool isOpen) {
+  void handleSlideIsOpenChanged(bool? isOpen) {
     setState(() {
-      _fabColor = isOpen ? Colors.green : Colors.blue;
+      _fabColor = isOpen! ? Colors.green : Colors.blue;
     });
   }
 
@@ -83,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: _rotationAnimation == null
             ? Icon(Icons.add)
             : RotationTransition(
-                turns: _rotationAnimation,
+                turns: _rotationAnimation!,
                 child: Icon(Icons.add),
               ),
       ),
@@ -128,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
       ),
-      actionPane: _getActionPane(item.index),
+      actionPane: _getActionPane(item.index)!,
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
           ? VerticalListItem(items[index])
@@ -193,17 +195,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       actions: <Widget>[
                         FlatButton(
                           child: Text('Cancel'),
-                          onPressed: () => Navigator.of(context).pop(false),
+                          onPressed: () => Navigator.of(context)!.pop(false),
                         ),
                         FlatButton(
                           child: Text('Ok'),
-                          onPressed: () => Navigator.of(context).pop(true),
+                          onPressed: () => Navigator.of(context)!.pop(true),
                         ),
                       ],
                     );
                   },
-                );
-              },
+                ) as FutureOr<bool>;
+              } as FutureOr<bool> Function(SlideActionType?)?,
         onDismissed: (actionType) {
           _showSnackBar(
               context,
@@ -215,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
       ),
-      actionPane: _getActionPane(item.index),
+      actionPane: _getActionPane(item.index)!,
       actionExtentRatio: 0.25,
       child: direction == Axis.horizontal
           ? VerticalListItem(items[index])
@@ -227,14 +229,14 @@ class _MyHomePageState extends State<MyHomePage> {
               return IconSlideAction(
                 caption: 'Archive',
                 color: renderingMode == SlidableRenderingMode.slide
-                    ? Colors.blue.withOpacity(animation.value)
+                    ? Colors.blue.withOpacity(animation!.value)
                     : (renderingMode == SlidableRenderingMode.dismiss
                         ? Colors.blue
                         : Colors.green),
                 icon: Icons.archive,
                 onTap: () async {
                   var state = Slidable.of(context);
-                  var dismiss = await showDialog<bool>(
+                  var dismiss = await (showDialog<bool>(
                     context: context,
                     builder: (context) {
                       return AlertDialog(
@@ -243,19 +245,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         actions: <Widget>[
                           FlatButton(
                             child: Text('Cancel'),
-                            onPressed: () => Navigator.of(context).pop(false),
+                            onPressed: () => Navigator.of(context)!.pop(false),
                           ),
                           FlatButton(
                             child: Text('Ok'),
-                            onPressed: () => Navigator.of(context).pop(true),
+                            onPressed: () => Navigator.of(context)!.pop(true),
                           ),
                         ],
                       );
                     },
-                  );
+                  ) as FutureOr<bool>);
 
                   if (dismiss) {
-                    state.dismiss();
+                    state!.dismiss();
                   }
                 },
               );
@@ -263,7 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return IconSlideAction(
                 caption: 'Share',
                 color: renderingMode == SlidableRenderingMode.slide
-                    ? Colors.indigo.withOpacity(animation.value)
+                    ? Colors.indigo.withOpacity(animation!.value)
                     : Colors.indigo,
                 icon: Icons.share,
                 onTap: () => _showSnackBar(context, 'Share'),
@@ -277,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return IconSlideAction(
                 caption: 'More',
                 color: renderingMode == SlidableRenderingMode.slide
-                    ? Colors.grey.shade200.withOpacity(animation.value)
+                    ? Colors.grey.shade200.withOpacity(animation!.value)
                     : Colors.grey.shade200,
                 icon: Icons.more_horiz,
                 onTap: () => _showSnackBar(context, 'More'),
@@ -287,7 +289,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return IconSlideAction(
                 caption: 'Delete',
                 color: renderingMode == SlidableRenderingMode.slide
-                    ? Colors.red.withOpacity(animation.value)
+                    ? Colors.red.withOpacity(animation!.value)
                     : Colors.red,
                 icon: Icons.delete,
                 onTap: () => _showSnackBar(context, 'Delete'),
@@ -297,7 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  static Widget _getActionPane(int index) {
+  static Widget? _getActionPane(int index) {
     switch (index % 4) {
       case 0:
         return SlidableBehindActionPane();
@@ -312,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  static Color _getAvatarColor(int index) {
+  static Color? _getAvatarColor(int index) {
     switch (index % 4) {
       case 0:
         return Colors.red;
@@ -327,7 +329,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  static String _getSubtitle(int index) {
+  static String? _getSubtitle(int index) {
     switch (index % 4) {
       case 0:
         return 'SlidableBehindActionPane';
@@ -343,7 +345,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showSnackBar(BuildContext context, String text) {
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context)!
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 }
 
@@ -368,7 +372,7 @@ class HorizontalListItem extends StatelessWidget {
           Expanded(
             child: Center(
               child: Text(
-                item.subtitle,
+                item.subtitle!,
               ),
             ),
           ),
@@ -398,7 +402,7 @@ class VerticalListItem extends StatelessWidget {
             foregroundColor: Colors.white,
           ),
           title: Text(item.title),
-          subtitle: Text(item.subtitle),
+          subtitle: Text(item.subtitle!),
         ),
       ),
     );
@@ -415,6 +419,6 @@ class _HomeItem {
 
   final int index;
   final String title;
-  final String subtitle;
-  final Color color;
+  final String? subtitle;
+  final Color? color;
 }

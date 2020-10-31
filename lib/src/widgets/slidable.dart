@@ -278,7 +278,7 @@ class SlidableData extends InheritedWidget {
 
   /// Creates a [FractionallyAlignedSizedBox] related to the current direction and showed actions.
   FractionallyAlignedSizedBox createFractionallyAlignedSizedBox({
-    Widget? child,
+    required Widget child,
     double? extentFactor,
     double? positionFactor,
   }) {
@@ -560,19 +560,19 @@ class SlidableState extends State<Slidable>
     _dismissAnimation?.removeStatusListener(_handleShowAllActionsStatusChanged);
 
     _actionsMoveAnimation = CurvedAnimation(
-      parent: _overallMoveController!,
+      parent: _overallMoveController,
       curve: Interval(0, _totalActionsExtent),
     )..addStatusListener(_handleShowAllActionsStatusChanged);
     _dismissAnimation = CurvedAnimation(
-      parent: _overallMoveController!,
+      parent: _overallMoveController,
       curve: Interval(_totalActionsExtent, 1),
     )..addStatusListener(_handleShowAllActionsStatusChanged);
   }
 
-  AnimationController? _overallMoveController;
+  late final AnimationController _overallMoveController;
 
   /// The overall animation.
-  Animation<double> get overallMoveAnimation => _overallMoveController!.view;
+  Animation<double> get overallMoveAnimation => _overallMoveController.view;
 
   Animation<double>? _actionsMoveAnimation;
   Animation<double>? _dismissAnimation;
@@ -621,7 +621,7 @@ class SlidableState extends State<Slidable>
   @override
   bool get wantKeepAlive =>
       !widget.closeOnScroll &&
-      (_overallMoveController?.isAnimating == true ||
+      (_overallMoveController.isAnimating == true ||
           _resizeController?.isAnimating == true);
 
   /// The current actions that have to be shown.
@@ -675,7 +675,7 @@ class SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    _overallMoveController!.dispose();
+    _overallMoveController.dispose();
     _resizeController?.dispose();
     _removeScrollingNotifierListener();
     widget.controller?._activeState = null;
@@ -694,7 +694,7 @@ class SlidableState extends State<Slidable>
       });
     }
     if (_actionCount > 0) {
-      _overallMoveController!.animateTo(
+      _overallMoveController.animateTo(
         _totalActionsExtent,
         curve: Curves.easeIn,
         duration: widget.movementDuration,
@@ -704,7 +704,7 @@ class SlidableState extends State<Slidable>
 
   /// Closes this [Slidable].
   void close() {
-    if (!_overallMoveController!.isDismissed) {
+    if (!_overallMoveController.isDismissed) {
       if (widget.controller?.activeState == this) {
         widget.controller?.activeState = null;
       } else {
@@ -715,7 +715,7 @@ class SlidableState extends State<Slidable>
 
   void _flingAnimationController() {
     if (!_dismissing) {
-      _overallMoveController!.fling(velocity: -1);
+      _overallMoveController.fling(velocity: -1);
     }
   }
 
@@ -732,7 +732,7 @@ class SlidableState extends State<Slidable>
         });
       }
 
-      _overallMoveController!.fling();
+      _overallMoveController.fling();
     }
   }
 
@@ -753,8 +753,8 @@ class SlidableState extends State<Slidable>
     _dragExtent = _actionsMoveAnimation!.value *
         _actionsDragAxisExtent *
         _dragExtent.sign;
-    if (_overallMoveController!.isAnimating) {
-      _overallMoveController!.stop();
+    if (_overallMoveController.isAnimating) {
+      _overallMoveController.stop();
     }
   }
 
@@ -773,12 +773,12 @@ class SlidableState extends State<Slidable>
         if (_dismissible && !widget.dismissal!.dragDismissible) {
           // If the widget is not dismissible by dragging, clamp drag result
           // so the widget doesn't slide past [_totalActionsExtent].
-          _overallMoveController!.value =
+          _overallMoveController.value =
               (_dragExtent.abs() / _overallDragAxisExtent)
                   .clamp(0.0, _totalActionsExtent)
                   .toDouble();
         } else {
-          _overallMoveController!.value =
+          _overallMoveController.value =
               _dragExtent.abs() / _overallDragAxisExtent;
         }
       }
@@ -822,8 +822,8 @@ class SlidableState extends State<Slidable>
   }
 
   void _handleOverallPositionChanged() {
-    final double value = _overallMoveController!.value;
-    if (value == _overallMoveController!.lowerBound) {
+    final double value = _overallMoveController.value;
+    if (value == _overallMoveController.lowerBound) {
       _renderingMode = SlidableRenderingMode.none;
     } else if (value <= _totalActionsExtent) {
       _renderingMode = SlidableRenderingMode.slide;
@@ -837,7 +837,7 @@ class SlidableState extends State<Slidable>
   Future<void> _handleDismissStatusChanged(AnimationStatus status) async {
     if (_dismissible) {
       if (status == AnimationStatus.completed &&
-          _overallMoveController!.value == _overallMoveController!.upperBound &&
+          _overallMoveController.value == _overallMoveController.upperBound &&
           !_dragUnderway) {
         if (widget.dismissal!.onWillDismiss == null ||
             await widget.dismissal!.onWillDismiss!(actionType)) {
@@ -865,8 +865,7 @@ class SlidableState extends State<Slidable>
   }
 
   void _startResizeAnimation() {
-    assert(_overallMoveController != null);
-    assert(_overallMoveController!.isCompleted);
+    assert(_overallMoveController.isCompleted);
     assert(_resizeController == null);
     assert(_sizePriorToCollapse == null);
     final SlidableDismissal dismissal = widget.dismissal!;

@@ -47,7 +47,7 @@ class FractionallyAlignedSizedBox extends StatelessWidget {
   final double? heightFactor;
 
   /// The widget below this widget in the tree.
-  final Widget? child;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {

@@ -195,6 +195,11 @@ class IconSlideAction extends ClosableSlideAction {
     }
 
     return Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(
+          const Radius.circular(500.0),
+        ),
+      ),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

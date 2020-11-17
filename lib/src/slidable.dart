@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/dismissal_transition.dart';
 import 'package:flutter_slidable/src/slidable_controller.dart';
-import 'package:flutter_slidable/src/sliding_details.dart';
+
+import 'action_pane.dart';
 
 /// Represents a group of slidables where only one of them can be open at the
 /// same time.
@@ -11,16 +13,16 @@ class SlidableGroup {}
 class Slidable extends StatefulWidget {
   const Slidable({
     Key key,
-    this.actionPane,
-    this.secondaryActionPane,
+    this.startActionPane,
+    this.endActionPane,
     this.direction,
     @required this.child,
     this.dragStartBehavior = DragStartBehavior.start,
   })  : assert(dragStartBehavior != null),
         super(key: key);
 
-  final Widget actionPane;
-  final Widget secondaryActionPane;
+  final Widget startActionPane;
+  final Widget endActionPane;
   final Axis direction;
   final Widget child;
 
@@ -86,8 +88,8 @@ class _SlidableState extends State<Slidable>
 
   void updateController() {
     controller
-      ..enableActionPane = widget.actionPane != null
-      ..enableSecondaryActionPane = widget.secondaryActionPane != null;
+      ..enableStartActionPane = widget.startActionPane != null
+      ..enableEndActionPane = widget.endActionPane != null;
   }
 
   void handleControllerChanges() {
@@ -104,7 +106,7 @@ class _SlidableState extends State<Slidable>
   }
 
   void handleDismissing() {
-    if (controller.dismissRequest != null) {
+    if (controller.resizeRequest != null) {
       setState(() {});
     }
   }
@@ -123,9 +125,9 @@ class _SlidableState extends State<Slidable>
 
   Widget get actionPane {
     if (controller.ratio > 0) {
-      return widget.actionPane;
+      return widget.startActionPane;
     } else if (controller.ratio < 0) {
-      return widget.secondaryActionPane;
+      return widget.endActionPane;
     } else {
       return null;
     }
@@ -266,6 +268,8 @@ class SlidableGestureDetector extends StatefulWidget {
 
 class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   double dragExtent = 0;
+  Offset startPosition;
+  Offset lastPosition;
 
   bool get directionIsXAxis {
     return widget.direction == Axis.horizontal;
@@ -292,7 +296,7 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   }
 
   void handleDragStart(DragStartDetails details) {
-    // widget.controller.slidingDetails = SlidingDetails(active: true);
+    startPosition = details.localPosition;
     dragExtent =
         dragExtent.sign * overallDragAxisExtent * widget.controller.ratio.abs();
   }
@@ -300,17 +304,20 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   void handleDragUpdate(DragUpdateDetails details) {
     final delta = details.primaryDelta;
     dragExtent += delta;
+    lastPosition = details.localPosition;
     widget.controller.ratio = dragExtent / overallDragAxisExtent;
   }
 
   void handleDragEnd(DragEndDetails details) {
-    // print('velocity: ${details.primaryVelocity}');
-    // widget.controller.slidingDetails = SlidingDetails(
-    //   active: false,
-    //   velocity: details.primaryVelocity,
-    //   shouldOpen: details.primaryVelocity.sign == dragExtent.sign,
-    // );
-    widget.controller.handleEndGesture(details.primaryVelocity);
+    final delta = lastPosition - startPosition;
+    final primaryDelta = directionIsXAxis ? delta.dx : delta.dy;
+    final gestureDirection =
+        primaryDelta >= 0 ? GestureDirection.opening : GestureDirection.closing;
+
+    widget.controller.handleEndGesture(
+      details.primaryVelocity,
+      gestureDirection,
+    );
   }
 }
 

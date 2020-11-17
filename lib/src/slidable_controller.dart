@@ -1,16 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/src/sliding_details.dart';
 
 const _defaultMovementDuration = Duration(milliseconds: 200);
 const _defaultCurve = Curves.ease;
 
+abstract class ActionPaneConfiguration {
+  bool canChangeRatio(double ratio);
+  double get extentRatio;
+}
+
+enum GestureDirection {
+  opening,
+  closing,
+}
+
 @immutable
-class DismissRequest {
-  const DismissRequest(this.duration, this.onDismissed);
+class ResizeRequest {
+  const ResizeRequest(this.duration, this.onDismissed);
 
   final Duration duration;
   final VoidCallback onDismissed;
+}
+
+@immutable
+class DismissGesture {
+  DismissGesture(this.endGesture);
+  final EndGesture endGesture;
 }
 
 @immutable
@@ -19,16 +34,20 @@ class EndGesture {
   final double velocity;
 }
 
-class ForwardGesture extends EndGesture {
-  ForwardGesture(double velocity) : super(velocity);
+class OpeningGesture extends EndGesture {
+  OpeningGesture(double velocity) : super(velocity);
 }
 
-class ReverseGesture extends EndGesture {
-  ReverseGesture(double velocity) : super(velocity);
+class ClosingGesture extends EndGesture {
+  ClosingGesture(double velocity) : super(velocity);
 }
 
 class StillGesture extends EndGesture {
-  StillGesture() : super(0);
+  StillGesture(this.direction) : super(0);
+
+  final GestureDirection direction;
+  bool get opening => direction == GestureDirection.opening;
+  bool get closing => direction == GestureDirection.closing;
 }
 
 /// Represents a way to control a slidable from outside.
@@ -40,25 +59,20 @@ class SlidableController with ChangeNotifier {
 
   final AnimationController _animationController;
 
-  bool enableActionPane = false;
-  bool enableSecondaryActionPane = false;
+  bool enableStartActionPane = false;
+  bool enableEndActionPane = false;
+
+  ActionPaneConfiguration actionPaneConfiguration;
 
   bool acceptRatio(double ratio) {
     return ratio == 0 ||
-        (ratio > 0 && enableActionPane) ||
-        (ratio < 0 && enableSecondaryActionPane);
+        ((ratio > 0 && enableStartActionPane) ||
+                (ratio < 0 && enableEndActionPane)) &&
+            (actionPaneConfiguration == null ||
+                actionPaneConfiguration.canChangeRatio(ratio.abs()));
   }
 
   Animation<double> get animation => _animationController.view;
-
-  // SlidingDetails get slidingDetails => _slidingDetails;
-  // SlidingDetails _slidingDetails;
-  // set slidingDetails(SlidingDetails value) {
-  //   if (_slidingDetails != value) {
-  //     _slidingDetails = value;
-  //     notifyListeners();
-  //   }
-  // }
 
   EndGesture get endGesture => _endGesture;
   EndGesture _endGesture;
@@ -70,7 +84,16 @@ class SlidableController with ChangeNotifier {
     }
   }
 
-  double get sign => _sign;
+  DismissGesture get dismissGesture => _dismissGesture;
+  DismissGesture _dismissGesture;
+  set dismissGesture(DismissGesture value) {
+    if (_dismissGesture != value) {
+      _dismissGesture = value;
+      notifyListeners();
+    }
+  }
+
+  double get sign => _animationController.value.sign * _sign;
   double _sign = 0;
   @protected
   set sign(double value) {
@@ -80,11 +103,11 @@ class SlidableController with ChangeNotifier {
     }
   }
 
-  DismissRequest get dismissRequest => _dismissRequest;
-  DismissRequest _dismissRequest;
-  set dismissRequest(DismissRequest value) {
-    if (_dismissRequest != value) {
-      _dismissRequest = value;
+  ResizeRequest get resizeRequest => _resizeRequest;
+  ResizeRequest _resizeRequest;
+  set resizeRequest(ResizeRequest value) {
+    if (_resizeRequest != value) {
+      _resizeRequest = value;
       notifyListeners();
     }
   }
@@ -97,49 +120,69 @@ class SlidableController with ChangeNotifier {
   double get ratio => _animationController.value * _sign;
   set ratio(double value) {
     if (ratio != value && acceptRatio(value)) {
-      // print(value);
       _sign = value.sign;
       _animationController.value = value.abs();
       notifyListeners();
     }
   }
 
-  void handleEndGesture(double velocity) {
+  void handleEndGesture(double velocity, GestureDirection direction) {
     if (velocity == 0) {
-      endGesture = StillGesture();
+      endGesture = StillGesture(direction);
     } else if (velocity.sign == sign) {
-      endGesture = ForwardGesture(velocity);
+      endGesture = OpeningGesture(velocity);
     } else {
-      endGesture = ReverseGesture(velocity.abs());
+      endGesture = ClosingGesture(velocity.abs());
     }
   }
 
-  void close({
+  TickerFuture close({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) {
-    _animationController.animateTo(0, duration: duration, curve: curve);
+    return _animationController.animateTo(
+      0,
+      duration: duration,
+      curve: curve,
+    );
   }
 
-  void openTo(
+  TickerFuture open({
+    Duration duration = _defaultMovementDuration,
+    Curve curve = _defaultCurve,
+  }) {
+    assert(actionPaneConfiguration != null);
+    assert(duration != null);
+    return openTo(
+      actionPaneConfiguration.extentRatio,
+      duration: duration,
+      curve: curve,
+    );
+  }
+
+  TickerFuture openTo(
     double ratio, {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) {
     assert(ratio != null && ratio >= -1 && ratio <= 1);
     assert(duration != null);
-    _animationController.animateTo(ratio, duration: duration, curve: curve);
+    return _animationController.animateTo(
+      ratio,
+      duration: duration,
+      curve: curve,
+    );
   }
 
   void dismiss(
-    DismissRequest dismissRequest, {
+    ResizeRequest request, {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) {
-    this.dismissRequest = dismissRequest;
+    resizeRequest = request;
     _animationController
         .animateTo(1, duration: _defaultMovementDuration, curve: curve)
-        .then((_) => this.dismissRequest = null);
+        .then((_) => resizeRequest = null);
   }
 
   @override

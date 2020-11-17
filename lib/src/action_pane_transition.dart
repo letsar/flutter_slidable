@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_slidable/src/drawer_transition.dart';
+import 'package:flutter_slidable/src/flex_entrance_transition.dart';
 
 class SlidableBehindTransition extends StatelessWidget {
   const SlidableBehindTransition({
@@ -13,7 +13,6 @@ class SlidableBehindTransition extends StatelessWidget {
     final pane = ActionPane.of(context);
     final style = ActionPaneStyle.of(context);
     return Flex(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       direction: style.direction,
       children: pane.children,
     );
@@ -35,6 +34,7 @@ class SlidableStretchTransition extends StatelessWidget {
       animation: controller.animation,
       builder: (BuildContext context, Widget child) {
         final value = controller.animation.value / pane.extentRatio;
+
         return FractionallySizedBox(
           alignment: style.alignment,
           widthFactor: style.direction == Axis.horizontal ? value : null,
@@ -85,7 +85,7 @@ class SlidableDrawerTransition extends StatelessWidget {
     final animation = controller.animation
         .drive(CurveTween(curve: Interval(0, pane.extentRatio)));
 
-    return FlexDrawer(
+    return FlexEntranceTransition(
       mainAxisPosition: animation,
       direction: style.direction,
       fromStart: style.fromStart,

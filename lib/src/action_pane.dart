@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_slidable/src/action_pane_transition.dart';
 import 'package:flutter_slidable/src/slidable_controller.dart';
-import 'package:flutter_slidable/src/sliding_details.dart';
 
 const _defaultExtentRatio = 0.5;
 
@@ -11,9 +9,16 @@ class ActionPane extends StatefulWidget {
     Key key,
     this.extentRatio = _defaultExtentRatio,
     @required this.transition,
+    this.dismissible,
+    this.openThreshold,
+    this.closeThreshold,
     this.children,
   })  : assert(extentRatio != null && extentRatio > 0 && extentRatio <= 1),
         assert(children != null),
+        assert(
+            openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
+        assert(closeThreshold == null ||
+            (closeThreshold > 0 && closeThreshold < 1)),
         super(key: key);
 
   /// The total extent of this [ActionPane] relatively to the enclosing
@@ -26,8 +31,12 @@ class ActionPane extends StatefulWidget {
   // ActionSlide avec int en paramètre => Flexible
 
   final Widget transition;
+  final Widget dismissible;
 
   final List<Widget> children;
+
+  final double openThreshold;
+  final double closeThreshold;
 
   @override
   _ActionPaneState createState() => _ActionPaneState();
@@ -39,77 +48,120 @@ class ActionPane extends StatefulWidget {
   }
 }
 
-class _ActionPaneState extends State<ActionPane> {
+class _ActionPaneState extends State<ActionPane>
+    implements ActionPaneConfiguration {
   SlidableController controller;
-  // SlidingDetails slidingDetails;
   EndGesture endGesture;
   double ratio = 0;
+  double openThreshold;
+  double closeThreshold;
+  bool showTransition;
+
+  double get extentRatio => widget.extentRatio;
 
   @override
   void initState() {
     super.initState();
     controller = Slidable.of(context);
     controller.addListener(handleControllerChanges);
+    controller.actionPaneConfiguration = this;
+    showTransition = true;
+    updateThresholds();
+  }
+
+  void updateThresholds() {
+    openThreshold = widget.openThreshold ?? widget.extentRatio / 2;
+    closeThreshold = widget.closeThreshold ?? widget.extentRatio / 2;
+  }
+
+  @override
+  void didUpdateWidget(covariant ActionPane oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.dismissible == null) {
+      // In the case where the child was different than the transition, we get
+      // it back.
+      showTransition = true;
+    }
+    updateThresholds();
   }
 
   @override
   void dispose() {
     controller.removeListener(handleControllerChanges);
+    controller.actionPaneConfiguration = null;
     super.dispose();
   }
 
+  bool canChangeRatio(double ratio) {
+    return widget.dismissible != null || ratio <= widget.extentRatio;
+  }
+
   void handleControllerChanges() {
-    // if (slidingDetails != controller.slidingDetails) {
-    //   slidingDetails = controller.slidingDetails;
-    //   handleSlidingDetailsChanged();
-    // }
     if (endGesture != controller.endGesture) {
       endGesture = controller.endGesture;
       handleEndGestureChanged();
     }
-  }
 
-  // void handleSlidingDetailsChanged() {
-  //   // indicate it to the panes ?
-  //   if (!slidingDetails.active) {
-  //     if (slidingDetails.shouldOpen) {
-  //       controller.openTo(0.5);
-  //     } else if (controller.ratio.abs() > 0.5) {
-  //       // controller.dismiss(DismissRequest(Duration(milliseconds: 300), null));
-  //     } else {
-  //       controller.close();
-  //     }
-  //   }
-  // }
+    if (widget.dismissible != null) {
+      if (ratio != controller.ratio) {
+        ratio = controller.ratio;
+        handleRatioChanged();
+      }
+    }
+  }
 
   void handleEndGestureChanged() {
     // indicate it to the panes ?
-    if (endGesture is ForwardGesture) {
-      controller.openTo(0.5);
-    } else if (endGesture is ReverseGesture) {
-      controller.close();
-    } else if (endGesture is StillGesture) {
-      if (controller.ratio.abs() < 0.25) {
-        controller.close();
-      } else {
-        controller.openTo(0.5);
-      }
+    final gesture = endGesture;
+    final position = controller.animation.value;
+
+    if (widget.dismissible != null && position > widget.extentRatio) {
+      controller.dismissGesture = DismissGesture(endGesture);
+      return;
+    }
+
+    if (gesture is OpeningGesture ||
+        gesture is StillGesture &&
+            ((gesture.opening && position >= openThreshold) ||
+                gesture.closing && position > closeThreshold)) {
+      controller.open();
+      return;
+    }
+
+    // Otherwise we close the the Slidable.
+    controller.close();
+  }
+
+  void handleRatioChanged() {
+    final show = ratio <= widget.extentRatio;
+    if (show != showTransition) {
+      setState(() {
+        showTransition = show;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final style = ActionPaneStyle.of(context);
+
+    Widget child;
+
+    if (showTransition) {
+      final factor = widget.extentRatio;
+      child = FractionallySizedBox(
+        alignment: style.alignment,
+        widthFactor: style.direction == Axis.horizontal ? factor : null,
+        heightFactor: style.direction == Axis.horizontal ? null : factor,
+        child: widget.transition,
+      );
+    } else {
+      child = widget.dismissible;
+    }
+
     return _ActionPaneScope(
       actionPane: widget,
-      child: FractionallySizedBox(
-        alignment: style.alignment,
-        widthFactor:
-            style.direction == Axis.horizontal ? widget.extentRatio : null,
-        heightFactor:
-            style.direction == Axis.horizontal ? null : widget.extentRatio,
-        child: widget.transition,
-      ),
+      child: child,
     );
   }
 }
@@ -128,63 +180,3 @@ class _ActionPaneScope extends InheritedWidget {
     return oldWidget.actionPane != actionPane;
   }
 }
-
-// class ActionPane extends StatefulWidget {
-//   const ActionPane({
-//     Key key,
-//     @required this.child,
-//   }) : super(key: key);
-
-//   final Widget child;
-
-//   @override
-//   _ActionPaneState createState() => _ActionPaneState();
-// }
-
-// class _ActionPaneState extends State<ActionPane> {
-//   SlidableController controller;
-//   SlidingDetails slidingDetails;
-//   double ratio = 0;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     controller = Slidable.of(context);
-//     controller.addListener(handleControllerChanges);
-//   }
-
-//   @override
-//   void dispose() {
-//     controller.removeListener(handleControllerChanges);
-//     super.dispose();
-//   }
-
-//   void handleControllerChanges() {
-//     if (slidingDetails != controller.slidingDetails) {
-//       slidingDetails = controller.slidingDetails;
-//       handleSlidingDetailsChanged();
-//     }
-//   }
-
-//   void handleRatioChanged() {}
-
-//   void handleRatioSignChanged() {}
-
-//   void handleSlidingDetailsChanged() {
-//     // indicate it to the panes ?
-//     if (!slidingDetails.active) {
-//       if (slidingDetails.shouldOpen) {
-//         controller.openTo(0.5);
-//       } else if (controller.ratio.abs() > 0.5) {
-//         controller.dismiss(DismissRequest(Duration(milliseconds: 300), null));
-//       } else {
-//         controller.close();
-//       }
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return widget.child;
-//   }
-// }

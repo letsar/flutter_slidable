@@ -1,8 +1,13 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_slidable/src/dismissible_pane_transition.dart';
+import 'package:flutter_slidable/src/slidable.dart';
+import 'package:flutter_slidable/src/slidable_controller.dart';
 
 // TODO: pas fini
 
-const double _kDismissThreshold = 0.4;
+const double _kDismissThreshold = 0.75;
+const Duration _kDismissalDuration = Duration(milliseconds: 300);
+const Duration _kResizeDuration = Duration(milliseconds: 300);
 
 /// Signature used by [DismissiblePane] to give the application an opportunity
 /// to confirm or veto a dismiss gesture.
@@ -10,16 +15,24 @@ const double _kDismissThreshold = 0.4;
 /// Used by [DismissiblePane.confirmDismiss].
 typedef ConfirmDismissCallback = Future<bool> Function();
 
-class DismissiblePane extends StatelessWidget {
+class DismissiblePane extends StatefulWidget {
   const DismissiblePane({
     Key key,
-    this.dismissalDuration,
-    this.resizeDuration,
+    @required this.onDismissed,
+    this.dismissThreshold = _kDismissThreshold,
+    this.dismissalDuration = _kDismissalDuration,
+    this.resizeDuration = _kResizeDuration,
     this.confirmDismiss,
-    this.onDismissed,
     this.closeOnCancel,
-    this.child,
-  }) : super(key: key);
+    this.transition = const DismissiblePaneTransition(),
+  })  : assert(dismissThreshold != null),
+        assert(dismissalDuration != null),
+        assert(resizeDuration != null),
+        assert(onDismissed != null),
+        assert(transition != null),
+        super(key: key);
+
+  final double dismissThreshold;
 
   final Duration dismissalDuration;
 
@@ -32,10 +45,54 @@ class DismissiblePane extends StatelessWidget {
   final ConfirmDismissCallback confirmDismiss;
   final VoidCallback onDismissed;
   final bool closeOnCancel;
-  final Widget child;
+  final Widget transition;
+
+  @override
+  _DismissiblePaneState createState() => _DismissiblePaneState();
+}
+
+class _DismissiblePaneState extends State<DismissiblePane> {
+  SlidableController controller;
+  DismissGesture dismissGesture;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Slidable.of(context);
+    controller.addListener(handleControllerChanges);
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(handleControllerChanges);
+    super.dispose();
+  }
+
+  void handleControllerChanges() {
+    if (dismissGesture != controller.dismissGesture) {
+      dismissGesture = controller.dismissGesture;
+      handleDismissGestureChanged();
+    }
+  }
+
+  void handleDismissGestureChanged() {
+    final endGesture = dismissGesture.endGesture;
+    final position = controller.animation.value;
+
+    if (endGesture is OpeningGesture ||
+        endGesture is StillGesture && position >= widget.dismissThreshold) {
+      controller.dismiss(
+        ResizeRequest(widget.resizeDuration, widget.onDismissed),
+        duration: widget.dismissalDuration,
+      );
+      return;
+    }
+
+    controller.open();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return widget.transition;
   }
 }

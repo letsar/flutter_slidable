@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class FlexDrawer extends MultiChildRenderObjectWidget {
-  FlexDrawer({
+class FlexEntranceTransition extends MultiChildRenderObjectWidget {
+  FlexEntranceTransition({
     Key key,
     this.mainAxisPosition,
     this.direction,
@@ -25,7 +25,7 @@ class FlexDrawer extends MultiChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return RenderFlexDrawer(
+    return RenderFlexEntranceTransition(
       mainAxisPosition: mainAxisPosition,
       direction: direction,
       fromStart: fromStart,
@@ -33,7 +33,8 @@ class FlexDrawer extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context, RenderFlexDrawer renderObject) {
+  void updateRenderObject(
+      BuildContext context, RenderFlexEntranceTransition renderObject) {
     renderObject
       ..mainAxisPosition = mainAxisPosition
       ..direction = direction
@@ -45,11 +46,11 @@ class FlexDrawerParentData extends FlexParentData {
   Tween<double> mainAxisPosition;
 }
 
-class RenderFlexDrawer extends RenderBox
+class RenderFlexEntranceTransition extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, FlexDrawerParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, FlexDrawerParentData> {
-  RenderFlexDrawer({
+  RenderFlexEntranceTransition({
     List<RenderBox> children,
     Axis direction = Axis.horizontal,
     Animation<double> mainAxisPosition,
@@ -123,20 +124,22 @@ class RenderFlexDrawer extends RenderBox
   }
 
   void updateOffsets() {
-    visitChildren((child) {
-      final parentData = child.parentData as FlexDrawerParentData;
-      final mainAxisPosition = parentData.mainAxisPosition.evaluate(
-        _mainAxisPosition,
-      );
-      switch (_direction) {
-        case Axis.horizontal:
-          parentData.offset = Offset(mainAxisPosition, 0);
-          break;
-        case Axis.vertical:
-          parentData.offset = Offset(0, mainAxisPosition);
-          break;
-      }
-    });
+    visitChildren(updateChildOffsets);
+  }
+
+  void updateChildOffsets(RenderObject child) {
+    final parentData = child.parentData as FlexDrawerParentData;
+    final mainAxisPosition = parentData.mainAxisPosition.evaluate(
+      _mainAxisPosition,
+    );
+    switch (_direction) {
+      case Axis.horizontal:
+        parentData.offset = Offset(mainAxisPosition, 0);
+        break;
+      case Axis.vertical:
+        parentData.offset = Offset(0, mainAxisPosition);
+        break;
+    }
   }
 
   int getTotalFlex() {
@@ -185,7 +188,6 @@ class RenderFlexDrawer extends RenderBox
             height: constraints.maxHeight,
             width: mainAxisExtent,
           );
-          parentData.offset = Offset(begin, 0);
           break;
         case Axis.vertical:
           mainAxisExtent = constraints.maxHeight * extentFactor;
@@ -194,7 +196,6 @@ class RenderFlexDrawer extends RenderBox
             height: mainAxisExtent,
             width: constraints.maxWidth,
           );
-          parentData.offset = Offset(0, begin);
           break;
       }
       parentData.mainAxisPosition = Tween(
@@ -202,6 +203,7 @@ class RenderFlexDrawer extends RenderBox
         end: totalMainAxisExtent,
       );
       child.layout(innerConstraints);
+      updateChildOffsets(child);
       totalMainAxisExtent += mainAxisExtent;
     });
   }

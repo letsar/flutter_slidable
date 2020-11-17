@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/slidable_controller.dart';
 
+/// Animates the end of a dismiss.
 class DismissalTransition extends StatefulWidget {
   const DismissalTransition({
     Key key,
@@ -22,13 +23,14 @@ class DismissalTransition extends StatefulWidget {
 
 class _DismissalTransitionState extends State<DismissalTransition>
     with SingleTickerProviderStateMixin {
-  Size sizePriorToCollapse;
+  bool resized = false;
   AnimationController animationController;
   Animation<double> resizeAnimation;
 
   @override
   void initState() {
     super.initState();
+
     animationController = AnimationController(vsync: this);
     resizeAnimation = animationController.drive(Tween(begin: 1, end: 0));
     widget.controller.animation
@@ -55,24 +57,21 @@ class _DismissalTransitionState extends State<DismissalTransition>
   }
 
   void handleSlidableAnimationStatusChanged(AnimationStatus status) {
-    final dismissRequest = widget.controller.dismissRequest;
-    if (status == AnimationStatus.completed && dismissRequest != null) {
-      animationController.duration = dismissRequest.duration;
+    final resizeRequest = widget.controller.resizeRequest;
+    if (status == AnimationStatus.completed && resizeRequest != null) {
+      animationController.duration = resizeRequest.duration;
       animationController.forward(from: 0).then((_) {
-        sizePriorToCollapse = null;
-        dismissRequest.onDismissed?.call();
+        resizeRequest.onDismissed?.call();
       });
       setState(() {
-        sizePriorToCollapse = context.size;
+        resized = true;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget result = widget.child;
-
-    if (sizePriorToCollapse != null) {
+    if (resized) {
       assert(() {
         if (resizeAnimation.status != AnimationStatus.forward) {
           assert(resizeAnimation.status == AnimationStatus.completed);
@@ -91,18 +90,12 @@ class _DismissalTransitionState extends State<DismissalTransition>
         }
         return true;
       }());
-
-      result = SizeTransition(
-        sizeFactor: resizeAnimation,
-        axis: widget.axis,
-        child: SizedBox(
-          width: sizePriorToCollapse.width,
-          height: sizePriorToCollapse.height,
-          child: result,
-        ),
-      );
     }
 
-    return result;
+    return SizeTransition(
+      sizeFactor: resizeAnimation,
+      axis: widget.axis,
+      child: widget.child,
+    );
   }
 }

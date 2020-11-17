@@ -39,72 +39,75 @@ class MyHomePage extends StatelessWidget {
         children: [
           Slidable(
             direction: direction,
-            actionPane: ActionPane(
+            startActionPane: ActionPane(
               transition: SlidableBehindTransition(),
               children: [
-                SlideAction(color: Colors.green, text: 'green'),
-                SlideAction(color: Colors.amber, text: 'amber'),
+                SlideAction(color: Colors.green, icon: Icons.share),
+                SlideAction(color: Colors.amber, icon: Icons.delete),
               ],
             ),
-            secondaryActionPane: ActionPane(
+            endActionPane: ActionPane(
               transition: SlidableBehindTransition(),
               children: [
-                SlideAction(color: Colors.red, text: 'red'),
-                SlideAction(color: Colors.blue, text: 'blue', flex: 2),
+                SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
               ],
             ),
             child: Tile(color: Colors.grey, text: 'hello'),
           ),
           Slidable(
             direction: direction,
-            actionPane: ActionPane(
+            startActionPane: ActionPane(
               transition: SlidableStretchTransition(),
               children: [
-                SlideAction(color: Colors.green, text: 'green'),
-                SlideAction(color: Colors.amber, text: 'amber'),
+                SlideAction(color: Colors.green, icon: Icons.share),
+                SlideAction(color: Colors.amber, icon: Icons.delete),
               ],
             ),
-            secondaryActionPane: ActionPane(
+            endActionPane: ActionPane(
               transition: SlidableStretchTransition(),
               children: [
-                SlideAction(color: Colors.red, text: 'red'),
-                SlideAction(color: Colors.blue, text: 'blue', flex: 2),
+                SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
               ],
             ),
             child: Tile(color: Colors.pink, text: 'hello 2'),
           ),
           Slidable(
             direction: direction,
-            actionPane: ActionPane(
+            startActionPane: ActionPane(
               transition: SlidableScrollTransition(),
               children: [
-                SlideAction(color: Colors.green, text: 'green'),
-                SlideAction(color: Colors.amber, text: 'amber'),
+                SlideAction(color: Colors.green, icon: Icons.share),
+                SlideAction(color: Colors.amber, icon: Icons.delete),
               ],
             ),
-            secondaryActionPane: ActionPane(
+            endActionPane: ActionPane(
               transition: SlidableScrollTransition(),
               children: [
-                SlideAction(color: Colors.red, text: 'red'),
-                SlideAction(color: Colors.blue, text: 'blue', flex: 2),
+                SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
               ],
             ),
             child: Tile(color: Colors.yellow, text: 'hello 3'),
           ),
           Slidable(
             direction: direction,
-            actionPane: ActionPane(
+            startActionPane: ActionPane(
               transition: SlidableDrawerTransition(),
+              dismissible: DismissiblePane(
+                onDismissed: () {},
+              ),
               children: [
-                SlideAction(color: Colors.green, text: 'green'),
-                SlideAction(color: Colors.amber, text: 'amber'),
+                SlideAction(color: Colors.green, icon: Icons.share),
+                SlideAction(color: Colors.amber, icon: Icons.delete),
               ],
             ),
-            secondaryActionPane: ActionPane(
+            endActionPane: ActionPane(
               transition: SlidableDrawerTransition(),
               children: [
-                SlideAction(color: Colors.red, text: 'red'),
-                SlideAction(color: Colors.blue, text: 'blue', flex: 2),
+                SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
               ],
             ),
             child: Tile(color: Colors.lime, text: 'hello 4'),
@@ -119,12 +122,12 @@ class SlideAction extends StatelessWidget {
   const SlideAction({
     Key key,
     @required this.color,
-    @required this.text,
+    @required this.icon,
     this.flex = 1,
   }) : super(key: key);
 
   final Color color;
-  final String text;
+  final IconData icon;
   final int flex;
 
   @override
@@ -136,7 +139,12 @@ class SlideAction extends StatelessWidget {
         height: direction == Axis.horizontal ? double.infinity : null,
         width: direction == Axis.horizontal ? null : double.infinity,
         color: color,
-        child: Text(text),
+        child: Center(
+          child: Icon(
+            icon,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

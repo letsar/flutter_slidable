@@ -3,8 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/dismissal_transition.dart';
 import 'package:flutter_slidable/src/slidable_controller.dart';
-
-import 'action_pane.dart';
+import 'package:flutter_slidable/src/slidable_scroll_configurator.dart';
 
 /// Represents a group of slidables where only one of them can be open at the
 /// same time.
@@ -13,13 +12,30 @@ class SlidableGroup {}
 class Slidable extends StatefulWidget {
   const Slidable({
     Key key,
+    this.enabled = true,
+    this.closeOnScroll = true,
     this.startActionPane,
     this.endActionPane,
     this.direction,
     @required this.child,
-    this.dragStartBehavior = DragStartBehavior.start,
-  })  : assert(dragStartBehavior != null),
+    this.dragStartBehavior = DragStartBehavior.down,
+  })  : assert(enabled != null),
+        assert(closeOnScroll != null),
+        assert(dragStartBehavior != null),
         super(key: key);
+
+  /// Whether this slidable is interactive.
+  ///
+  /// If false, the child will not slid to show actions.
+  ///
+  /// Defaults to true.
+  final bool enabled;
+
+  /// Specifies to close this [Slidable] after the closest [Scrollable]'s
+  /// position changed.
+  ///
+  /// Defaults to true.
+  final bool closeOnScroll;
 
   final Widget startActionPane;
   final Widget endActionPane;
@@ -59,7 +75,7 @@ class _SlidableState extends State<Slidable>
   SlidableController controller;
   Animation<Offset> moveAnimation;
 
-  double sign = 0;
+  // double sign = 0;
 
 // TODO.
   @override
@@ -93,8 +109,11 @@ class _SlidableState extends State<Slidable>
   }
 
   void handleControllerChanges() {
-    if (sign != controller.sign) {
-      sign = controller.sign;
+    // if (sign != controller.sign) {
+    //   sign = controller.sign;
+    //   handleRatioSignChanged();
+    // }
+    if (controller.lastChangedProperty == SlidableControllerProperty.sign) {
       handleRatioSignChanged();
     }
   }
@@ -167,19 +186,24 @@ class _SlidableState extends State<Slidable>
     );
 
     return SlidableGestureDetector(
+      enabled: widget.enabled,
       controller: controller,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
-      child: DismissalTransition(
-        axis: flipAxis(widget.direction),
+      child: SlidableScrollConfigurator(
         controller: controller,
-        child: ActionPaneStyle(
-          alignment: actionPaneAlignment,
-          direction: widget.direction,
-          fromStart: controller.ratio > 0,
-          child: _SlidableControllerScope(
-            controller: controller,
-            child: content,
+        closeOnScroll: widget.closeOnScroll,
+        child: DismissalTransition(
+          axis: flipAxis(widget.direction),
+          controller: controller,
+          child: ActionPaneStyle(
+            alignment: actionPaneAlignment,
+            direction: widget.direction,
+            fromStart: controller.ratio > 0,
+            child: _SlidableControllerScope(
+              controller: controller,
+              child: content,
+            ),
           ),
         ),
       ),
@@ -231,11 +255,13 @@ class ActionPaneStyle extends InheritedWidget {
 class SlidableGestureDetector extends StatefulWidget {
   const SlidableGestureDetector({
     Key key,
+    this.enabled = true,
     @required this.controller,
     @required this.direction,
     @required this.child,
     this.dragStartBehavior = DragStartBehavior.start,
-  })  : assert(controller != null),
+  })  : assert(enabled != null),
+        assert(controller != null),
         assert(child != null),
         assert(dragStartBehavior != null),
         super(key: key);
@@ -243,6 +269,7 @@ class SlidableGestureDetector extends StatefulWidget {
   final SlidableController controller;
   final Widget child;
   final Axis direction;
+  final bool enabled;
 
   /// Determines the way that drag start behavior is handled.
   ///
@@ -277,13 +304,15 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
 
   @override
   Widget build(BuildContext context) {
+    final canDragHorizontally = directionIsXAxis && widget.enabled;
+    final canDragVertically = !directionIsXAxis && widget.enabled;
     return GestureDetector(
-      onHorizontalDragStart: directionIsXAxis ? handleDragStart : null,
-      onHorizontalDragUpdate: directionIsXAxis ? handleDragUpdate : null,
-      onHorizontalDragEnd: directionIsXAxis ? handleDragEnd : null,
-      onVerticalDragStart: directionIsXAxis ? null : handleDragStart,
-      onVerticalDragUpdate: directionIsXAxis ? null : handleDragUpdate,
-      onVerticalDragEnd: directionIsXAxis ? null : handleDragEnd,
+      onHorizontalDragStart: canDragHorizontally ? handleDragStart : null,
+      onHorizontalDragUpdate: canDragHorizontally ? handleDragUpdate : null,
+      onHorizontalDragEnd: canDragHorizontally ? handleDragEnd : null,
+      onVerticalDragStart: canDragVertically ? handleDragStart : null,
+      onVerticalDragUpdate: canDragVertically ? handleDragUpdate : null,
+      onVerticalDragEnd: canDragVertically ? handleDragEnd : null,
       behavior: HitTestBehavior.opaque,
       dragStartBehavior: widget.dragStartBehavior,
       child: widget.child,

@@ -23,12 +23,13 @@ class DismissiblePane extends StatefulWidget {
     this.dismissalDuration = _kDismissalDuration,
     this.resizeDuration = _kResizeDuration,
     this.confirmDismiss,
-    this.closeOnCancel,
+    this.closeOnCancel = false,
     this.transition = const DismissiblePaneTransition(),
   })  : assert(dismissThreshold != null),
         assert(dismissalDuration != null),
         assert(resizeDuration != null),
         assert(onDismissed != null),
+        assert(closeOnCancel != null),
         assert(transition != null),
         super(key: key);
 
@@ -53,7 +54,7 @@ class DismissiblePane extends StatefulWidget {
 
 class _DismissiblePaneState extends State<DismissiblePane> {
   SlidableController controller;
-  DismissGesture dismissGesture;
+  // DismissGesture dismissGesture;
 
   @override
   void initState() {
@@ -69,22 +70,37 @@ class _DismissiblePaneState extends State<DismissiblePane> {
   }
 
   void handleControllerChanges() {
-    if (dismissGesture != controller.dismissGesture) {
-      dismissGesture = controller.dismissGesture;
+    // if (dismissGesture != controller.dismissGesture &&
+    //     controller.dismissGesture != null) {
+    //   dismissGesture = controller.dismissGesture;
+    //   handleDismissGestureChanged();
+    // }
+    if (controller.lastChangedProperty ==
+        SlidableControllerProperty.dismissGesture) {
       handleDismissGestureChanged();
     }
   }
 
-  void handleDismissGestureChanged() {
-    final endGesture = dismissGesture.endGesture;
+  Future<void> handleDismissGestureChanged() async {
+    final endGesture = controller.dismissGesture.endGesture;
     final position = controller.animation.value;
 
     if (endGesture is OpeningGesture ||
         endGesture is StillGesture && position >= widget.dismissThreshold) {
-      controller.dismiss(
-        ResizeRequest(widget.resizeDuration, widget.onDismissed),
-        duration: widget.dismissalDuration,
-      );
+      // TODO(team): sometimes we enter two times here.
+
+      bool canDismiss = true;
+      if (widget.confirmDismiss != null) {
+        canDismiss = (await widget.confirmDismiss()) ?? false;
+      }
+      if (canDismiss) {
+        controller.dismiss(
+          ResizeRequest(widget.resizeDuration, widget.onDismissed),
+          duration: widget.dismissalDuration,
+        );
+      } else if (widget.closeOnCancel) {
+        controller.close();
+      }
       return;
     }
 

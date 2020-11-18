@@ -33,39 +33,38 @@ class _DismissalTransitionState extends State<DismissalTransition>
 
     animationController = AnimationController(vsync: this);
     resizeAnimation = animationController.drive(Tween(begin: 1, end: 0));
-    widget.controller.animation
-        .addStatusListener(handleSlidableAnimationStatusChanged);
+    widget.controller.addListener(handleControllerChanges);
   }
 
   @override
   void didUpdateWidget(covariant DismissalTransition oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller.animation != widget.controller.animation) {
-      oldWidget.controller.animation
-          .removeStatusListener(handleSlidableAnimationStatusChanged);
-      widget.controller.animation
-          .addStatusListener(handleSlidableAnimationStatusChanged);
+      oldWidget.controller.removeListener(handleControllerChanges);
+      widget.controller.addListener(handleControllerChanges);
     }
   }
 
   @override
   void dispose() {
-    widget.controller.animation
-        .removeStatusListener(handleSlidableAnimationStatusChanged);
+    widget.controller.removeListener(handleControllerChanges);
     animationController.dispose();
     super.dispose();
   }
 
-  void handleSlidableAnimationStatusChanged(AnimationStatus status) {
+  void handleControllerChanges() {
     final resizeRequest = widget.controller.resizeRequest;
-    if (status == AnimationStatus.completed && resizeRequest != null) {
-      animationController.duration = resizeRequest.duration;
-      animationController.forward(from: 0).then((_) {
-        resizeRequest.onDismissed?.call();
-      });
-      setState(() {
-        resized = true;
-      });
+    if (widget.controller.lastChangedProperty ==
+        SlidableControllerProperty.resizeRequest) {
+      if (widget.controller.animation.status == AnimationStatus.completed) {
+        animationController.duration = resizeRequest.duration;
+        animationController.forward(from: 0).then((_) {
+          resizeRequest.onDismissed?.call();
+        });
+        setState(() {
+          resized = true;
+        });
+      }
     }
   }
 

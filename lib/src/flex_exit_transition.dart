@@ -47,12 +47,13 @@ class FlexExitTransition extends MultiChildRenderObjectWidget {
   }
 }
 
-class FlexDrawerParentData extends FlexParentData {}
+class FlexExitTransitionParentData extends FlexParentData {}
 
 class RenderFlexExitTransition extends RenderBox
     with
-        ContainerRenderObjectMixin<RenderBox, FlexDrawerParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, FlexDrawerParentData> {
+        ContainerRenderObjectMixin<RenderBox, FlexExitTransitionParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox,
+            FlexExitTransitionParentData> {
   RenderFlexExitTransition({
     List<RenderBox> children,
     Axis direction = Axis.horizontal,
@@ -116,8 +117,8 @@ class RenderFlexExitTransition extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! FlexDrawerParentData) {
-      child.parentData = FlexDrawerParentData();
+    if (child.parentData is! FlexExitTransitionParentData) {
+      child.parentData = FlexExitTransitionParentData();
     }
   }
 
@@ -140,7 +141,7 @@ class RenderFlexExitTransition extends RenderBox
   int getTotalFlex() {
     int totalFlex = 0;
     visitChildren((child) {
-      final parentData = child.parentData as FlexDrawerParentData;
+      final parentData = child.parentData as FlexExitTransitionParentData;
       assert(() {
         if (parentData.flex != null) {
           return true;
@@ -172,7 +173,7 @@ class RenderFlexExitTransition extends RenderBox
     double totalMainAxisExtentSoFar = 0;
 
     visitChildren((child) {
-      final parentData = child.parentData as FlexDrawerParentData;
+      final parentData = child.parentData as FlexExitTransitionParentData;
       final extentFactor = parentData.flex / totalFlex * initialExtentRatio;
       BoxConstraints innerConstraints;
       double initialMainAxisExtent;
@@ -212,7 +213,7 @@ class RenderFlexExitTransition extends RenderBox
     // The x, y parameters have the top left of the node's box as the origin.
     RenderBox child = fromStart ? firstChild : lastChild;
     while (child != null) {
-      final childParentData = child.parentData as FlexDrawerParentData;
+      final childParentData = child.parentData as FlexExitTransitionParentData;
       final bool isHit = result.addWithPaintOffset(
         offset: childParentData.offset,
         position: position,
@@ -236,7 +237,7 @@ class RenderFlexExitTransition extends RenderBox
   void paint(PaintingContext context, Offset offset) {
     RenderBox child = fromStart ? lastChild : firstChild;
     while (child != null) {
-      final childParentData = child.parentData as FlexDrawerParentData;
+      final childParentData = child.parentData as FlexExitTransitionParentData;
       context.paintChild(child, childParentData.offset + offset);
 
       child = fromStart

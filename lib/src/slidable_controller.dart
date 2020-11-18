@@ -9,6 +9,14 @@ abstract class ActionPaneConfiguration {
   double get extentRatio;
 }
 
+enum SlidableControllerProperty {
+  endGesture,
+  dismissGesture,
+  resizeRequest,
+  sign,
+  ratio,
+}
+
 enum GestureDirection {
   opening,
   closing,
@@ -54,9 +62,11 @@ class StillGesture extends EndGesture {
 class SlidableController with ChangeNotifier {
   SlidableController(TickerProvider vsync)
       : _animationController = AnimationController(vsync: vsync) {
-    _animationController.addListener(notifyListeners);
+    _animationController.addListener(_notifyAnimationChanged);
   }
 
+  final List<SlidableControllerProperty> _changedProperties =
+      <SlidableControllerProperty>[];
   final AnimationController _animationController;
 
   bool enableStartActionPane = false;
@@ -72,7 +82,15 @@ class SlidableController with ChangeNotifier {
                 actionPaneConfiguration.canChangeRatio(ratio.abs()));
   }
 
+  SlidableControllerProperty get lastChangedProperty => _changedProperties.last;
+
   Animation<double> get animation => _animationController.view;
+
+  void _notifyPropertyListeners(SlidableControllerProperty property) {
+    _changedProperties.add(property);
+    notifyListeners();
+    _changedProperties.removeLast();
+  }
 
   EndGesture get endGesture => _endGesture;
   EndGesture _endGesture;
@@ -80,7 +98,7 @@ class SlidableController with ChangeNotifier {
   set endGesture(EndGesture value) {
     if (_endGesture != value) {
       _endGesture = value;
-      notifyListeners();
+      _notifyPropertyListeners(SlidableControllerProperty.endGesture);
     }
   }
 
@@ -89,17 +107,7 @@ class SlidableController with ChangeNotifier {
   set dismissGesture(DismissGesture value) {
     if (_dismissGesture != value) {
       _dismissGesture = value;
-      notifyListeners();
-    }
-  }
-
-  double get sign => _animationController.value.sign * _sign;
-  double _sign = 0;
-  @protected
-  set sign(double value) {
-    if (_sign != value) {
-      _sign = value;
-      notifyListeners();
+      _notifyPropertyListeners(SlidableControllerProperty.dismissGesture);
     }
   }
 
@@ -108,8 +116,23 @@ class SlidableController with ChangeNotifier {
   set resizeRequest(ResizeRequest value) {
     if (_resizeRequest != value) {
       _resizeRequest = value;
-      notifyListeners();
+      _notifyPropertyListeners(SlidableControllerProperty.resizeRequest);
     }
+  }
+
+  double get sign => _sign;
+  double _sign = 0;
+  @protected
+  set sign(double value) {
+    if (_sign != value) {
+      _sign = value;
+      _notifyPropertyListeners(SlidableControllerProperty.sign);
+    }
+  }
+
+  void _notifyAnimationChanged() {
+    sign = _animationController.value.sign * _sign;
+    _notifyPropertyListeners(SlidableControllerProperty.ratio);
   }
 
   /// The ratio between -1 and 1 representing the actual.
@@ -120,9 +143,9 @@ class SlidableController with ChangeNotifier {
   double get ratio => _animationController.value * _sign;
   set ratio(double value) {
     if (ratio != value && acceptRatio(value)) {
-      _sign = value.sign;
       _animationController.value = value.abs();
-      notifyListeners();
+      sign = value.sign;
+      _notifyPropertyListeners(SlidableControllerProperty.ratio);
     }
   }
 
@@ -174,20 +197,22 @@ class SlidableController with ChangeNotifier {
     );
   }
 
-  void dismiss(
+  Future<void> dismiss(
     ResizeRequest request, {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
-  }) {
+  }) async {
+    await _animationController.animateTo(
+      1,
+      duration: _defaultMovementDuration,
+      curve: curve,
+    );
     resizeRequest = request;
-    _animationController
-        .animateTo(1, duration: _defaultMovementDuration, curve: curve)
-        .then((_) => resizeRequest = null);
   }
 
   @override
   void dispose() {
-    _animationController.removeListener(notifyListeners);
+    _animationController.removeListener(_notifyAnimationChanged);
     _animationController.dispose();
     super.dispose();
   }

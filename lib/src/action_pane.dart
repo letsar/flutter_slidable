@@ -4,7 +4,20 @@ import 'package:flutter_slidable/src/slidable_controller.dart';
 
 const _defaultExtentRatio = 0.5;
 
-class ActionPane extends StatefulWidget {
+/// Data of the ambient [ActionPane] accessible from its children.
+abstract class ActionPaneData {
+  /// The total extent of this [ActionPane] relatively to the enclosing
+  /// [Slidable] widget.
+  ///
+  /// Must be between 0 (excluded) and 1.
+  double get extentRatio;
+
+  /// The actions for this pane.
+  List<Widget> get children;
+}
+
+/// An action pane.
+class ActionPane extends StatefulWidget implements ActionPaneData {
   const ActionPane({
     Key key,
     this.extentRatio = _defaultExtentRatio,
@@ -21,42 +34,56 @@ class ActionPane extends StatefulWidget {
             (closeThreshold > 0 && closeThreshold < 1)),
         super(key: key);
 
-  /// The total extent of this [ActionPane] relatively to the enclosing
-  /// [Slidable] widget.
-  ///
-  /// Must be between 0 (excluded) and 1.
+  @override
   final double extentRatio;
 
-  // Penser à pouvoir faire des widgets 80/20.
-  // ActionSlide avec int en paramètre => Flexible
-
+  /// A widget which animates when the [Slidable] moves.
   final Widget transition;
+
+  /// A widget which animates when the [Slidable] dismisses.
   final Widget dismissible;
 
-  final List<Widget> children;
-
+  /// The fraction of the total extent from where the [Slidable] will
+  /// automatically open when the drag end.
+  ///
+  /// Must be between 0 (excluded) and 1 (excluded).
+  ///
+  /// By default this value is half the [extentRatio].
   final double openThreshold;
+
+  /// The fraction of the total extent from where the [Slidable] will
+  /// automatically close when the drag end.
+  ///
+  /// Must be between 0 (excluded) and 1 (excluded).
+  ///
+  /// By default this value is half the [extentRatio].
   final double closeThreshold;
+
+  @override
+  final List<Widget> children;
 
   @override
   _ActionPaneState createState() => _ActionPaneState();
 
-  static ActionPane of(BuildContext context) {
+  /// The action pane's data from the closest instance of this class that
+  /// encloses the given context.
+  static ActionPaneData of(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<_ActionPaneScope>()
-        ?.actionPane;
+        ?.actionPaneData;
   }
 }
 
 class _ActionPaneState extends State<ActionPane>
     implements ActionPaneConfiguration {
   SlidableController controller;
-  EndGesture endGesture;
-  double ratio = 0;
+  // EndGesture endGesture;
+  // double ratio = 0;
   double openThreshold;
   double closeThreshold;
   bool showTransition;
 
+  @override
   double get extentRatio => widget.extentRatio;
 
   @override
@@ -97,26 +124,28 @@ class _ActionPaneState extends State<ActionPane>
   }
 
   void handleControllerChanges() {
-    if (endGesture != controller.endGesture) {
-      endGesture = controller.endGesture;
+    // if (endGesture != controller.endGesture && controller.endGesture != null) {
+    //   endGesture = controller.endGesture;
+    //   handleEndGestureChanged();
+    // }
+    if (controller.lastChangedProperty ==
+        SlidableControllerProperty.endGesture) {
       handleEndGestureChanged();
     }
 
     if (widget.dismissible != null) {
-      if (ratio != controller.ratio) {
-        ratio = controller.ratio;
+      if (controller.lastChangedProperty == SlidableControllerProperty.ratio) {
         handleRatioChanged();
       }
     }
   }
 
   void handleEndGestureChanged() {
-    // indicate it to the panes ?
-    final gesture = endGesture;
+    final gesture = controller.endGesture;
     final position = controller.animation.value;
 
     if (widget.dismissible != null && position > widget.extentRatio) {
-      controller.dismissGesture = DismissGesture(endGesture);
+      controller.dismissGesture = DismissGesture(gesture);
       return;
     }
 
@@ -125,6 +154,7 @@ class _ActionPaneState extends State<ActionPane>
             ((gesture.opening && position >= openThreshold) ||
                 gesture.closing && position > closeThreshold)) {
       controller.open();
+
       return;
     }
 
@@ -133,7 +163,7 @@ class _ActionPaneState extends State<ActionPane>
   }
 
   void handleRatioChanged() {
-    final show = ratio <= widget.extentRatio;
+    final show = controller.ratio <= widget.extentRatio;
     if (show != showTransition) {
       setState(() {
         showTransition = show;
@@ -160,23 +190,23 @@ class _ActionPaneState extends State<ActionPane>
     }
 
     return _ActionPaneScope(
-      actionPane: widget,
+      actionPaneData: widget,
       child: child,
     );
   }
 }
 
 class _ActionPaneScope extends InheritedWidget {
-  _ActionPaneScope({
+  const _ActionPaneScope({
     Key key,
-    this.actionPane,
+    this.actionPaneData,
     Widget child,
   }) : super(key: key, child: child);
 
-  final ActionPane actionPane;
+  final ActionPaneData actionPaneData;
 
   @override
   bool updateShouldNotify(covariant _ActionPaneScope oldWidget) {
-    return oldWidget.actionPane != actionPane;
+    return oldWidget.actionPaneData != actionPaneData;
   }
 }

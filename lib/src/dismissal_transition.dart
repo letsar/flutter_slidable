@@ -33,26 +33,26 @@ class _DismissalTransitionState extends State<DismissalTransition>
 
     animationController = AnimationController(vsync: this);
     resizeAnimation = animationController.drive(Tween(begin: 1, end: 0));
-    widget.controller.addListener(handleControllerChanges);
+    widget.controller.addListener(handleControllerChanged);
   }
 
   @override
   void didUpdateWidget(covariant DismissalTransition oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller.animation != widget.controller.animation) {
-      oldWidget.controller.removeListener(handleControllerChanges);
-      widget.controller.addListener(handleControllerChanges);
+      oldWidget.controller.removeListener(handleControllerChanged);
+      widget.controller.addListener(handleControllerChanged);
     }
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(handleControllerChanges);
+    widget.controller.removeListener(handleControllerChanged);
     animationController.dispose();
     super.dispose();
   }
 
-  void handleControllerChanges() {
+  void handleControllerChanged() {
     final resizeRequest = widget.controller.resizeRequest;
     if (widget.controller.lastChangedProperty ==
         SlidableControllerProperty.resizeRequest) {

@@ -3,8 +3,6 @@ import 'package:flutter_slidable/src/dismissible_pane_transition.dart';
 import 'package:flutter_slidable/src/slidable.dart';
 import 'package:flutter_slidable/src/slidable_controller.dart';
 
-// TODO: pas fini
-
 const double _kDismissThreshold = 0.75;
 const Duration _kDismissalDuration = Duration(milliseconds: 300);
 const Duration _kResizeDuration = Duration(milliseconds: 300);
@@ -59,17 +57,41 @@ class _DismissiblePaneState extends State<DismissiblePane> {
   @override
   void initState() {
     super.initState();
+    assert(() {
+      final slidable = context.findAncestorWidgetOfExactType<Slidable>();
+      if (slidable.key == null) {
+        throw FlutterError.fromParts(<DiagnosticsNode>[
+          ErrorSummary('DismissiblePane created on a Slidable without a Key.'),
+          ErrorDescription(
+            'The closest Slidable of DismissiblePane has been created without '
+            'a Key.\n'
+            'The key argument must not be null because Slidables are '
+            'commonly used in lists and removed from the list when '
+            'dismissed. Without keys, the default behavior is to sync '
+            'widgets based on their index in the list, which means the item '
+            'after the dismissed item would be synced with the state of the '
+            'dismissed item. Using keys causes the widgets to sync according '
+            'to their keys and avoids this pitfall.',
+          ),
+          ErrorHint(
+            'To avoid this problem, set the key of the enclosing Slidable '
+            'widget.',
+          ),
+        ]);
+      }
+      return true;
+    }());
     controller = Slidable.of(context);
-    controller.addListener(handleControllerChanges);
+    controller.addListener(handleControllerChanged);
   }
 
   @override
   void dispose() {
-    controller.removeListener(handleControllerChanges);
+    controller.removeListener(handleControllerChanged);
     super.dispose();
   }
 
-  void handleControllerChanges() {
+  void handleControllerChanged() {
     // if (dismissGesture != controller.dismissGesture &&
     //     controller.dismissGesture != null) {
     //   dismissGesture = controller.dismissGesture;

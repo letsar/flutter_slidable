@@ -36,6 +36,8 @@ class DismissGesture {
   final EndGesture endGesture;
 }
 
+class StartGesture {}
+
 @immutable
 class EndGesture {
   EndGesture(this.velocity);
@@ -163,7 +165,7 @@ class SlidableController with ChangeNotifier {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) {
-    return _animationController.animateTo(
+    return _animationController.animateBack(
       0,
       duration: duration,
       curve: curve,

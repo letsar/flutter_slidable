@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/dismissal_transition.dart';
+import 'package:flutter_slidable/src/notifications.dart';
 import 'package:flutter_slidable/src/slidable_controller.dart';
 import 'package:flutter_slidable/src/slidable_scroll_configurator.dart';
 
@@ -12,6 +13,7 @@ class SlidableGroup {}
 class Slidable extends StatefulWidget {
   const Slidable({
     Key key,
+    this.tag,
     this.enabled = true,
     this.closeOnScroll = true,
     this.startActionPane,
@@ -41,6 +43,7 @@ class Slidable extends StatefulWidget {
   final Widget endActionPane;
   final Axis direction;
   final Widget child;
+  final Object tag;
 
   /// Determines the way that drag start behavior is handled.
   ///
@@ -84,7 +87,7 @@ class _SlidableState extends State<Slidable>
   @override
   void initState() {
     super.initState();
-    controller = SlidableController(this)..addListener(handleControllerChanges);
+    controller = SlidableController(this)..addListener(handleControllerChanged);
     updateController();
     updateMoveAnimation();
   }
@@ -97,7 +100,7 @@ class _SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    controller.removeListener(handleControllerChanges);
+    controller.removeListener(handleControllerChanged);
     controller.dispose();
     super.dispose();
   }
@@ -108,7 +111,7 @@ class _SlidableState extends State<Slidable>
       ..enableEndActionPane = widget.endActionPane != null;
   }
 
-  void handleControllerChanges() {
+  void handleControllerChanged() {
     // if (sign != controller.sign) {
     //   sign = controller.sign;
     //   handleRatioSignChanged();
@@ -190,19 +193,23 @@ class _SlidableState extends State<Slidable>
       controller: controller,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
-      child: SlidableScrollConfigurator(
+      child: SlidableNotificationSender(
+        tag: widget.tag,
         controller: controller,
-        closeOnScroll: widget.closeOnScroll,
-        child: DismissalTransition(
-          axis: flipAxis(widget.direction),
+        child: SlidableScrollConfigurator(
           controller: controller,
-          child: ActionPaneStyle(
-            alignment: actionPaneAlignment,
-            direction: widget.direction,
-            fromStart: controller.ratio > 0,
-            child: _SlidableControllerScope(
-              controller: controller,
-              child: content,
+          closeOnScroll: widget.closeOnScroll,
+          child: DismissalTransition(
+            axis: flipAxis(widget.direction),
+            controller: controller,
+            child: ActionPaneStyle(
+              alignment: actionPaneAlignment,
+              direction: widget.direction,
+              fromStart: controller.ratio > 0,
+              child: _SlidableControllerScope(
+                controller: controller,
+                child: content,
+              ),
             ),
           ),
         ),

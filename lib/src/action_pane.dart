@@ -90,7 +90,7 @@ class _ActionPaneState extends State<ActionPane>
   void initState() {
     super.initState();
     controller = Slidable.of(context);
-    controller.addListener(handleControllerChanges);
+    controller.addListener(handleControllerChanged);
     controller.actionPaneConfiguration = this;
     showTransition = true;
     updateThresholds();
@@ -114,7 +114,7 @@ class _ActionPaneState extends State<ActionPane>
 
   @override
   void dispose() {
-    controller.removeListener(handleControllerChanges);
+    controller.removeListener(handleControllerChanged);
     controller.actionPaneConfiguration = null;
     super.dispose();
   }
@@ -123,7 +123,7 @@ class _ActionPaneState extends State<ActionPane>
     return widget.dismissible != null || ratio <= widget.extentRatio;
   }
 
-  void handleControllerChanges() {
+  void handleControllerChanged() {
     // if (endGesture != controller.endGesture && controller.endGesture != null) {
     //   endGesture = controller.endGesture;
     //   handleEndGestureChanged();

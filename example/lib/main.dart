@@ -23,10 +23,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({
     Key key,
   }) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool alive = true;
 
   @override
   Widget build(BuildContext context) {
@@ -35,237 +42,248 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Flutter Slidable'),
       ),
-      body: ListView(
-        scrollDirection: flipAxis(direction),
-        children: [
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
+      body: SlidableNotificationListener(
+        onNotification: (notification) {},
+        child: ListView(
+          scrollDirection: flipAxis(direction),
+          children: [
+            Slidable(
+              tag: '0',
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
+            Slidable(
+              tag: '0',
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableStretchTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableStretchTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.pink, text: 'hello 2'),
             ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableStretchTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableScrollTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableScrollTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.yellow, text: 'hello 3'),
             ),
-            endActionPane: ActionPane(
-              transition: SlidableStretchTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
-            ),
-            child: Tile(color: Colors.pink, text: 'hello 2'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableScrollTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
-            ),
-            endActionPane: ActionPane(
-              transition: SlidableScrollTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
-            ),
-            child: Tile(color: Colors.yellow, text: 'hello 3'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableDrawerTransition(),
-              dismissible: DismissiblePane(
-                onDismissed: () {},
-                closeOnCancel: true,
-                confirmDismiss: () async {
-                  return showDialog<bool>(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Are you sure?'),
-                        content: const Text('Are you sure to dismiss?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(true);
-                            },
-                            child: const Text('Yes'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(false);
-                            },
-                            child: const Text('No'),
-                          ),
-                        ],
+            if (alive)
+              Slidable(
+                key: ValueKey(4),
+                direction: direction,
+                startActionPane: ActionPane(
+                  transition: SlidableDrawerTransition(),
+                  dismissible: DismissiblePane(
+                    onDismissed: () {
+                      setState(() {
+                        alive = false;
+                      });
+                    },
+                    closeOnCancel: true,
+                    confirmDismiss: () async {
+                      return showDialog<bool>(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Are you sure?'),
+                            content: const Text('Are you sure to dismiss?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                                child: const Text('Yes'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                                child: const Text('No'),
+                              ),
+                            ],
+                          );
+                        },
                       );
                     },
-                  );
-                },
+                  ),
+                  children: [
+                    SlideAction(color: Colors.green, icon: Icons.share),
+                    SlideAction(color: Colors.amber, icon: Icons.delete),
+                  ],
+                ),
+                endActionPane: ActionPane(
+                  transition: SlidableDrawerTransition(),
+                  children: [
+                    SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                    SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                  ],
+                ),
+                child: Tile(color: Colors.lime, text: 'hello 4'),
               ),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            endActionPane: ActionPane(
-              transition: SlidableDrawerTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            child: Tile(color: Colors.lime, text: 'hello 4'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.green, icon: Icons.share),
+                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                transition: SlidableBehindTransition(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: Tile(color: Colors.grey, text: 'hello'),
             ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
-            ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
-            ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
-            ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
-            ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
-            ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
-            ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
-            ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-          Slidable(
-            direction: direction,
-            startActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.green, icon: Icons.share),
-                SlideAction(color: Colors.amber, icon: Icons.delete),
-              ],
-            ),
-            endActionPane: ActionPane(
-              transition: SlidableBehindTransition(),
-              children: [
-                SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-              ],
-            ),
-            child: Tile(color: Colors.grey, text: 'hello'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

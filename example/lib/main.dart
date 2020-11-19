@@ -345,7 +345,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showSnackBar(BuildContext context, String text) {
-    ScaffoldMessenger.of(context)!
+    ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(text)));
   }

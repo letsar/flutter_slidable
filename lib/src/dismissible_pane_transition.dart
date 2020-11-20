@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/src/action_pane.dart';
-import 'package:flutter_slidable/src/flex_exit_transition.dart';
-import 'package:flutter_slidable/src/slidable.dart';
+
+import 'action_pane.dart';
+import 'flex_exit_transition.dart';
+import 'slidable.dart';
 
 class DismissiblePaneTransition extends StatelessWidget {
   const DismissiblePaneTransition({

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/src/slidable_controller.dart';
+
+import 'controller.dart';
 
 /// Animates the end of a dismiss.
 class DismissalTransition extends StatefulWidget {

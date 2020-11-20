@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/src/slidable.dart';
-import 'package:flutter_slidable/src/slidable_controller.dart';
+
+import 'controller.dart';
 
 class SlidableScrollConfigurator extends StatefulWidget {
   const SlidableScrollConfigurator({

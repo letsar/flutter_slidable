@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/src/dismissible_pane_transition.dart';
-import 'package:flutter_slidable/src/slidable.dart';
-import 'package:flutter_slidable/src/slidable_controller.dart';
+
+import 'controller.dart';
+import 'dismissible_pane_transition.dart';
+import 'slidable.dart';
 
 const double _kDismissThreshold = 0.75;
 const Duration _kDismissalDuration = Duration(milliseconds: 300);

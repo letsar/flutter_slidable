@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/src/slidable_controller.dart';
+
+import 'controller.dart';
 
 typedef SlidableNotificationCallback = void Function(
   SlidableNotification notification,
@@ -18,11 +19,14 @@ class SlidableNotification {
 class SlidableNotificationListener extends StatefulWidget {
   const SlidableNotificationListener({
     Key key,
-    @required this.onNotification,
+    this.onNotification,
     this.autoClose = true,
     @required this.child,
-  })  : assert(onNotification != null),
-        assert(autoClose != null),
+  })  : assert(autoClose != null),
+        assert(
+          autoClose || onNotification != null,
+          'Either autoClose or onNotification must be set.',
+        ),
         assert(child != null),
         super(key: key);
 
@@ -53,7 +57,7 @@ class _SlidableNotificationListenerState
       }
       openControllers[notification.tag] = controller;
     }
-    widget.onNotification(notification);
+    widget.onNotification?.call(notification);
   }
 
   void clearController(SlidableController controller, Object tag) {

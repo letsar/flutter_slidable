@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_slidable/src/slidable_controller.dart';
+
+import 'controller.dart';
+import 'slidable.dart';
 
 const _defaultExtentRatio = 0.5;
 

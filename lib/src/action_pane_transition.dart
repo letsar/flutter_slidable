@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_slidable/src/flex_entrance_transition.dart';
+
+import 'action_pane.dart';
+import 'flex_entrance_transition.dart';
+import 'slidable.dart';
 
 class SlidableBehindTransition extends StatelessWidget {
   const SlidableBehindTransition({

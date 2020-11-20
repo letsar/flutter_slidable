@@ -303,20 +303,13 @@ class SlideAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final direction = AppState.of(context).direction;
-    return Expanded(
+    return SlidableIconAction(
       flex: flex,
-      child: Container(
-        height: direction == Axis.horizontal ? double.infinity : null,
-        width: direction == Axis.horizontal ? null : double.infinity,
-        color: color,
-        child: Center(
-          child: Icon(
-            icon,
-            color: Colors.white,
-          ),
-        ),
-      ),
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      onPressed: (_) {},
+      icon: icon,
+      label: 'hello',
     );
   }
 }

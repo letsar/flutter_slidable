@@ -8,10 +8,6 @@ import 'gesture_detector.dart';
 import 'notifications.dart';
 import 'scroll_configurator.dart';
 
-/// Represents a group of slidables where only one of them can be open at the
-/// same time.
-class SlidableGroup {}
-
 class Slidable extends StatefulWidget {
   const Slidable({
     Key key,

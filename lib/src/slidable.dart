@@ -19,9 +19,11 @@ class Slidable extends StatefulWidget {
     this.direction,
     @required this.child,
     this.dragStartBehavior = DragStartBehavior.down,
+    this.useTextDirection = true,
   })  : assert(enabled != null),
         assert(closeOnScroll != null),
         assert(dragStartBehavior != null),
+        assert(useTextDirection != null),
         super(key: key);
 
   /// Whether this slidable is interactive.
@@ -42,6 +44,7 @@ class Slidable extends StatefulWidget {
   final Axis direction;
   final Widget child;
   final Object tag;
+  final bool useTextDirection;
 
   /// Determines the way that drag start behavior is handled.
   ///
@@ -75,8 +78,7 @@ class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   SlidableController controller;
   Animation<Offset> moveAnimation;
-
-  // double sign = 0;
+  bool keepPanesOrder;
 
 // TODO.
   @override
@@ -86,6 +88,12 @@ class _SlidableState extends State<Slidable>
   void initState() {
     super.initState();
     controller = SlidableController(this)..addListener(handleControllerChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    updateIsLeftToRight();
     updateController();
     updateMoveAnimation();
   }
@@ -93,6 +101,7 @@ class _SlidableState extends State<Slidable>
   @override
   void didUpdateWidget(covariant Slidable oldWidget) {
     super.didUpdateWidget(oldWidget);
+    updateIsLeftToRight();
     updateController();
   }
 
@@ -105,15 +114,19 @@ class _SlidableState extends State<Slidable>
 
   void updateController() {
     controller
-      ..enableStartActionPane = widget.startActionPane != null
-      ..enableEndActionPane = widget.endActionPane != null;
+      ..enableStartActionPane = startActionPane != null
+      ..enableEndActionPane = endActionPane != null;
+  }
+
+  void updateIsLeftToRight() {
+    final textDirection = Directionality.of(context);
+    keepPanesOrder = widget.direction == Axis.vertical ||
+        !widget.useTextDirection ||
+        textDirection == null ||
+        textDirection == TextDirection.ltr;
   }
 
   void handleControllerChanged() {
-    // if (sign != controller.sign) {
-    //   sign = controller.sign;
-    //   handleRatioSignChanged();
-    // }
     if (controller.lastChangedProperty == SlidableControllerProperty.sign) {
       handleRatioSignChanged();
     }
@@ -145,13 +158,18 @@ class _SlidableState extends State<Slidable>
 
   Widget get actionPane {
     if (controller.ratio > 0) {
-      return widget.startActionPane;
+      return startActionPane;
     } else if (controller.ratio < 0) {
-      return widget.endActionPane;
+      return endActionPane;
     } else {
       return null;
     }
   }
+
+  Widget get startActionPane =>
+      keepPanesOrder ? widget.startActionPane : widget.endActionPane;
+  Widget get endActionPane =>
+      keepPanesOrder ? widget.endActionPane : widget.startActionPane;
 
   Alignment get actionPaneAlignment {
     if (widget.direction == Axis.horizontal) {

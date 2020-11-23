@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: const AppState(
-        direction: Axis.horizontal,
+        direction: Axis.vertical,
         child: MyHomePage(),
       ),
     );
@@ -47,24 +47,30 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           scrollDirection: flipAxis(direction),
           children: [
-            Slidable(
-              tag: '0',
-              direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: Slidable(
+                tag: '0',
+                direction: direction,
+                startActionPane: ActionPane(
+                  extentRatio: 0.5,
+                  openThreshold: 0.1,
+                  closeThreshold: 0.4,
+                  transition: SlidableBehindTransition(),
+                  children: [
+                    SlideAction(color: Colors.green, icon: Icons.share),
+                    SlideAction(color: Colors.amber, icon: Icons.delete),
+                  ],
+                ),
+                endActionPane: ActionPane(
+                  transition: SlidableBehindTransition(),
+                  children: [
+                    SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                    SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                  ],
+                ),
+                child: Tile(color: Colors.grey, text: 'hello'),
               ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
               tag: '0',

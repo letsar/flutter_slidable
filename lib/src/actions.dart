@@ -96,7 +96,11 @@ class SlidableIconAction extends StatelessWidget {
     final children = <Widget>[];
 
     if (icon != null) {
-      children.add(Icon(icon));
+      children.add(
+        Flexible(
+          child: Icon(icon),
+        ),
+      );
     }
 
     if (label != null) {
@@ -109,9 +113,11 @@ class SlidableIconAction extends StatelessWidget {
       }
 
       children.add(
-        Text(
-          label,
-          overflow: TextOverflow.ellipsis,
+        Flexible(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       );
     }

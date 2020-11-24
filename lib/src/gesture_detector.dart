@@ -14,6 +14,7 @@ class SlidableGestureDetector extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
   })  : assert(enabled != null),
         assert(controller != null),
+        assert(direction != null),
         assert(child != null),
         assert(dragStartBehavior != null),
         super(key: key);

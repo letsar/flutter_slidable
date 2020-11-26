@@ -3,7 +3,7 @@ import 'package:flutter_slidable/src/controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-typedef ValueOrNull = T Function<T>(int index, int step);
+typedef ValueOrNull = T Function<T>(int index);
 
 class MockSlidableController extends Mock implements SlidableController {}
 
@@ -24,14 +24,14 @@ class FakeSlidableController extends Fake implements SlidableController {
 
 void testConstructorAsserts({
   @required List<Object> values,
-  @required Object Function(ValueOrNull valueOrNull, int step) factory,
+  @required Object Function(ValueOrNull valueOrNull) factory,
 }) {
-  T valueOrNull<T>(int index, int step) {
-    return index == step ? null : values[index] as T;
-  }
-
   for (var i = 0; i < values.length; i++) {
-    expect(() => factory(valueOrNull, i), throwsAssertionError);
+    T valueOrNull<T>(int index) {
+      return index == i ? null : values[index] as T;
+    }
+
+    expect(() => factory(valueOrNull), throwsAssertionError);
   }
 }
 

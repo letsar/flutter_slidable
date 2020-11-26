@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
 
-class SlidableScrollConfigurator extends StatefulWidget {
-  const SlidableScrollConfigurator({
+class SlidableScrollingBehavior extends StatefulWidget {
+  const SlidableScrollingBehavior({
     Key key,
     @required this.controller,
     this.closeOnScroll = true,
@@ -27,12 +27,11 @@ class SlidableScrollConfigurator extends StatefulWidget {
   final Widget child;
 
   @override
-  _SlidableScrollConfiguratorState createState() =>
-      _SlidableScrollConfiguratorState();
+  _SlidableScrollingBehaviorState createState() =>
+      _SlidableScrollingBehaviorState();
 }
 
-class _SlidableScrollConfiguratorState
-    extends State<SlidableScrollConfigurator> {
+class _SlidableScrollingBehaviorState extends State<SlidableScrollingBehavior> {
   ScrollPosition scrollPosition;
 
   @override
@@ -43,7 +42,7 @@ class _SlidableScrollConfiguratorState
   }
 
   @override
-  void didUpdateWidget(covariant SlidableScrollConfigurator oldWidget) {
+  void didUpdateWidget(covariant SlidableScrollingBehavior oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.closeOnScroll != widget.closeOnScroll) {
       removeScrollingNotifierListener();

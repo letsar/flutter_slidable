@@ -15,7 +15,7 @@ void main() {
     reset(mockSlidableController);
   });
 
-  group('SlidableGestureDetector', () {
+  group('SlidableGestureDetector -', () {
     test('constructor asserts', () {
       final values = [
         true,
@@ -27,12 +27,12 @@ void main() {
 
       testConstructorAsserts(
         values: values,
-        factory: (valueOrNull, step) => SlidableGestureDetector(
-          enabled: valueOrNull<bool>(0, step),
-          controller: valueOrNull<SlidableController>(1, step),
-          direction: valueOrNull<Axis>(2, step),
-          dragStartBehavior: valueOrNull<DragStartBehavior>(3, step),
-          child: valueOrNull<Widget>(4, step),
+        factory: (valueOrNull) => SlidableGestureDetector(
+          enabled: valueOrNull(0),
+          controller: valueOrNull(1),
+          direction: valueOrNull(2),
+          dragStartBehavior: valueOrNull(3),
+          child: valueOrNull(4),
         ),
       );
     });

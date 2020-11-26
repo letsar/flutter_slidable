@@ -4,6 +4,11 @@ import 'package:flutter/widgets.dart';
 const _defaultMovementDuration = Duration(milliseconds: 200);
 const _defaultCurve = Curves.ease;
 
+enum SlidableDirection {
+  startToEnd,
+  endToStart,
+}
+
 abstract class ActionPaneConfiguration {
   bool canChangeRatio(double ratio);
   double get extentRatio;
@@ -71,17 +76,19 @@ class SlidableController with ChangeNotifier {
       <SlidableControllerProperty>[];
   final AnimationController _animationController;
 
-  bool enableStartActionPane = false;
-  bool enableEndActionPane = false;
+  bool enableStartActionPane = true;
+  bool enableEndActionPane = true;
+  bool _canSetRatio = true;
 
   ActionPaneConfiguration actionPaneConfiguration;
 
   bool acceptRatio(double ratio) {
-    return ratio == 0 ||
-        ((ratio > 0 && enableStartActionPane) ||
-                (ratio < 0 && enableEndActionPane)) &&
-            (actionPaneConfiguration == null ||
-                actionPaneConfiguration.canChangeRatio(ratio.abs()));
+    return _canSetRatio &&
+        (ratio == 0 ||
+            ((ratio > 0 && enableStartActionPane) ||
+                    (ratio < 0 && enableEndActionPane)) &&
+                (actionPaneConfiguration == null ||
+                    actionPaneConfiguration.canChangeRatio(ratio.abs())));
   }
 
   SlidableControllerProperty get lastChangedProperty => _changedProperties.last;
@@ -134,7 +141,10 @@ class SlidableController with ChangeNotifier {
 
   void _notifyAnimationChanged() {
     sign = _animationController.value.sign * _sign;
-    _notifyPropertyListeners(SlidableControllerProperty.ratio);
+
+    if (!_refreshingRatio) {
+      _notifyPropertyListeners(SlidableControllerProperty.ratio);
+    }
   }
 
   /// The ratio between -1 and 1 representing the actual.
@@ -143,9 +153,13 @@ class SlidableController with ChangeNotifier {
   /// Within the interval [-1, 0[, the end action panel is visible.
   /// Within the interval ]0, 1], the start action panel is visible.
   double get ratio => _animationController.value * _sign;
+
+  bool _refreshingRatio = false;
   set ratio(double value) {
     if (ratio != value && acceptRatio(value)) {
+      _refreshingRatio = true;
       _animationController.value = value.abs();
+      _refreshingRatio = false;
       sign = value.sign;
       _notifyPropertyListeners(SlidableControllerProperty.ratio);
     }
@@ -161,25 +175,33 @@ class SlidableController with ChangeNotifier {
     }
   }
 
-  TickerFuture close({
+  Future<void> close({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
+    bool avoidReopening = false,
   }) {
-    return _animationController.animateBack(
-      0,
-      duration: duration,
-      curve: curve,
-    );
+    _canSetRatio = !avoidReopening;
+    return _animationController
+        .animateBack(
+          0,
+          duration: duration,
+          curve: curve,
+        )
+        .then((_) => _canSetRatio = true);
   }
 
   TickerFuture open({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
+    SlidableDirection direction,
   }) {
     assert(actionPaneConfiguration != null);
     assert(duration != null);
+    assert(direction != null || sign != 0);
+
+    final toSign = direction.toSign() ?? sign;
     return openTo(
-      actionPaneConfiguration.extentRatio,
+      actionPaneConfiguration.extentRatio * toSign,
       duration: duration,
       curve: curve,
     );
@@ -192,8 +214,13 @@ class SlidableController with ChangeNotifier {
   }) {
     assert(ratio != null && ratio >= -1 && ratio <= 1);
     assert(duration != null);
+    // Edge case: to be able to correctly set the sign when the value is zero,
+    // we have to manually set the ratio to a tiny amount.
+    if (_animationController.value == 0) {
+      this.ratio = 0.05 * ratio.sign;
+    }
     return _animationController.animateTo(
-      ratio,
+      ratio.abs(),
       duration: duration,
       curve: curve,
     );
@@ -215,7 +242,21 @@ class SlidableController with ChangeNotifier {
   @override
   void dispose() {
     _animationController.removeListener(_notifyAnimationChanged);
+    _animationController.stop();
     _animationController.dispose();
     super.dispose();
+  }
+}
+
+extension on SlidableDirection {
+  double toSign() {
+    switch (this) {
+      case SlidableDirection.startToEnd:
+        return 1;
+      case SlidableDirection.endToStart:
+        return -1;
+      default:
+        return null;
+    }
   }
 }

@@ -6,7 +6,7 @@ import 'controller.dart';
 import 'dismissal_transition.dart';
 import 'gesture_detector.dart';
 import 'notifications.dart';
-import 'scroll_configurator.dart';
+import 'scrolling_behavior.dart';
 
 class Slidable extends StatefulWidget {
   const Slidable({
@@ -212,7 +212,7 @@ class _SlidableState extends State<Slidable>
       child: SlidableNotificationSender(
         tag: widget.tag,
         controller: controller,
-        child: SlidableScrollConfigurator(
+        child: SlidableScrollingBehavior(
           controller: controller,
           closeOnScroll: widget.closeOnScroll,
           child: DismissalTransition(

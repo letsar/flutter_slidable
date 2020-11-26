@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
@@ -6,14 +8,34 @@ typedef SlidableNotificationCallback = void Function(
   SlidableNotification notification,
 );
 
+@immutable
 class SlidableNotification {
-  SlidableNotification({
+  const SlidableNotification({
     @required this.tag,
     @required this.ratio,
   });
 
   final Object tag;
   final double ratio;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is SlidableNotification &&
+        other.tag == tag &&
+        other.ratio == ratio;
+  }
+
+  @override
+  int get hashCode => hashValues(tag, ratio);
+
+  @override
+  String toString() => 'SlidableNotification(tag: $tag, ratio: $ratio)';
 }
 
 class SlidableNotificationListener extends StatefulWidget {
@@ -53,7 +75,7 @@ class _SlidableNotificationListenerState
       // Automatically close the last controller saved with the same tag.
       final lastOpenController = openControllers[notification.tag];
       if (lastOpenController != null && lastOpenController != controller) {
-        lastOpenController.close();
+        lastOpenController.close(avoidReopening: false);
       }
       openControllers[notification.tag] = controller;
     }
@@ -69,15 +91,15 @@ class _SlidableNotificationListenerState
 
   @override
   Widget build(BuildContext context) {
-    return SlidableNotificationListenerScope(
+    return _SlidableNotificationListenerScope(
       state: this,
       child: widget.child,
     );
   }
 }
 
-class SlidableNotificationListenerScope extends InheritedWidget {
-  const SlidableNotificationListenerScope({
+class _SlidableNotificationListenerScope extends InheritedWidget {
+  const _SlidableNotificationListenerScope({
     Key key,
     @required this.state,
     @required Widget child,
@@ -87,7 +109,7 @@ class SlidableNotificationListenerScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(
-      covariant SlidableNotificationListenerScope oldWidget) {
+      covariant _SlidableNotificationListenerScope oldWidget) {
     return oldWidget.state != state;
   }
 }
@@ -98,7 +120,9 @@ class SlidableNotificationSender extends StatefulWidget {
     @required this.tag,
     @required this.controller,
     @required this.child,
-  }) : super(key: key);
+  })  : assert(controller != null),
+        assert(child != null),
+        super(key: key);
 
   final Object tag;
   final SlidableController controller;
@@ -117,7 +141,8 @@ class _SlidableNotificationSenderState
   void didChangeDependencies() {
     super.didChangeDependencies();
     final state = context
-        .dependOnInheritedWidgetOfExactType<SlidableNotificationListenerScope>()
+        .dependOnInheritedWidgetOfExactType<
+            _SlidableNotificationListenerScope>()
         ?.state;
     if (state != listenerState) {
       if (state == null) {
@@ -140,11 +165,13 @@ class _SlidableNotificationSenderState
 
   void handleControllerChanged() {
     final controller = widget.controller;
-    final notification = SlidableNotification(
-      tag: widget.tag,
-      ratio: controller.ratio,
-    );
-    listenerState.sendNotification(controller, notification);
+    if (controller.lastChangedProperty == SlidableControllerProperty.ratio) {
+      final notification = SlidableNotification(
+        tag: widget.tag,
+        ratio: controller.ratio,
+      );
+      listenerState.sendNotification(controller, notification);
+    }
   }
 
   @override

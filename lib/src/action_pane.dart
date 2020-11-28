@@ -91,7 +91,11 @@ class _ActionPaneState extends State<ActionPane>
   void initState() {
     super.initState();
     controller = Slidable.of(context);
-    controller.addListener(handleControllerChanged);
+    controller.endGesture.addListener(handleEndGestureChanged);
+
+    if (widget.dismissible != null) {
+      controller.animation.addListener(handleRatioChanged);
+    }
     controller.actionPaneConfiguration = this;
     showTransition = true;
     updateThresholds();
@@ -105,48 +109,38 @@ class _ActionPaneState extends State<ActionPane>
   @override
   void didUpdateWidget(covariant ActionPane oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.dismissible != null) {
+      controller.animation.removeListener(handleRatioChanged);
+    }
     if (widget.dismissible == null) {
       // In the case where the child was different than the transition, we get
       // it back.
       showTransition = true;
+    } else {
+      controller.animation.addListener(handleRatioChanged);
     }
     updateThresholds();
   }
 
   @override
   void dispose() {
-    controller.removeListener(handleControllerChanged);
+    controller.endGesture.removeListener(handleRatioChanged);
+    controller.animation.removeListener(handleRatioChanged);
     controller.actionPaneConfiguration = null;
     super.dispose();
   }
 
+  @override
   bool canChangeRatio(double ratio) {
     return widget.dismissible != null || ratio <= widget.extentRatio;
   }
 
-  void handleControllerChanged() {
-    // if (endGesture != controller.endGesture && controller.endGesture != null) {
-    //   endGesture = controller.endGesture;
-    //   handleEndGestureChanged();
-    // }
-    if (controller.lastChangedProperty ==
-        SlidableControllerProperty.endGesture) {
-      handleEndGestureChanged();
-    }
-
-    if (widget.dismissible != null) {
-      if (controller.lastChangedProperty == SlidableControllerProperty.ratio) {
-        handleRatioChanged();
-      }
-    }
-  }
-
   void handleEndGestureChanged() {
-    final gesture = controller.endGesture;
+    final gesture = controller.endGesture.value;
     final position = controller.animation.value;
 
     if (widget.dismissible != null && position > widget.extentRatio) {
-      controller.dismissGesture = DismissGesture(gesture);
+      controller.dismissGesture.value = DismissGesture(gesture);
       return;
     }
 

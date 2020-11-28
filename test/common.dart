@@ -7,21 +7,6 @@ typedef ValueOrNull = T Function<T>(int index);
 
 class MockSlidableController extends Mock implements SlidableController {}
 
-class FakeSlidableController extends Fake implements SlidableController {
-  final List<String> logs = <String>[];
-
-  @override
-  double ratio = 0;
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    final memberName = invocation.memberName;
-    final namedArguments = invocation.namedArguments;
-    final positionalArguments = invocation.positionalArguments;
-    logs.add('m: $memberName, n: $namedArguments, p:$positionalArguments');
-  }
-}
-
 void testConstructorAsserts({
   @required List<Object> values,
   @required Object Function(ValueOrNull valueOrNull) factory,

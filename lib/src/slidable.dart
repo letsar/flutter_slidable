@@ -87,7 +87,8 @@ class _SlidableState extends State<Slidable>
   @override
   void initState() {
     super.initState();
-    controller = SlidableController(this)..addListener(handleControllerChanged);
+    controller = SlidableController(this)
+      ..actionPanelType.addListener(handleActionPanelTypeChanged);
   }
 
   @override
@@ -107,7 +108,7 @@ class _SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    controller.removeListener(handleControllerChanged);
+    controller.actionPanelType.removeListener(handleActionPanelTypeChanged);
     controller.dispose();
     super.dispose();
   }
@@ -126,13 +127,7 @@ class _SlidableState extends State<Slidable>
         textDirection == TextDirection.ltr;
   }
 
-  void handleControllerChanged() {
-    if (controller.lastChangedProperty == SlidableControllerProperty.sign) {
-      handleRatioSignChanged();
-    }
-  }
-
-  void handleRatioSignChanged() {
+  void handleActionPanelTypeChanged() {
     setState(() {
       updateMoveAnimation();
     });
@@ -145,7 +140,7 @@ class _SlidableState extends State<Slidable>
   }
 
   void updateMoveAnimation() {
-    final double end = controller.sign;
+    final double end = controller.actionPanelType.value.toSign();
     moveAnimation = controller.animation.drive(
       Tween<Offset>(
         begin: Offset.zero,
@@ -157,12 +152,13 @@ class _SlidableState extends State<Slidable>
   }
 
   Widget get actionPane {
-    if (controller.ratio > 0) {
-      return startActionPane;
-    } else if (controller.ratio < 0) {
-      return endActionPane;
-    } else {
-      return null;
+    switch (controller.actionPanelType.value) {
+      case ActionPanelType.start:
+        return startActionPane;
+      case ActionPanelType.end:
+        return endActionPane;
+      default:
+        return null;
     }
   }
 
@@ -172,10 +168,11 @@ class _SlidableState extends State<Slidable>
       keepPanesOrder ? widget.endActionPane : widget.startActionPane;
 
   Alignment get actionPaneAlignment {
+    final sign = controller.actionPanelType.value.toSign();
     if (widget.direction == Axis.horizontal) {
-      return Alignment(controller.sign * -1, 0);
+      return Alignment(-sign, 0);
     } else {
-      return Alignment(0, controller.sign * -1);
+      return Alignment(0, -sign);
     }
   }
 
@@ -221,7 +218,8 @@ class _SlidableState extends State<Slidable>
             child: ActionPaneStyle(
               alignment: actionPaneAlignment,
               direction: widget.direction,
-              fromStart: controller.ratio > 0,
+              fromStart:
+                  controller.actionPanelType.value == ActionPanelType.start,
               child: _SlidableControllerScope(
                 controller: controller,
                 child: content,
@@ -280,7 +278,7 @@ class SlidableClipper extends CustomClipper<Rect> {
     @required this.controller,
   })  : assert(axis != null),
         assert(controller != null),
-        super(reclip: controller);
+        super(reclip: controller.animation);
 
   final Axis axis;
   final SlidableController controller;
@@ -299,7 +297,11 @@ class SlidableClipper extends CustomClipper<Rect> {
         final double offset = controller.ratio * size.height;
         if (offset < 0) {
           return Rect.fromLTRB(
-              0, size.height + offset, size.width, size.height);
+            0,
+            size.height + offset,
+            size.width,
+            size.height,
+          );
         }
         return Rect.fromLTRB(0, 0, size.width, offset);
     }
@@ -311,7 +313,6 @@ class SlidableClipper extends CustomClipper<Rect> {
 
   @override
   bool shouldReclip(SlidableClipper oldClipper) {
-    return oldClipper.axis != axis ||
-        oldClipper.controller.ratio != controller.ratio;
+    return oldClipper.axis != axis;
   }
 }

@@ -7,8 +7,8 @@ class DismissalTransition extends StatefulWidget {
   const DismissalTransition({
     Key key,
     @required this.axis,
-    @required this.child,
     @required this.controller,
+    @required this.child,
   })  : assert(axis != null),
         assert(controller != null),
         assert(child != null),
@@ -34,38 +34,37 @@ class _DismissalTransitionState extends State<DismissalTransition>
 
     animationController = AnimationController(vsync: this);
     resizeAnimation = animationController.drive(Tween(begin: 1, end: 0));
-    widget.controller.addListener(handleControllerChanged);
+    widget.controller.resizeRequest.addListener(handleResizeRequestChanged);
   }
 
   @override
   void didUpdateWidget(covariant DismissalTransition oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller.animation != widget.controller.animation) {
-      oldWidget.controller.removeListener(handleControllerChanged);
-      widget.controller.addListener(handleControllerChanged);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.resizeRequest
+          .removeListener(handleResizeRequestChanged);
+      widget.controller.resizeRequest.addListener(handleResizeRequestChanged);
     }
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(handleControllerChanged);
+    widget.controller.resizeRequest.removeListener(handleResizeRequestChanged);
     animationController.dispose();
     super.dispose();
   }
 
-  void handleControllerChanged() {
-    final resizeRequest = widget.controller.resizeRequest;
-    if (widget.controller.lastChangedProperty ==
-        SlidableControllerProperty.resizeRequest) {
-      if (widget.controller.animation.status == AnimationStatus.completed) {
-        animationController.duration = resizeRequest.duration;
-        animationController.forward(from: 0).then((_) {
-          resizeRequest.onDismissed?.call();
-        });
-        setState(() {
-          resized = true;
-        });
-      }
+  void handleResizeRequestChanged() {
+    final resizeRequest = widget.controller.resizeRequest.value;
+
+    if (widget.controller.animation.status == AnimationStatus.completed) {
+      animationController.duration = resizeRequest.duration;
+      animationController.forward(from: 0).then((_) {
+        resizeRequest.onDismissed?.call();
+      });
+      setState(() {
+        resized = true;
+      });
     }
   }
 

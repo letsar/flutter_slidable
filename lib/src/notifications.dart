@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
@@ -12,11 +10,9 @@ typedef SlidableNotificationCallback = void Function(
 class SlidableNotification {
   const SlidableNotification({
     @required this.tag,
-    @required this.ratio,
   });
 
   final Object tag;
-  final double ratio;
 
   @override
   bool operator ==(Object other) {
@@ -26,8 +22,29 @@ class SlidableNotification {
     if (other.runtimeType != runtimeType) {
       return false;
     }
-    return other is SlidableNotification &&
-        other.tag == tag &&
+    return other is SlidableNotification && other.tag == tag;
+  }
+
+  @override
+  int get hashCode => tag.hashCode;
+
+  @override
+  String toString() => 'SlidableNotification(tag: $tag)';
+}
+
+@immutable
+class SlidableRatioChangedNotification extends SlidableNotification {
+  const SlidableRatioChangedNotification({
+    @required Object tag,
+    @required this.ratio,
+  }) : super(tag: tag);
+
+  final double ratio;
+
+  @override
+  bool operator ==(Object other) {
+    return super == other &&
+        other is SlidableRatioChangedNotification &&
         other.ratio == ratio;
   }
 
@@ -35,7 +52,8 @@ class SlidableNotification {
   int get hashCode => hashValues(tag, ratio);
 
   @override
-  String toString() => 'SlidableNotification(tag: $tag, ratio: $ratio)';
+  String toString() =>
+      'SlidableRatioChangedNotification(tag: $tag, ratio: $ratio)';
 }
 
 class SlidableNotificationListener extends StatefulWidget {
@@ -70,16 +88,22 @@ class _SlidableNotificationListenerState
     SlidableController controller,
     SlidableNotification notification,
   ) {
-    if (widget.autoClose &&
-        controller.animation.status == AnimationStatus.forward) {
+    handleNotification(controller, notification);
+    widget.onNotification?.call(notification);
+  }
+
+  void handleNotification(
+    SlidableController controller,
+    SlidableNotification notification,
+  ) {
+    if (widget.autoClose && !controller.closing) {
       // Automatically close the last controller saved with the same tag.
       final lastOpenController = openControllers[notification.tag];
       if (lastOpenController != null && lastOpenController != controller) {
-        lastOpenController.close(avoidReopening: false);
+        lastOpenController.close();
       }
       openControllers[notification.tag] = controller;
     }
-    widget.onNotification?.call(notification);
   }
 
   void clearController(SlidableController controller, Object tag) {
@@ -146,9 +170,9 @@ class _SlidableNotificationSenderState
         ?.state;
     if (state != listenerState) {
       if (state == null) {
-        widget.controller.removeListener(handleControllerChanged);
+        removeListeners();
       } else if (listenerState == null) {
-        widget.controller.addListener(handleControllerChanged);
+        addListeners();
       }
       listenerState = state;
     }
@@ -157,21 +181,27 @@ class _SlidableNotificationSenderState
   @override
   void dispose() {
     if (listenerState != null) {
-      widget.controller.removeListener(handleControllerChanged);
+      removeListeners();
       listenerState.clearController(widget.controller, widget.tag);
     }
     super.dispose();
   }
 
-  void handleControllerChanged() {
+  void addListeners() {
+    widget.controller.animation.addListener(handleRatioChanged);
+  }
+
+  void removeListeners() {
+    widget.controller.animation.removeListener(handleRatioChanged);
+  }
+
+  void handleRatioChanged() {
     final controller = widget.controller;
-    if (controller.lastChangedProperty == SlidableControllerProperty.ratio) {
-      final notification = SlidableNotification(
-        tag: widget.tag,
-        ratio: controller.ratio,
-      );
-      listenerState.sendNotification(controller, notification);
-    }
+    final notification = SlidableRatioChangedNotification(
+      tag: widget.tag,
+      ratio: controller.ratio,
+    );
+    listenerState.sendNotification(controller, notification);
   }
 
   @override

@@ -4,22 +4,15 @@ import 'package:flutter/widgets.dart';
 const _defaultMovementDuration = Duration(milliseconds: 200);
 const _defaultCurve = Curves.ease;
 
-enum SlidableDirection {
-  startToEnd,
-  endToStart,
+enum ActionPanelType {
+  end,
+  none,
+  start,
 }
 
 abstract class ActionPaneConfiguration {
   bool canChangeRatio(double ratio);
   double get extentRatio;
-}
-
-enum SlidableControllerProperty {
-  endGesture,
-  dismissGesture,
-  resizeRequest,
-  sign,
-  ratio,
 }
 
 enum GestureDirection {
@@ -40,8 +33,6 @@ class DismissGesture {
   DismissGesture(this.endGesture);
   final EndGesture endGesture;
 }
-
-class StartGesture {}
 
 @immutable
 class EndGesture {
@@ -66,24 +57,33 @@ class StillGesture extends EndGesture {
 }
 
 /// Represents a way to control a slidable from outside.
-class SlidableController with ChangeNotifier {
+class SlidableController {
   SlidableController(TickerProvider vsync)
-      : _animationController = AnimationController(vsync: vsync) {
-    _animationController.addListener(_notifyAnimationChanged);
-  }
+      : _animationController = AnimationController(vsync: vsync),
+        endGesture = ValueNotifier(null),
+        dismissGesture = ValueNotifier(null),
+        resizeRequest = ValueNotifier(null),
+        actionPanelType = ValueNotifier(ActionPanelType.none);
 
-  final List<SlidableControllerProperty> _changedProperties =
-      <SlidableControllerProperty>[];
   final AnimationController _animationController;
 
   bool enableStartActionPane = true;
   bool enableEndActionPane = true;
-  bool _canSetRatio = true;
 
   ActionPaneConfiguration actionPaneConfiguration;
 
+  Animation<double> get animation => _animationController.view;
+
+  final ValueNotifier<EndGesture> endGesture;
+  final ValueNotifier<DismissGesture> dismissGesture;
+  final ValueNotifier<ResizeRequest> resizeRequest;
+  final ValueNotifier<ActionPanelType> actionPanelType;
+
+  bool get closing => _closing;
+  bool _closing = false;
+
   bool acceptRatio(double ratio) {
-    return _canSetRatio &&
+    return !_closing &&
         (ratio == 0 ||
             ((ratio > 0 && enableStartActionPane) ||
                     (ratio < 0 && enableEndActionPane)) &&
@@ -91,129 +91,76 @@ class SlidableController with ChangeNotifier {
                     actionPaneConfiguration.canChangeRatio(ratio.abs())));
   }
 
-  SlidableControllerProperty get lastChangedProperty => _changedProperties.last;
-
-  Animation<double> get animation => _animationController.view;
-
-  void _notifyPropertyListeners(SlidableControllerProperty property) {
-    _changedProperties.add(property);
-    notifyListeners();
-    _changedProperties.removeLast();
-  }
-
-  EndGesture get endGesture => _endGesture;
-  EndGesture _endGesture;
-  @protected
-  set endGesture(EndGesture value) {
-    if (_endGesture != value) {
-      _endGesture = value;
-      _notifyPropertyListeners(SlidableControllerProperty.endGesture);
-    }
-  }
-
-  DismissGesture get dismissGesture => _dismissGesture;
-  DismissGesture _dismissGesture;
-  set dismissGesture(DismissGesture value) {
-    if (_dismissGesture != value) {
-      _dismissGesture = value;
-      _notifyPropertyListeners(SlidableControllerProperty.dismissGesture);
-    }
-  }
-
-  ResizeRequest get resizeRequest => _resizeRequest;
-  ResizeRequest _resizeRequest;
-  set resizeRequest(ResizeRequest value) {
-    if (_resizeRequest != value) {
-      _resizeRequest = value;
-      _notifyPropertyListeners(SlidableControllerProperty.resizeRequest);
-    }
-  }
-
-  double get sign => _sign;
-  double _sign = 0;
-  @protected
-  set sign(double value) {
-    if (_sign != value) {
-      _sign = value;
-      _notifyPropertyListeners(SlidableControllerProperty.sign);
-    }
-  }
-
-  void _notifyAnimationChanged() {
-    sign = _animationController.value.sign * _sign;
-
-    if (!_refreshingRatio) {
-      _notifyPropertyListeners(SlidableControllerProperty.ratio);
-    }
-  }
-
-  /// The ratio between -1 and 1 representing the actual.
-  ///
-  /// When [ratio] is equals to 0, none of the action panels are visible.
-  /// Within the interval [-1, 0[, the end action panel is visible.
-  /// Within the interval ]0, 1], the start action panel is visible.
-  double get ratio => _animationController.value * _sign;
-
-  bool _refreshingRatio = false;
+  double get ratio =>
+      _animationController.value * actionPanelType.value.toSign();
   set ratio(double value) {
-    if (ratio != value && acceptRatio(value)) {
-      _refreshingRatio = true;
+    if (acceptRatio(value) && value != ratio) {
+      final index = value.sign.toInt() + 1;
+      actionPanelType.value = ActionPanelType.values[index];
       _animationController.value = value.abs();
-      _refreshingRatio = false;
-      sign = value.sign;
-      _notifyPropertyListeners(SlidableControllerProperty.ratio);
     }
   }
 
   void handleEndGesture(double velocity, GestureDirection direction) {
-    if (velocity == 0) {
-      endGesture = StillGesture(direction);
-    } else if (velocity.sign == sign) {
-      endGesture = OpeningGesture(velocity);
+    if (velocity == 0 || velocity == null) {
+      endGesture.value = StillGesture(direction);
+    } else if (velocity.sign == actionPanelType.value.toSign()) {
+      endGesture.value = OpeningGesture(velocity);
     } else {
-      endGesture = ClosingGesture(velocity.abs());
+      endGesture.value = ClosingGesture(velocity.abs());
     }
   }
 
   Future<void> close({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
-    bool avoidReopening = false,
-  }) {
-    _canSetRatio = !avoidReopening;
-    return _animationController
-        .animateBack(
-          0,
-          duration: duration,
-          curve: curve,
-        )
-        .then((_) => _canSetRatio = true);
+  }) async {
+    _closing = true;
+    await _animationController.animateBack(
+      0,
+      duration: duration,
+      curve: curve,
+    );
+    _closing = false;
   }
 
-  TickerFuture open({
+  Future<void> open({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
-    SlidableDirection direction,
-  }) {
+    ActionPanelType actionPanelType,
+  }) async {
     assert(actionPaneConfiguration != null);
     assert(duration != null);
-    assert(direction != null || sign != 0);
 
-    final toSign = direction.toSign() ?? sign;
+    if (_closing) {
+      return;
+    }
+
+    if (actionPanelType != null) {
+      this.actionPanelType.value = actionPanelType;
+    } else {
+      assert(this.actionPanelType.value != ActionPanelType.none);
+    }
+
     return openTo(
-      actionPaneConfiguration.extentRatio * toSign,
+      actionPaneConfiguration.extentRatio,
       duration: duration,
       curve: curve,
     );
   }
 
-  TickerFuture openTo(
+  Future<void> openTo(
     double ratio, {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
-  }) {
+  }) async {
     assert(ratio != null && ratio >= -1 && ratio <= 1);
     assert(duration != null);
+
+    if (_closing) {
+      return;
+    }
+
     // Edge case: to be able to correctly set the sign when the value is zero,
     // we have to manually set the ratio to a tiny amount.
     if (_animationController.value == 0) {
@@ -236,27 +183,24 @@ class SlidableController with ChangeNotifier {
       duration: _defaultMovementDuration,
       curve: curve,
     );
-    resizeRequest = request;
+    resizeRequest.value = request;
   }
 
-  @override
   void dispose() {
-    _animationController.removeListener(_notifyAnimationChanged);
     _animationController.stop();
     _animationController.dispose();
-    super.dispose();
   }
 }
 
-extension on SlidableDirection {
+extension ActionPanelTypeX on ActionPanelType {
   double toSign() {
     switch (this) {
-      case SlidableDirection.startToEnd:
+      case ActionPanelType.start:
         return 1;
-      case SlidableDirection.endToStart:
+      case ActionPanelType.end:
         return -1;
       default:
-        return null;
+        return 0;
     }
   }
 }

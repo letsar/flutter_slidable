@@ -83,29 +83,17 @@ class _DismissiblePaneState extends State<DismissiblePane> {
       return true;
     }());
     controller = Slidable.of(context);
-    controller.addListener(handleControllerChanged);
+    controller.dismissGesture.addListener(handleDismissGestureChanged);
   }
 
   @override
   void dispose() {
-    controller.removeListener(handleControllerChanged);
+    controller.dismissGesture.removeListener(handleDismissGestureChanged);
     super.dispose();
   }
 
-  void handleControllerChanged() {
-    // if (dismissGesture != controller.dismissGesture &&
-    //     controller.dismissGesture != null) {
-    //   dismissGesture = controller.dismissGesture;
-    //   handleDismissGestureChanged();
-    // }
-    if (controller.lastChangedProperty ==
-        SlidableControllerProperty.dismissGesture) {
-      handleDismissGestureChanged();
-    }
-  }
-
   Future<void> handleDismissGestureChanged() async {
-    final endGesture = controller.dismissGesture.endGesture;
+    final endGesture = controller.dismissGesture.value.endGesture;
     final position = controller.animation.value;
 
     if (endGesture is OpeningGesture ||

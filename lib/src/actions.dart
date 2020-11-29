@@ -8,7 +8,14 @@ const int _kFlex = 1;
 const Color _kBackgroundColor = Colors.white;
 const bool _kAutoClose = true;
 
+/// Represents an action of an [ActionPane].
 class SlidableAction extends StatelessWidget {
+  /// Creates a [SlidableAction].
+  ///
+  /// The [flex], [backgroundColor], [foregroundColor] and [autoClose] must not
+  /// be null.
+  ///
+  ///
   const SlidableAction({
     Key key,
     this.flex = _kFlex,
@@ -97,27 +104,21 @@ class SlidableIconAction extends StatelessWidget {
 
     if (icon != null) {
       children.add(
-        Flexible(
-          child: Icon(icon),
-        ),
+        Icon(icon),
       );
     }
 
     if (label != null) {
       if (children.isNotEmpty) {
         children.add(
-          Flexible(
-            child: SizedBox(height: spacing),
-          ),
+          SizedBox(height: spacing),
         );
       }
 
       children.add(
-        Flexible(
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-          ),
+        Text(
+          label,
+          overflow: TextOverflow.ellipsis,
         ),
       );
     }
@@ -126,7 +127,13 @@ class SlidableIconAction extends StatelessWidget {
         ? children.first
         : Column(
             mainAxisSize: MainAxisSize.min,
-            children: children,
+            children: [
+              ...children.map(
+                (child) => Flexible(
+                  child: child,
+                ),
+              )
+            ],
           );
 
     return SlidableAction(

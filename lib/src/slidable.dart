@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import 'action_pane.dart';
 import 'controller.dart';
 import 'dismissal_transition.dart';
 import 'gesture_detector.dart';
@@ -16,14 +17,16 @@ class Slidable extends StatefulWidget {
     this.closeOnScroll = true,
     this.startActionPane,
     this.endActionPane,
-    this.direction,
-    @required this.child,
+    this.direction = Axis.horizontal,
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
+    @required this.child,
   })  : assert(enabled != null),
         assert(closeOnScroll != null),
+        assert(direction != null),
         assert(dragStartBehavior != null),
         assert(useTextDirection != null),
+        assert(child != null),
         super(key: key);
 
   /// Whether this slidable is interactive.
@@ -39,8 +42,8 @@ class Slidable extends StatefulWidget {
   /// Defaults to true.
   final bool closeOnScroll;
 
-  final Widget startActionPane;
-  final Widget endActionPane;
+  final ActionPane startActionPane;
+  final ActionPane endActionPane;
   final Axis direction;
   final Widget child;
   final Object tag;
@@ -88,7 +91,7 @@ class _SlidableState extends State<Slidable>
   void initState() {
     super.initState();
     controller = SlidableController(this)
-      ..actionPanelType.addListener(handleActionPanelTypeChanged);
+      ..actionPaneType.addListener(handleActionPanelTypeChanged);
   }
 
   @override
@@ -108,15 +111,23 @@ class _SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    controller.actionPanelType.removeListener(handleActionPanelTypeChanged);
+    controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
     controller.dispose();
     super.dispose();
   }
 
   void updateController() {
-    controller
-      ..enableStartActionPane = startActionPane != null
-      ..enableEndActionPane = endActionPane != null;
+    if (startActionPane != null) {
+      controller
+        ..enableStartActionPane = true
+        ..startActionPaneExtentRatio = startActionPane.extentRatio;
+    }
+
+    if (endActionPane != null) {
+      controller
+        ..enableEndActionPane = true
+        ..endActionPaneExtentRatio = endActionPane.extentRatio;
+    }
   }
 
   void updateIsLeftToRight() {
@@ -140,7 +151,7 @@ class _SlidableState extends State<Slidable>
   }
 
   void updateMoveAnimation() {
-    final double end = controller.actionPanelType.value.toSign();
+    final double end = controller.actionPaneType.value.toSign();
     moveAnimation = controller.animation.drive(
       Tween<Offset>(
         begin: Offset.zero,
@@ -152,23 +163,23 @@ class _SlidableState extends State<Slidable>
   }
 
   Widget get actionPane {
-    switch (controller.actionPanelType.value) {
-      case ActionPanelType.start:
+    switch (controller.actionPaneType.value) {
+      case ActionPaneType.start:
         return startActionPane;
-      case ActionPanelType.end:
+      case ActionPaneType.end:
         return endActionPane;
       default:
         return null;
     }
   }
 
-  Widget get startActionPane =>
+  ActionPane get startActionPane =>
       keepPanesOrder ? widget.startActionPane : widget.endActionPane;
-  Widget get endActionPane =>
+  ActionPane get endActionPane =>
       keepPanesOrder ? widget.endActionPane : widget.startActionPane;
 
   Alignment get actionPaneAlignment {
-    final sign = controller.actionPanelType.value.toSign();
+    final sign = controller.actionPaneType.value.toSign();
     if (widget.direction == Axis.horizontal) {
       return Alignment(-sign, 0);
     } else {
@@ -215,11 +226,11 @@ class _SlidableState extends State<Slidable>
           child: DismissalTransition(
             axis: flipAxis(widget.direction),
             controller: controller,
-            child: ActionPaneStyle(
+            child: ActionPaneConfiguration(
               alignment: actionPaneAlignment,
               direction: widget.direction,
-              fromStart:
-                  controller.actionPanelType.value == ActionPanelType.start,
+              isStartActionPane:
+                  controller.actionPaneType.value == ActionPaneType.start,
               child: _SlidableControllerScope(
                 controller: controller,
                 child: content,
@@ -247,28 +258,29 @@ class _SlidableControllerScope extends InheritedWidget {
   }
 }
 
-class ActionPaneStyle extends InheritedWidget {
-  const ActionPaneStyle({
+class ActionPaneConfiguration extends InheritedWidget {
+  const ActionPaneConfiguration({
     Key key,
     @required this.alignment,
     @required this.direction,
-    @required this.fromStart,
+    @required this.isStartActionPane,
     Widget child,
   }) : super(key: key, child: child);
 
   final Alignment alignment;
   final Axis direction;
-  final bool fromStart;
+  final bool isStartActionPane;
 
   @override
-  bool updateShouldNotify(ActionPaneStyle old) {
+  bool updateShouldNotify(ActionPaneConfiguration old) {
     return alignment != old.alignment ||
         direction != old.direction ||
-        fromStart != old.fromStart;
+        isStartActionPane != old.isStartActionPane;
   }
 
-  static ActionPaneStyle of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ActionPaneStyle>();
+  static ActionPaneConfiguration of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<ActionPaneConfiguration>();
   }
 }
 

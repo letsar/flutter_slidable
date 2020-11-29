@@ -63,7 +63,7 @@ void main() {
   group('SlidableNotificationListener -', () {
     test('constructor asserts', () {
       final values = [
-        false,
+        true,
         const SizedBox(),
       ];
 

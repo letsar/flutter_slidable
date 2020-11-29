@@ -11,18 +11,17 @@ class DismissiblePaneTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pane = ActionPane.of(context);
-    final style = ActionPaneStyle.of(context);
+    final paneData = ActionPane.of(context);
     final controller = Slidable.of(context);
     final animation = controller.animation
-        .drive(CurveTween(curve: Interval(pane.extentRatio, 1)));
+        .drive(CurveTween(curve: Interval(paneData.extentRatio, 1)));
 
     return FlexExitTransition(
       mainAxisExtent: animation,
-      initialExtentRatio: pane.extentRatio,
-      direction: style.direction,
-      fromStart: style.fromStart,
-      children: pane.children,
+      initialExtentRatio: paneData.extentRatio,
+      direction: paneData.direction,
+      startToEnd: paneData.fromStart,
+      children: paneData.children,
     );
   }
 }

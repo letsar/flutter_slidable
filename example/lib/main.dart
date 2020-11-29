@@ -332,11 +332,14 @@ class Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final direction = AppState.of(context).direction;
-    return Container(
-      color: color,
-      height: direction == Axis.horizontal ? 100 : double.infinity,
-      width: direction == Axis.horizontal ? double.infinity : 100,
-      child: Center(child: Text(text)),
+    return GestureDetector(
+      onLongPress: () => Slidable.of(context).openEndActionPane(),
+      child: Container(
+        color: color,
+        height: direction == Axis.horizontal ? 100 : double.infinity,
+        width: direction == Axis.horizontal ? double.infinity : 100,
+        child: Center(child: Text(text)),
+      ),
     );
   }
 }

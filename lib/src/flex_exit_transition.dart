@@ -6,21 +6,19 @@ class FlexExitTransition extends MultiChildRenderObjectWidget {
     Key key,
     this.mainAxisExtent,
     this.direction,
-    this.fromStart,
+    this.startToEnd,
     this.initialExtentRatio,
     List<Widget> children,
   }) : super(key: key, children: children);
 
   /// The direction to use as the main axis.
-  ///
-  /// If you know the axis in advance, then consider using a [Row] (if it's
-  /// horizontal) or [Column] (if it's vertical) instead of a [Flex], since that
-  /// will be less verbose. (For [Row] and [Column] this property is fixed to
-  /// the appropriate axis.)
   final Axis direction;
 
-  final bool fromStart;
+  /// Indicates whether the children are shown from start to end.
+  final bool startToEnd;
 
+  /// The extent ratio of this widget in its parent when [mainAxisExtent]'s
+  /// value is 0..
   final double initialExtentRatio;
 
   /// The animation that controls the main axis position of the children.
@@ -28,45 +26,45 @@ class FlexExitTransition extends MultiChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return RenderFlexExitTransition(
+    return _RenderFlexExitTransition(
       mainAxisExtent: mainAxisExtent,
       direction: direction,
       initialExtentRatio: initialExtentRatio,
-      fromStart: fromStart,
+      startToEnd: startToEnd,
     );
   }
 
   @override
   void updateRenderObject(
-      BuildContext context, RenderFlexExitTransition renderObject) {
+      BuildContext context, _RenderFlexExitTransition renderObject) {
     renderObject
       ..mainAxisExtent = mainAxisExtent
       ..direction = direction
       ..initialExtentRatio = initialExtentRatio
-      ..fromStart = fromStart;
+      ..startToEnd = startToEnd;
   }
 }
 
-class FlexExitTransitionParentData extends FlexParentData {}
+class _FlexExitTransitionParentData extends FlexParentData {}
 
-class RenderFlexExitTransition extends RenderBox
+class _RenderFlexExitTransition extends RenderBox
     with
-        ContainerRenderObjectMixin<RenderBox, FlexExitTransitionParentData>,
+        ContainerRenderObjectMixin<RenderBox, _FlexExitTransitionParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox,
-            FlexExitTransitionParentData> {
-  RenderFlexExitTransition({
+            _FlexExitTransitionParentData> {
+  _RenderFlexExitTransition({
     List<RenderBox> children,
     Axis direction = Axis.horizontal,
     Animation<double> mainAxisExtent,
     double initialExtentRatio,
-    bool fromStart,
+    bool startToEnd,
   })  : assert(direction != null),
         assert(mainAxisExtent != null),
-        assert(fromStart != null),
+        assert(startToEnd != null),
         _direction = direction,
         _mainAxisExtent = mainAxisExtent,
         _initialExtentRatio = initialExtentRatio,
-        _fromStart = fromStart {
+        _startToEnd = startToEnd {
     addAll(children);
   }
 
@@ -81,12 +79,12 @@ class RenderFlexExitTransition extends RenderBox
     }
   }
 
-  bool get fromStart => _fromStart;
-  bool _fromStart;
-  set fromStart(bool value) {
+  bool get startToEnd => _startToEnd;
+  bool _startToEnd;
+  set startToEnd(bool value) {
     assert(value != null);
-    if (_fromStart != value) {
-      _fromStart = value;
+    if (_startToEnd != value) {
+      _startToEnd = value;
       markNeedsLayout();
     }
   }
@@ -117,8 +115,8 @@ class RenderFlexExitTransition extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! FlexExitTransitionParentData) {
-      child.parentData = FlexExitTransitionParentData();
+    if (child.parentData is! _FlexExitTransitionParentData) {
+      child.parentData = _FlexExitTransitionParentData();
     }
   }
 
@@ -141,7 +139,7 @@ class RenderFlexExitTransition extends RenderBox
   int getTotalFlex() {
     int totalFlex = 0;
     visitChildren((child) {
-      final parentData = child.parentData as FlexExitTransitionParentData;
+      final parentData = child.parentData as _FlexExitTransitionParentData;
       assert(() {
         if (parentData.flex != null) {
           return true;
@@ -173,7 +171,7 @@ class RenderFlexExitTransition extends RenderBox
     double totalMainAxisExtentSoFar = 0;
 
     visitChildren((child) {
-      final parentData = child.parentData as FlexExitTransitionParentData;
+      final parentData = child.parentData as _FlexExitTransitionParentData;
       final extentFactor = parentData.flex / totalFlex * initialExtentRatio;
       BoxConstraints innerConstraints;
       double initialMainAxisExtent;
@@ -211,9 +209,9 @@ class RenderFlexExitTransition extends RenderBox
   @override
   bool hitTestChildren(BoxHitTestResult result, {@required Offset position}) {
     // The x, y parameters have the top left of the node's box as the origin.
-    RenderBox child = fromStart ? firstChild : lastChild;
+    RenderBox child = startToEnd ? firstChild : lastChild;
     while (child != null) {
-      final childParentData = child.parentData as FlexExitTransitionParentData;
+      final childParentData = child.parentData as _FlexExitTransitionParentData;
       final bool isHit = result.addWithPaintOffset(
         offset: childParentData.offset,
         position: position,
@@ -225,7 +223,7 @@ class RenderFlexExitTransition extends RenderBox
       if (isHit) {
         return true;
       }
-      child = fromStart
+      child = startToEnd
           ? childParentData.nextSibling
           : childParentData.previousSibling;
     }
@@ -235,12 +233,12 @@ class RenderFlexExitTransition extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    RenderBox child = fromStart ? lastChild : firstChild;
+    RenderBox child = startToEnd ? lastChild : firstChild;
     while (child != null) {
-      final childParentData = child.parentData as FlexExitTransitionParentData;
+      final childParentData = child.parentData as _FlexExitTransitionParentData;
       context.paintChild(child, childParentData.offset + offset);
 
-      child = fromStart
+      child = startToEnd
           ? childParentData.previousSibling
           : childParentData.nextSibling;
     }

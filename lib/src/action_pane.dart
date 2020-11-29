@@ -6,19 +6,38 @@ import 'slidable.dart';
 const _defaultExtentRatio = 0.5;
 
 /// Data of the ambient [ActionPane] accessible from its children.
-abstract class ActionPaneData {
+@immutable
+class ActionPaneData {
+  /// Creates an [ActionPaneData].
+  const ActionPaneData({
+    @required this.extentRatio,
+    @required this.alignment,
+    @required this.direction,
+    @required this.fromStart,
+    @required this.children,
+  });
+
   /// The total extent of this [ActionPane] relatively to the enclosing
   /// [Slidable] widget.
   ///
   /// Must be between 0 (excluded) and 1.
-  double get extentRatio;
+  final double extentRatio;
+
+  /// The alignment used by the current action pane to position itself.
+  final Alignment alignment;
+
+  /// The axis in which the slidable can slide.
+  final Axis direction;
+
+  /// Whether the current action pane is the start one.
+  final bool fromStart;
 
   /// The actions for this pane.
-  List<Widget> get children;
+  final List<Widget> children;
 }
 
 /// An action pane.
-class ActionPane extends StatefulWidget implements ActionPaneData {
+class ActionPane extends StatefulWidget {
   const ActionPane({
     Key key,
     this.extentRatio = _defaultExtentRatio,
@@ -26,7 +45,7 @@ class ActionPane extends StatefulWidget implements ActionPaneData {
     this.dismissible,
     this.openThreshold,
     this.closeThreshold,
-    this.children,
+    @required this.children,
   })  : assert(extentRatio != null && extentRatio > 0 && extentRatio <= 1),
         assert(children != null),
         assert(
@@ -35,7 +54,10 @@ class ActionPane extends StatefulWidget implements ActionPaneData {
             (closeThreshold > 0 && closeThreshold < 1)),
         super(key: key);
 
-  @override
+  /// The total extent of this [ActionPane] relatively to the enclosing
+  /// [Slidable] widget.
+  ///
+  /// Must be between 0 (excluded) and 1.
   final double extentRatio;
 
   /// A widget which animates when the [Slidable] moves.
@@ -60,7 +82,7 @@ class ActionPane extends StatefulWidget implements ActionPaneData {
   /// By default this value is half the [extentRatio].
   final double closeThreshold;
 
-  @override
+  /// The actions for this pane.
   final List<Widget> children;
 
   @override
@@ -76,7 +98,7 @@ class ActionPane extends StatefulWidget implements ActionPaneData {
 }
 
 class _ActionPaneState extends State<ActionPane>
-    implements ActionPaneConfiguration {
+    implements ActionPaneConfigurator {
   SlidableController controller;
   // EndGesture endGesture;
   // double ratio = 0;
@@ -124,7 +146,7 @@ class _ActionPaneState extends State<ActionPane>
 
   @override
   void dispose() {
-    controller.endGesture.removeListener(handleRatioChanged);
+    controller.endGesture.removeListener(handleEndGestureChanged);
     controller.animation.removeListener(handleRatioChanged);
     controller.actionPaneConfiguration = null;
     super.dispose();
@@ -148,7 +170,7 @@ class _ActionPaneState extends State<ActionPane>
         gesture is StillGesture &&
             ((gesture.opening && position >= openThreshold) ||
                 gesture.closing && position > closeThreshold)) {
-      controller.open();
+      controller.openCurrentActionPane();
 
       return;
     }
@@ -168,16 +190,16 @@ class _ActionPaneState extends State<ActionPane>
 
   @override
   Widget build(BuildContext context) {
-    final style = ActionPaneStyle.of(context);
+    final config = ActionPaneConfiguration.of(context);
 
     Widget child;
 
     if (showTransition) {
       final factor = widget.extentRatio;
       child = FractionallySizedBox(
-        alignment: style.alignment,
-        widthFactor: style.direction == Axis.horizontal ? factor : null,
-        heightFactor: style.direction == Axis.horizontal ? null : factor,
+        alignment: config.alignment,
+        widthFactor: config.direction == Axis.horizontal ? factor : null,
+        heightFactor: config.direction == Axis.horizontal ? null : factor,
         child: widget.transition,
       );
     } else {
@@ -185,7 +207,13 @@ class _ActionPaneState extends State<ActionPane>
     }
 
     return _ActionPaneScope(
-      actionPaneData: widget,
+      actionPaneData: ActionPaneData(
+        alignment: config.alignment,
+        direction: config.direction,
+        fromStart: config.isStartActionPane,
+        extentRatio: widget.extentRatio,
+        children: widget.children,
+      ),
       child: child,
     );
   }

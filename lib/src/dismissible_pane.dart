@@ -24,10 +24,10 @@ class DismissiblePane extends StatefulWidget {
     this.confirmDismiss,
     this.closeOnCancel = false,
     this.transition = const DismissiblePaneTransition(),
-  })  : assert(dismissThreshold != null),
+  })  : assert(onDismissed != null),
+        assert(dismissThreshold != null),
         assert(dismissalDuration != null),
         assert(resizeDuration != null),
-        assert(onDismissed != null),
         assert(closeOnCancel != null),
         assert(transition != null),
         super(key: key);
@@ -115,7 +115,7 @@ class _DismissiblePaneState extends State<DismissiblePane> {
       return;
     }
 
-    controller.open();
+    controller.openCurrentActionPane();
   }
 
   @override

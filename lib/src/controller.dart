@@ -4,13 +4,13 @@ import 'package:flutter/widgets.dart';
 const _defaultMovementDuration = Duration(milliseconds: 200);
 const _defaultCurve = Curves.ease;
 
-enum ActionPanelType {
+enum ActionPaneType {
   end,
   none,
   start,
 }
 
-abstract class ActionPaneConfiguration {
+abstract class ActionPaneConfigurator {
   bool canChangeRatio(double ratio);
   double get extentRatio;
 }
@@ -63,21 +63,43 @@ class SlidableController {
         endGesture = ValueNotifier(null),
         dismissGesture = ValueNotifier(null),
         resizeRequest = ValueNotifier(null),
-        actionPanelType = ValueNotifier(ActionPanelType.none);
+        actionPaneType = ValueNotifier(ActionPaneType.none);
 
   final AnimationController _animationController;
 
   bool enableStartActionPane = true;
   bool enableEndActionPane = true;
 
-  ActionPaneConfiguration actionPaneConfiguration;
+  double get startActionPaneExtentRatio => _startActionPaneExtentRatio;
+  double _startActionPaneExtentRatio;
+  set startActionPaneExtentRatio(double value) {
+    if (_startActionPaneExtentRatio != value &&
+        value != null &&
+        value >= 0 &&
+        value <= 1) {
+      _startActionPaneExtentRatio = value;
+    }
+  }
+
+  double get endActionPaneExtentRatio => _endActionPaneExtentRatio;
+  double _endActionPaneExtentRatio;
+  set endActionPaneExtentRatio(double value) {
+    if (_endActionPaneExtentRatio != value &&
+        value != null &&
+        value >= 0 &&
+        value <= 1) {
+      _endActionPaneExtentRatio = value;
+    }
+  }
+
+  ActionPaneConfigurator actionPaneConfiguration;
 
   Animation<double> get animation => _animationController.view;
 
   final ValueNotifier<EndGesture> endGesture;
   final ValueNotifier<DismissGesture> dismissGesture;
   final ValueNotifier<ResizeRequest> resizeRequest;
-  final ValueNotifier<ActionPanelType> actionPanelType;
+  final ValueNotifier<ActionPaneType> actionPaneType;
 
   bool get closing => _closing;
   bool _closing = false;
@@ -92,11 +114,11 @@ class SlidableController {
   }
 
   double get ratio =>
-      _animationController.value * actionPanelType.value.toSign();
+      _animationController.value * actionPaneType.value.toSign();
   set ratio(double value) {
     if (acceptRatio(value) && value != ratio) {
       final index = value.sign.toInt() + 1;
-      actionPanelType.value = ActionPanelType.values[index];
+      actionPaneType.value = ActionPaneType.values[index];
       _animationController.value = value.abs();
     }
   }
@@ -104,7 +126,7 @@ class SlidableController {
   void handleEndGesture(double velocity, GestureDirection direction) {
     if (velocity == 0 || velocity == null) {
       endGesture.value = StillGesture(direction);
-    } else if (velocity.sign == actionPanelType.value.toSign()) {
+    } else if (velocity.sign == actionPaneType.value.toSign()) {
       endGesture.value = OpeningGesture(velocity);
     } else {
       endGesture.value = ClosingGesture(velocity.abs());
@@ -124,26 +146,51 @@ class SlidableController {
     _closing = false;
   }
 
-  Future<void> open({
+  Future<void> openCurrentActionPane({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
-    ActionPanelType actionPanelType,
   }) async {
     assert(actionPaneConfiguration != null);
     assert(duration != null);
 
-    if (_closing) {
-      return;
-    }
+    return openTo(
+      actionPaneConfiguration.extentRatio,
+      duration: duration,
+      curve: curve,
+    );
+  }
 
-    if (actionPanelType != null) {
-      this.actionPanelType.value = actionPanelType;
-    } else {
-      assert(this.actionPanelType.value != ActionPanelType.none);
+  Future<void> openStartActionPane({
+    Duration duration = _defaultMovementDuration,
+    Curve curve = _defaultCurve,
+  }) async {
+    assert(duration != null);
+
+    if (actionPaneType.value != ActionPaneType.start) {
+      actionPaneType.value = ActionPaneType.start;
+      ratio = 0;
     }
 
     return openTo(
-      actionPaneConfiguration.extentRatio,
+      startActionPaneExtentRatio,
+      duration: duration,
+      curve: curve,
+    );
+  }
+
+  Future<void> openEndActionPane({
+    Duration duration = _defaultMovementDuration,
+    Curve curve = _defaultCurve,
+  }) async {
+    assert(duration != null);
+
+    if (actionPaneType.value != ActionPaneType.end) {
+      actionPaneType.value = ActionPaneType.end;
+      ratio = 0;
+    }
+
+    return openTo(
+      -endActionPaneExtentRatio,
       duration: duration,
       curve: curve,
     );
@@ -192,12 +239,12 @@ class SlidableController {
   }
 }
 
-extension ActionPanelTypeX on ActionPanelType {
+extension ActionPaneTypeX on ActionPaneType {
   double toSign() {
     switch (this) {
-      case ActionPanelType.start:
+      case ActionPaneType.start:
         return 1;
-      case ActionPanelType.end:
+      case ActionPaneType.end:
         return -1;
       default:
         return 0;

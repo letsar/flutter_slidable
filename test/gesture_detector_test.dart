@@ -159,8 +159,8 @@ void main() {
         ratio = realInvocation.positionalArguments[0] as double;
       });
 
-      final mockActionPanelType = ValueNotifier(ActionPanelType.none);
-      when(mockSlidableController.actionPanelType)
+      final mockActionPanelType = ValueNotifier(ActionPaneType.none);
+      when(mockSlidableController.actionPaneType)
           .thenReturn(mockActionPanelType);
 
       await tester.pumpWidget(Center(

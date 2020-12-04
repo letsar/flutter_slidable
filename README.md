@@ -83,7 +83,7 @@ Animate the actions as if they were streched while the `Slidable` is moving:
 [flutter_favorite_badge]: https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/flutter_favorite_badge.png
 [flutter_favorite]: https://flutter.dev/docs/development/packages-and-plugins/favorites
 
-[behind_motion]: packages/images/behind_motion.gif
-[drawer_motion]: packages/images/drawer_motion.gif
-[scroll_motion]: packages/images/scroll_motion.gif
-[stretch_motion]: packages/images/stretch_motion.gif
+[behind_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/behind_motion.gif
+[drawer_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/drawer_motion.gif
+[scroll_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/scroll_motion.gif
+[stretch_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/stretch_motion.gif

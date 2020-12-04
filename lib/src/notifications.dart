@@ -33,8 +33,8 @@ class SlidableNotification {
 }
 
 @immutable
-class SlidableRatioChangedNotification extends SlidableNotification {
-  const SlidableRatioChangedNotification({
+class SlidableRatioNotification extends SlidableNotification {
+  const SlidableRatioNotification({
     @required Object tag,
     @required this.ratio,
   }) : super(tag: tag);
@@ -44,7 +44,7 @@ class SlidableRatioChangedNotification extends SlidableNotification {
   @override
   bool operator ==(Object other) {
     return super == other &&
-        other is SlidableRatioChangedNotification &&
+        other is SlidableRatioNotification &&
         other.ratio == ratio;
   }
 
@@ -52,8 +52,7 @@ class SlidableRatioChangedNotification extends SlidableNotification {
   int get hashCode => hashValues(tag, ratio);
 
   @override
-  String toString() =>
-      'SlidableRatioChangedNotification(tag: $tag, ratio: $ratio)';
+  String toString() => 'SlidableRatioNotification(tag: $tag, ratio: $ratio)';
 }
 
 class SlidableNotificationListener extends StatefulWidget {
@@ -197,7 +196,7 @@ class _SlidableNotificationSenderState
 
   void handleRatioChanged() {
     final controller = widget.controller;
-    final notification = SlidableRatioChangedNotification(
+    final notification = SlidableRatioNotification(
       tag: widget.tag,
       ratio: controller.ratio,
     );

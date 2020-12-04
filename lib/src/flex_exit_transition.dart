@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+// INTERNAL USE
+// ignore_for_file: public_member_api_docs
+
 class FlexExitTransition extends MultiChildRenderObjectWidget {
   FlexExitTransition({
     Key key,
-    this.mainAxisExtent,
-    this.direction,
-    this.startToEnd,
-    this.initialExtentRatio,
-    List<Widget> children,
-  }) : super(key: key, children: children);
+    @required this.mainAxisExtent,
+    @required this.direction,
+    @required this.startToEnd,
+    @required this.initialExtentRatio,
+    @required List<Widget> children,
+  })  : assert(mainAxisExtent != null),
+        assert(direction != null),
+        assert(startToEnd != null),
+        assert(initialExtentRatio != null),
+        super(key: key, children: children);
 
   /// The direction to use as the main axis.
   final Axis direction;
@@ -22,7 +29,7 @@ class FlexExitTransition extends MultiChildRenderObjectWidget {
   final double initialExtentRatio;
 
   /// The animation that controls the main axis position of the children.
-  Animation<double> mainAxisExtent;
+  final Animation<double> mainAxisExtent;
 
   @override
   RenderObject createRenderObject(BuildContext context) {

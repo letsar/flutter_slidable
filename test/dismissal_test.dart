@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/controller.dart';
-import 'package:flutter_slidable/src/dismissal_transition.dart';
+import 'package:flutter_slidable/src/dismissal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'common.dart';
@@ -8,7 +8,7 @@ import 'common.dart';
 // ignore_for_file: invalid_use_of_protected_member
 
 void main() {
-  group('DimissalTransition', () {
+  group('SlidableDismissal', () {
     test(
       'constructor asserts',
       () {
@@ -20,7 +20,7 @@ void main() {
 
         testConstructorAsserts(
           values: values,
-          factory: (valueOrNull) => DismissalTransition(
+          factory: (valueOrNull) => SlidableDismissal(
             axis: valueOrNull(0),
             controller: valueOrNull(1),
             child: valueOrNull(2),
@@ -37,7 +37,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox.shrink(
-              child: DismissalTransition(
+              child: SlidableDismissal(
                 axis: Axis.horizontal,
                 controller: slidableController,
                 child: const SizedBox(height: 100, width: 200),
@@ -53,7 +53,7 @@ void main() {
       ));
 
       await tester.pumpAndSettle();
-      final finder = find.byTypeOf<DismissalTransition>();
+      final finder = find.byTypeOf<SlidableDismissal>();
       expect(finder, findsOneWidget);
       expect(tester.getSize(finder).height, 0);
     });
@@ -66,7 +66,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox.shrink(
-              child: DismissalTransition(
+              child: SlidableDismissal(
                 axis: Axis.vertical,
                 controller: slidableController,
                 child: const SizedBox(height: 200, width: 100),
@@ -82,7 +82,7 @@ void main() {
       ));
 
       await tester.pumpAndSettle();
-      final finder = find.byTypeOf<DismissalTransition>();
+      final finder = find.byTypeOf<SlidableDismissal>();
       expect(finder, findsOneWidget);
       expect(tester.getSize(finder).width, 0);
     });
@@ -96,7 +96,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox.shrink(
-              child: DismissalTransition(
+              child: SlidableDismissal(
                 axis: Axis.vertical,
                 controller: slidableController,
                 child: const SizedBox(height: 200, width: 100),
@@ -122,7 +122,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox.shrink(
-              child: DismissalTransition(
+              child: SlidableDismissal(
                 axis: Axis.vertical,
                 controller: slidableController,
                 child: const SizedBox(height: 200, width: 100),
@@ -145,7 +145,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox.shrink(
-              child: DismissalTransition(
+              child: SlidableDismissal(
                 axis: Axis.vertical,
                 controller: slidableController1,
                 child: const SizedBox(height: 200, width: 100),
@@ -163,7 +163,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: Center(
             child: SizedBox.shrink(
-              child: DismissalTransition(
+              child: SlidableDismissal(
                 axis: Axis.vertical,
                 controller: slidableController2,
                 child: const SizedBox(height: 200, width: 100),

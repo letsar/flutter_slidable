@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'action_pane_configuration.dart';
 import 'controller.dart';
 import 'slidable.dart';
 
@@ -38,20 +39,29 @@ class ActionPaneData {
 
 /// An action pane.
 class ActionPane extends StatefulWidget {
+  /// Creates an [ActionPane].
+  ///
+  /// The [extentRatio] argument must not be null and must be between 0
+  /// (exclusive) and 1 (inclusive).
+  /// The [openThreshold] argument must be null or between 0 and 1
+  /// (both exclusives).
+  /// The [closeThreshold] argument must be null or between 0 and 1
+  /// (both exclusives).
+  /// The [children] argument must not be null.
   const ActionPane({
     Key key,
     this.extentRatio = _defaultExtentRatio,
-    @required this.transition,
+    @required this.motion,
     this.dismissible,
     this.openThreshold,
     this.closeThreshold,
     @required this.children,
   })  : assert(extentRatio != null && extentRatio > 0 && extentRatio <= 1),
-        assert(children != null),
         assert(
             openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
         assert(closeThreshold == null ||
             (closeThreshold > 0 && closeThreshold < 1)),
+        assert(children != null),
         super(key: key);
 
   /// The total extent of this [ActionPane] relatively to the enclosing
@@ -61,9 +71,9 @@ class ActionPane extends StatefulWidget {
   final double extentRatio;
 
   /// A widget which animates when the [Slidable] moves.
-  final Widget transition;
+  final Widget motion;
 
-  /// A widget which animates when the [Slidable] dismisses.
+  /// A widget which control how the [Slidable] dismisses.
   final Widget dismissible;
 
   /// The fraction of the total extent from where the [Slidable] will
@@ -100,11 +110,9 @@ class ActionPane extends StatefulWidget {
 class _ActionPaneState extends State<ActionPane>
     implements ActionPaneConfigurator {
   SlidableController controller;
-  // EndGesture endGesture;
-  // double ratio = 0;
   double openThreshold;
   double closeThreshold;
-  bool showTransition;
+  bool showMotion;
 
   @override
   double get extentRatio => widget.extentRatio;
@@ -119,7 +127,7 @@ class _ActionPaneState extends State<ActionPane>
       controller.animation.addListener(handleRatioChanged);
     }
     controller.actionPaneConfiguration = this;
-    showTransition = true;
+    showMotion = true;
     updateThresholds();
   }
 
@@ -135,9 +143,9 @@ class _ActionPaneState extends State<ActionPane>
       controller.animation.removeListener(handleRatioChanged);
     }
     if (widget.dismissible == null) {
-      // In the case where the child was different than the transition, we get
+      // In the case where the child was different than the motion, we get
       // it back.
-      showTransition = true;
+      showMotion = true;
     } else {
       controller.animation.addListener(handleRatioChanged);
     }
@@ -181,9 +189,9 @@ class _ActionPaneState extends State<ActionPane>
 
   void handleRatioChanged() {
     final show = controller.ratio <= widget.extentRatio;
-    if (show != showTransition) {
+    if (show != showMotion) {
       setState(() {
-        showTransition = show;
+        showMotion = show;
       });
     }
   }
@@ -194,13 +202,13 @@ class _ActionPaneState extends State<ActionPane>
 
     Widget child;
 
-    if (showTransition) {
+    if (showMotion) {
       final factor = widget.extentRatio;
       child = FractionallySizedBox(
         alignment: config.alignment,
         widthFactor: config.direction == Axis.horizontal ? factor : null,
         heightFactor: config.direction == Axis.horizontal ? null : factor,
-        child: widget.transition,
+        child: widget.motion,
       );
     } else {
       child = widget.dismissible;

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
-import 'dismissible_pane_transition.dart';
+import 'dismissible_pane_motions.dart';
 import 'slidable.dart';
 
 const double _kDismissThreshold = 0.75;
@@ -23,13 +23,13 @@ class DismissiblePane extends StatefulWidget {
     this.resizeDuration = _kResizeDuration,
     this.confirmDismiss,
     this.closeOnCancel = false,
-    this.transition = const DismissiblePaneTransition(),
+    this.motion = const InversedDrawerMotion(),
   })  : assert(onDismissed != null),
         assert(dismissThreshold != null),
         assert(dismissalDuration != null),
         assert(resizeDuration != null),
         assert(closeOnCancel != null),
-        assert(transition != null),
+        assert(motion != null),
         super(key: key);
 
   final double dismissThreshold;
@@ -45,7 +45,7 @@ class DismissiblePane extends StatefulWidget {
   final ConfirmDismissCallback confirmDismiss;
   final VoidCallback onDismissed;
   final bool closeOnCancel;
-  final Widget transition;
+  final Widget motion;
 
   @override
   _DismissiblePaneState createState() => _DismissiblePaneState();
@@ -98,8 +98,6 @@ class _DismissiblePaneState extends State<DismissiblePane> {
 
     if (endGesture is OpeningGesture ||
         endGesture is StillGesture && position >= widget.dismissThreshold) {
-      // TODO(team): sometimes we enter two times here.
-
       bool canDismiss = true;
       if (widget.confirmDismiss != null) {
         canDismiss = (await widget.confirmDismiss()) ?? false;
@@ -120,6 +118,6 @@ class _DismissiblePaneState extends State<DismissiblePane> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.transition;
+    return widget.motion;
   }
 }

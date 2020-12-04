@@ -4,8 +4,8 @@ import 'action_pane.dart';
 import 'flex_exit_transition.dart';
 import 'slidable.dart';
 
-class DismissiblePaneTransition extends StatelessWidget {
-  const DismissiblePaneTransition({
+class InversedDrawerMotion extends StatelessWidget {
+  const InversedDrawerMotion({
     Key key,
   }) : super(key: key);
 

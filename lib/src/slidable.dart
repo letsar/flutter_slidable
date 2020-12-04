@@ -3,16 +3,22 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'action_pane.dart';
+import 'action_pane_configuration.dart';
 import 'controller.dart';
-import 'dismissal_transition.dart';
+import 'dismissal.dart';
 import 'gesture_detector.dart';
 import 'notifications.dart';
 import 'scrolling_behavior.dart';
 
+/// A widget which can be dragged to reveal contextual actions.
 class Slidable extends StatefulWidget {
+  /// Creates a [Slidable].
+  ///
+  /// The [enabled], [closeOnScroll], [direction], [dragStartBehavior],
+  /// [useTextDirection] and [child] arguments must not be null.
   const Slidable({
     Key key,
-    this.tag,
+    this.groupTag,
     this.enabled = true,
     this.closeOnScroll = true,
     this.startActionPane,
@@ -42,11 +48,38 @@ class Slidable extends StatefulWidget {
   /// Defaults to true.
   final bool closeOnScroll;
 
+  /// The tag shared by all the [Slidable]s of the same group.
+  ///
+  /// This is used by [SlidableNotificationListener] to keep only one [Slidable]
+  /// of the same group, open.
+  final Object groupTag;
+
+  /// A widget which is shown when the user drags the [Slidable] to the right or
+  /// to the bottom.
+  ///
+  /// When [direction] is [Axis.horizontal] and [useTextDirection] is true, the
+  /// [startActionPane] is determined by the ambient [TextDirection].
   final ActionPane startActionPane;
+
+  /// A widget which is shown when the user drags the [Slidable] to the left or
+  /// to the top.
+  ///
+  /// When [direction] is [Axis.horizontal] and [useTextDirection] is true, the
+  /// [startActionPane] is determined by the ambient [TextDirection].
   final ActionPane endActionPane;
+
+  /// The direction in which this [Slidable] can be dragged.
+  ///
+  /// Defaults to [Axis.horizontal].
   final Axis direction;
-  final Widget child;
-  final Object tag;
+
+  /// Whether the ambient [TextDirection] should be used to determine how
+  /// [startActionPane] and [endActionPane] should be revealed.
+  ///
+  /// If [direction] is [Axis.vertical], this has no effect.
+  /// If [direction] is [Axis.horizontal], then [startActionPane] is revealed
+  /// when the users drags to the reading direction (and in the inverse of the
+  /// reading direction for [endActionPane]).
   final bool useTextDirection;
 
   /// Determines the way that drag start behavior is handled.
@@ -66,9 +99,24 @@ class Slidable extends StatefulWidget {
   ///  * [DragGestureRecognizer.dragStartBehavior], which gives an example for the different behaviors.
   final DragStartBehavior dragStartBehavior;
 
+  /// The widget below this widget in the tree.
+  ///
+  /// {@macro flutter.widgets.ProxyWidget.child}
+  final Widget child;
+
   @override
   _SlidableState createState() => _SlidableState();
 
+  /// The closest instance of the [SlidableController] which controls this
+  /// [Slidable] that encloses the given context.
+  ///
+  /// {@tool snippet}
+  /// Typical usage is as follows:
+  ///
+  /// ```dart
+  /// SlidableController controller = Slidable.of(context);
+  /// ```
+  /// {@end-tool}
   static SlidableController of(BuildContext context) {
     final scope = context
         .getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()
@@ -83,9 +131,8 @@ class _SlidableState extends State<Slidable>
   Animation<Offset> moveAnimation;
   bool keepPanesOrder;
 
-// TODO.
   @override
-  bool get wantKeepAlive => false;
+  bool get wantKeepAlive => !widget.closeOnScroll;
 
   @override
   void initState() {
@@ -117,17 +164,13 @@ class _SlidableState extends State<Slidable>
   }
 
   void updateController() {
-    if (startActionPane != null) {
-      controller
-        ..enableStartActionPane = true
-        ..startActionPaneExtentRatio = startActionPane.extentRatio;
-    }
+    controller
+      ..enableStartActionPane = widget.startActionPane != null
+      ..startActionPaneExtentRatio = startActionPane?.extentRatio;
 
-    if (endActionPane != null) {
-      controller
-        ..enableEndActionPane = true
-        ..endActionPaneExtentRatio = endActionPane.extentRatio;
-    }
+    controller
+      ..enableEndActionPane = widget.endActionPane != null
+      ..endActionPaneExtentRatio = endActionPane?.extentRatio;
   }
 
   void updateIsLeftToRight() {
@@ -201,7 +244,7 @@ class _SlidableState extends State<Slidable>
         if (actionPane != null)
           Positioned.fill(
             child: ClipRect(
-              clipper: SlidableClipper(
+              clipper: _SlidableClipper(
                 axis: widget.direction,
                 controller: controller,
               ),
@@ -218,12 +261,12 @@ class _SlidableState extends State<Slidable>
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
       child: SlidableNotificationSender(
-        tag: widget.tag,
+        tag: widget.groupTag,
         controller: controller,
         child: SlidableScrollingBehavior(
           controller: controller,
           closeOnScroll: widget.closeOnScroll,
-          child: DismissalTransition(
+          child: SlidableDismissal(
             axis: flipAxis(widget.direction),
             controller: controller,
             child: ActionPaneConfiguration(
@@ -258,34 +301,8 @@ class _SlidableControllerScope extends InheritedWidget {
   }
 }
 
-class ActionPaneConfiguration extends InheritedWidget {
-  const ActionPaneConfiguration({
-    Key key,
-    @required this.alignment,
-    @required this.direction,
-    @required this.isStartActionPane,
-    Widget child,
-  }) : super(key: key, child: child);
-
-  final Alignment alignment;
-  final Axis direction;
-  final bool isStartActionPane;
-
-  @override
-  bool updateShouldNotify(ActionPaneConfiguration old) {
-    return alignment != old.alignment ||
-        direction != old.direction ||
-        isStartActionPane != old.isStartActionPane;
-  }
-
-  static ActionPaneConfiguration of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<ActionPaneConfiguration>();
-  }
-}
-
-class SlidableClipper extends CustomClipper<Rect> {
-  SlidableClipper({
+class _SlidableClipper extends CustomClipper<Rect> {
+  _SlidableClipper({
     @required this.axis,
     @required this.controller,
   })  : assert(axis != null),
@@ -324,7 +341,7 @@ class SlidableClipper extends CustomClipper<Rect> {
   Rect getApproximateClipRect(Size size) => getClip(size);
 
   @override
-  bool shouldReclip(SlidableClipper oldClipper) {
+  bool shouldReclip(_SlidableClipper oldClipper) {
     return oldClipper.axis != axis;
   }
 }

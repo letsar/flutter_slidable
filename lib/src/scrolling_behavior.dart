@@ -2,6 +2,9 @@ import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
 
+// INTERNAL USE
+// ignore_for_file: public_member_api_docs
+
 class SlidableScrollingBehavior extends StatefulWidget {
   const SlidableScrollingBehavior({
     Key key,

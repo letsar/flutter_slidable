@@ -15,7 +15,7 @@ void main() {
         const Duration(milliseconds: 300),
         const Duration(milliseconds: 300),
         true,
-        const DismissiblePaneTransition(),
+        const InversedDrawerMotion(),
       ];
 
       testConstructorAsserts(
@@ -26,7 +26,7 @@ void main() {
           dismissalDuration: valueOrNull(2),
           resizeDuration: valueOrNull(3),
           closeOnCancel: valueOrNull(4),
-          transition: valueOrNull(5),
+          motion: valueOrNull(5),
         ),
       );
     });
@@ -46,15 +46,15 @@ void main() {
                   dismissible: DismissiblePane(
                     onDismissed: handleDismissed,
                     dismissThreshold: 0.8,
-                    transition:
+                    motion:
                         // For coverage:
                         // ignore: prefer_const_constructors
-                        DismissiblePaneTransition(),
+                        InversedDrawerMotion(),
                   ),
-                  transition: const SlidableBehindTransition(),
+                  motion: const BehindMotion(),
                   children: [
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -94,10 +94,10 @@ void main() {
                     onDismissed: handleDismissed,
                     dismissThreshold: 0.8,
                   ),
-                  transition: const SlidableBehindTransition(),
+                  motion: const BehindMotion(),
                   children: [
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -146,10 +146,10 @@ void main() {
                     onDismissed: handleDismissed,
                     dismissThreshold: 0.8,
                   ),
-                  transition: const SlidableBehindTransition(),
+                  motion: const BehindMotion(),
                   children: [
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -202,10 +202,10 @@ void main() {
                     confirmDismiss: confirmDismiss,
                     dismissThreshold: 0.8,
                   ),
-                  transition: const SlidableBehindTransition(),
+                  motion: const BehindMotion(),
                   children: [
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -260,10 +260,10 @@ void main() {
                     closeOnCancel: true,
                     dismissThreshold: 0.8,
                   ),
-                  transition: const SlidableBehindTransition(),
+                  motion: const BehindMotion(),
                   children: [
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
                   ],
                 ),
                 child: Builder(

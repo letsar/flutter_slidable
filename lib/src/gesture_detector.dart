@@ -3,7 +3,9 @@ import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
 
-/// Internal use.
+// INTERNAL USE
+// ignore_for_file: public_member_api_docs
+
 class SlidableGestureDetector extends StatefulWidget {
   const SlidableGestureDetector({
     Key key,

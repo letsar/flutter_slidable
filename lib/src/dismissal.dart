@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'controller.dart';
 
-/// Animates the end of a dismiss.
-class DismissalTransition extends StatefulWidget {
-  const DismissalTransition({
+// INTERNAL USE
+// ignore_for_file: public_member_api_docs
+
+class SlidableDismissal extends StatefulWidget {
+  const SlidableDismissal({
     Key key,
     @required this.axis,
     @required this.controller,
@@ -19,10 +21,10 @@ class DismissalTransition extends StatefulWidget {
   final SlidableController controller;
 
   @override
-  _DismissalTransitionState createState() => _DismissalTransitionState();
+  _SlidableDismissalState createState() => _SlidableDismissalState();
 }
 
-class _DismissalTransitionState extends State<DismissalTransition>
+class _SlidableDismissalState extends State<SlidableDismissal>
     with SingleTickerProviderStateMixin {
   bool resized = false;
   AnimationController animationController;
@@ -38,7 +40,7 @@ class _DismissalTransitionState extends State<DismissalTransition>
   }
 
   @override
-  void didUpdateWidget(covariant DismissalTransition oldWidget) {
+  void didUpdateWidget(covariant SlidableDismissal oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.resizeRequest

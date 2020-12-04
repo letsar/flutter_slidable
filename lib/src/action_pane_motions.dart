@@ -5,11 +5,12 @@ import 'action_pane.dart';
 import 'flex_entrance_transition.dart';
 import 'slidable.dart';
 
-/// An [ActionPane] transition which reveals actions as if they were behind the
+/// An [ActionPane] motion which reveals actions as if they were behind the
 /// [Slidable].
-class SlidableBehindTransition extends StatelessWidget {
-  /// Creates a [SlidableBehindTransition].
-  const SlidableBehindTransition({
+///
+class BehindMotion extends StatelessWidget {
+  /// Creates a [BehindMotion].
+  const BehindMotion({
     Key key,
   }) : super(key: key);
 
@@ -23,11 +24,11 @@ class SlidableBehindTransition extends StatelessWidget {
   }
 }
 
-/// An [ActionPane] transition which reveals actions by stretching their extent
+/// An [ActionPane] motion which reveals actions by stretching their extent
 /// while sliding the [Slidable].
-class SlidableStretchTransition extends StatelessWidget {
-  /// Creates a [SlidableStretchTransition].
-  const SlidableStretchTransition({
+class StretchMotion extends StatelessWidget {
+  /// Creates a [StretchMotion].
+  const StretchMotion({
     Key key,
   }) : super(key: key);
 
@@ -43,21 +44,21 @@ class SlidableStretchTransition extends StatelessWidget {
 
         return FractionallySizedBox(
           alignment: paneData.alignment,
-          widthFactor: paneData.direction == Axis.horizontal ? value : null,
-          heightFactor: paneData.direction == Axis.horizontal ? null : value,
+          widthFactor: paneData.direction == Axis.horizontal ? value : 1,
+          heightFactor: paneData.direction == Axis.horizontal ? 1 : value,
           child: child,
         );
       },
-      child: const SlidableBehindTransition(),
+      child: const BehindMotion(),
     );
   }
 }
 
-/// An [ActionPane] transition which reveals actions as if they were scrolling
+/// An [ActionPane] motion which reveals actions as if they were scrolling
 /// from the outside.
-class SlidableScrollTransition extends StatelessWidget {
-  /// Creates a [SlidableScrollTransition].
-  const SlidableScrollTransition({
+class ScrollMotion extends StatelessWidget {
+  /// Creates a [ScrollMotion].
+  const ScrollMotion({
     Key key,
   }) : super(key: key);
 
@@ -75,15 +76,15 @@ class SlidableScrollTransition extends StatelessWidget {
 
     return SlideTransition(
       position: animation,
-      child: const SlidableBehindTransition(),
+      child: const BehindMotion(),
     );
   }
 }
 
-/// An [ActionPane] transition which reveals actions as if they were drawers.
-class SlidableDrawerTransition extends StatelessWidget {
-  /// Creates a [SlidableDrawerTransition].
-  const SlidableDrawerTransition({
+/// An [ActionPane] motion which reveals actions as if they were drawers.
+class DrawerMotion extends StatelessWidget {
+  /// Creates a [DrawerMotion].
+  const DrawerMotion({
     Key key,
   }) : super(key: key);
 

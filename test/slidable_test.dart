@@ -43,18 +43,18 @@ void main() {
           child: Slidable(
             startActionPane: ActionPane(
               key: startActionPaneKey,
-              transition: const SlidableBehindTransition(),
+              motion: const BehindMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
-              transition: const SlidableScrollTransition(),
+              motion: const ScrollMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             child: Builder(builder: (context) {
@@ -90,18 +90,18 @@ void main() {
           child: Slidable(
             startActionPane: ActionPane(
               key: startActionPaneKey,
-              transition: const SlidableBehindTransition(),
+              motion: const BehindMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
-              transition: const SlidableScrollTransition(),
+              motion: const ScrollMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             child: Builder(builder: (context) {
@@ -138,18 +138,18 @@ void main() {
             direction: Axis.vertical,
             startActionPane: ActionPane(
               key: startActionPaneKey,
-              transition: const SlidableBehindTransition(),
+              motion: const BehindMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
-              transition: const SlidableScrollTransition(),
+              motion: const ScrollMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             child: Builder(builder: (context) {
@@ -186,18 +186,18 @@ void main() {
             direction: Axis.vertical,
             startActionPane: ActionPane(
               key: startActionPaneKey,
-              transition: const SlidableBehindTransition(),
+              motion: const BehindMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
-              transition: const SlidableScrollTransition(),
+              motion: const ScrollMotion(),
               children: [
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableIconAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
             child: Builder(builder: (context) {
@@ -221,5 +221,85 @@ void main() {
       expect(find.byKey(startActionPaneKey), findsNothing);
       expect(find.byKey(endActionPaneKey), findsOneWidget);
     });
+  });
+
+  testWidgets('cannot drag to show startActionPane if null', (tester) async {
+    const gestureDetectorKey = ValueKey('gesture_detector');
+    const endActionPaneKey = ValueKey('end');
+    const childKey = ValueKey('child');
+    final findSlidable = find.byType(Slidable);
+    const duration = Duration(milliseconds: 300);
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Slidable(
+          endActionPane: ActionPane(
+            key: endActionPaneKey,
+            motion: const ScrollMotion(),
+            children: [
+              SlidableAction(onPressed: (_) {}, icon: Icons.share),
+              SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+            ],
+          ),
+          child: Builder(
+            key: childKey,
+            builder: (context) {
+              return GestureDetector(
+                key: gestureDetectorKey,
+                onTap: () {
+                  Slidable.of(context).openEndActionPane();
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.getTopLeft(find.byKey(childKey)), const Offset(0, 0));
+
+    await tester.timedDrag(findSlidable, const Offset(50, 0), duration);
+
+    expect(tester.getTopLeft(find.byKey(childKey)), const Offset(0, 0));
+  });
+
+  testWidgets('cannot drag to show endActionPane if null', (tester) async {
+    const gestureDetectorKey = ValueKey('gesture_detector');
+    const startActionPaneKey = ValueKey('start');
+    const childKey = ValueKey('child');
+    final findSlidable = find.byType(Slidable);
+    const duration = Duration(milliseconds: 300);
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Slidable(
+          startActionPane: ActionPane(
+            key: startActionPaneKey,
+            motion: const ScrollMotion(),
+            children: [
+              SlidableAction(onPressed: (_) {}, icon: Icons.share),
+              SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+            ],
+          ),
+          child: Builder(
+            key: childKey,
+            builder: (context) {
+              return GestureDetector(
+                key: gestureDetectorKey,
+                onTap: () {
+                  Slidable.of(context).openEndActionPane();
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.getTopLeft(find.byKey(childKey)), const Offset(0, 0));
+
+    await tester.timedDrag(findSlidable, const Offset(-50, 0), duration);
+
+    expect(tester.getTopLeft(find.byKey(childKey)), const Offset(0, 0));
   });
 }

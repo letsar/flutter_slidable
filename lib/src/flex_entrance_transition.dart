@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+// INTERNAL USE
+// ignore_for_file: public_member_api_docs
+
 class FlexEntranceTransition extends MultiChildRenderObjectWidget {
   FlexEntranceTransition({
     Key key,
-    this.mainAxisPosition,
-    this.direction,
-    this.startToEnd,
-    List<Widget> children,
-  }) : super(key: key, children: children);
+    @required this.mainAxisPosition,
+    @required this.direction,
+    @required this.startToEnd,
+    @required List<Widget> children,
+  })  : assert(mainAxisPosition != null),
+        assert(direction != null),
+        assert(startToEnd != null),
+        super(key: key, children: children);
 
   /// The direction to use as the main axis.
   final Axis direction;
@@ -17,7 +23,7 @@ class FlexEntranceTransition extends MultiChildRenderObjectWidget {
   final bool startToEnd;
 
   /// The animation that controls the main axis position of the children.
-  Animation<double> mainAxisPosition;
+  final Animation<double> mainAxisPosition;
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -151,7 +157,7 @@ class _RenderFlexEntranceTransition extends RenderBox
           throw FlutterError.fromParts(
             [
               ErrorSummary(
-                'DrawerTransition only supports children with non-zero flex',
+                'DrawerMotion only supports children with non-zero flex',
               ),
               ErrorDescription(
                 'Only children wrapped into Flexible widgets with non-zero '

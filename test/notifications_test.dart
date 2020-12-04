@@ -111,18 +111,18 @@ void main() {
 
         controller.ratio = 0.2;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
         ]);
 
         controller.ratio = 0.2;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
         ]);
 
         controller.ratio = 0.1;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.1),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.1),
         ]);
       },
     );
@@ -153,12 +153,12 @@ void main() {
 
         controller.ratio = 0.2;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
         ]);
 
         controller.ratio = 0.2;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
         ]);
 
         await tester.pumpWidget(
@@ -177,8 +177,8 @@ void main() {
 
         controller.ratio = 0.1;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.1),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.1),
         ]);
 
         await tester.pumpWidget(
@@ -191,8 +191,8 @@ void main() {
 
         controller.ratio = 0.2;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.1),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.1),
         ]);
 
         await tester.pumpWidget(
@@ -209,9 +209,9 @@ void main() {
 
         controller.ratio = 0.3;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.1),
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.3),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.1),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.3),
         ]);
 
         await tester.pumpWidget(
@@ -224,9 +224,9 @@ void main() {
 
         controller.ratio = 0.2;
         expect(notifications, <SlidableNotification>[
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.2),
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.1),
-          const SlidableRatioChangedNotification(tag: 'tag', ratio: 0.3),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.2),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.1),
+          const SlidableRatioNotification(tag: 'tag', ratio: 0.3),
         ]);
       },
     );

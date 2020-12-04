@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final direction = AppState.of(context).direction;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Slidable'),
+        title: const Text('Flutter Slidable'),
       ),
       body: SlidableNotificationListener(
         onNotification: (notification) {},
@@ -49,71 +49,70 @@ class _MyHomePageState extends State<MyHomePage> {
             Directionality(
               textDirection: TextDirection.rtl,
               child: Slidable(
-                tag: '0',
+                groupTag: '0',
                 direction: direction,
-                startActionPane: ActionPane(
-                  extentRatio: 0.5,
+                startActionPane: const ActionPane(
                   openThreshold: 0.1,
                   closeThreshold: 0.4,
-                  transition: SlidableBehindTransition(),
+                  motion: BehindMotion(),
                   children: [
                     SlideAction(color: Colors.green, icon: Icons.share),
                     SlideAction(color: Colors.amber, icon: Icons.delete),
                   ],
                 ),
-                endActionPane: ActionPane(
-                  transition: SlidableBehindTransition(),
+                endActionPane: const ActionPane(
+                  motion: BehindMotion(),
                   children: [
                     SlideAction(color: Colors.red, icon: Icons.delete_forever),
                     SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                   ],
                 ),
-                child: Tile(color: Colors.grey, text: 'hello'),
+                child: const Tile(color: Colors.grey, text: 'hello'),
               ),
             ),
             Slidable(
-              tag: '0',
+              groupTag: '0',
               direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableStretchTransition(),
+              startActionPane: const ActionPane(
+                motion: StretchMotion(),
                 children: [
                   SlideAction(color: Colors.green, icon: Icons.share),
                   SlideAction(color: Colors.amber, icon: Icons.delete),
                 ],
               ),
-              endActionPane: ActionPane(
-                transition: SlidableStretchTransition(),
+              endActionPane: const ActionPane(
+                motion: StretchMotion(),
                 children: [
                   SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 3),
                 ],
               ),
-              child: Tile(color: Colors.pink, text: 'hello 2'),
+              child: const Tile(color: Colors.pink, text: 'hello 2'),
             ),
             Slidable(
               direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableScrollTransition(),
+              startActionPane: const ActionPane(
+                motion: ScrollMotion(),
                 children: [
                   SlideAction(color: Colors.green, icon: Icons.share),
                   SlideAction(color: Colors.amber, icon: Icons.delete),
                 ],
               ),
-              endActionPane: ActionPane(
-                transition: SlidableScrollTransition(),
+              endActionPane: const ActionPane(
+                motion: ScrollMotion(),
                 children: [
                   SlideAction(color: Colors.red, icon: Icons.delete_forever),
                   SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                 ],
               ),
-              child: Tile(color: Colors.yellow, text: 'hello 3'),
+              child: const Tile(color: Colors.yellow, text: 'hello 3'),
             ),
             if (alive)
               Slidable(
-                key: ValueKey(4),
+                key: const ValueKey(4),
                 direction: direction,
                 startActionPane: ActionPane(
-                  transition: SlidableDrawerTransition(),
+                  motion: const DrawerMotion(),
                   dismissible: DismissiblePane(
                     onDismissed: () {
                       setState(() {
@@ -147,145 +146,91 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                   ),
-                  children: [
+                  children: const [
                     SlideAction(color: Colors.green, icon: Icons.share),
                     SlideAction(color: Colors.amber, icon: Icons.delete),
                   ],
                 ),
-                endActionPane: ActionPane(
-                  transition: SlidableDrawerTransition(),
+                endActionPane: const ActionPane(
+                  motion: DrawerMotion(),
                   children: [
                     SlideAction(color: Colors.red, icon: Icons.delete_forever),
                     SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                   ],
                 ),
-                child: Tile(color: Colors.lime, text: 'hello 4'),
+                child: const Tile(color: Colors.lime, text: 'hello 4'),
               ),
             Slidable(
               direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              startActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.green, icon: Icons.share),
                   SlideAction(color: Colors.amber, icon: Icons.delete),
                 ],
               ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              endActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.red, icon: Icons.delete_forever),
                   SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                 ],
               ),
-              child: Tile(color: Colors.grey, text: 'hello'),
+              child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
               direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              startActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.green, icon: Icons.share),
                   SlideAction(color: Colors.amber, icon: Icons.delete),
                 ],
               ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              endActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.red, icon: Icons.delete_forever),
                   SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                 ],
               ),
-              child: Tile(color: Colors.grey, text: 'hello'),
+              child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
               direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              startActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.green, icon: Icons.share),
                   SlideAction(color: Colors.amber, icon: Icons.delete),
                 ],
               ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              endActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.red, icon: Icons.delete_forever),
                   SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                 ],
               ),
-              child: Tile(color: Colors.grey, text: 'hello'),
+              child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
               direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              startActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.green, icon: Icons.share),
                   SlideAction(color: Colors.amber, icon: Icons.delete),
                 ],
               ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
+              endActionPane: const ActionPane(
+                motion: BehindMotion(),
                 children: [
                   SlideAction(color: Colors.red, icon: Icons.delete_forever),
                   SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                 ],
               ),
-              child: Tile(color: Colors.grey, text: 'hello'),
-            ),
-            Slidable(
-              direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: Tile(color: Colors.grey, text: 'hello'),
-            ),
-            Slidable(
-              direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: Tile(color: Colors.grey, text: 'hello'),
-            ),
-            Slidable(
-              direction: direction,
-              startActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: ActionPane(
-                transition: SlidableBehindTransition(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: Tile(color: Colors.grey, text: 'hello'),
+              child: const Tile(color: Colors.grey, text: 'hello'),
             ),
           ],
         ),
@@ -308,7 +253,7 @@ class SlideAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SlidableIconAction(
+    return SlidableAction(
       flex: flex,
       backgroundColor: color,
       foregroundColor: Colors.white,

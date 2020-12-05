@@ -136,6 +136,17 @@ Animate the actions as if they were streched while the `Slidable` is moving:
 
 ![Stretch Motion][stretch_motion]
 
+## Sponsoring
+
+I'm working on my packages on my free-time, but I don't have as much time as I would. If this package or any other package I created is helping you, please consider to sponsor me so that I can take time to read the issues, fix bugs, merge pull requests and add features to these packages.
+
+## Contributions
+
+Feel free to contribute to this project.
+
+If you find a bug or want a feature, but don't know how to fix/implement it, please fill an [issue][issue].  
+If you fixed a bug or implemented a feature, please send a [pull request][pr].
+
 <!-- Links -->
 [github_action_badge]: https://github.com/letsar/flutter_slidable/workflows/Build/badge.svg
 [github_action]: https://github.com/letsar/flutter_slidable/actions
@@ -147,8 +158,9 @@ Animate the actions as if they were streched while the `Slidable` is moving:
 [buy_me_a_coffee_badge]: https://img.buymeacoffee.com/button-api/?text=Donate&emoji=&slug=romainrastel&button_colour=29b6f6&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00
 [flutter_favorite_badge]: https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/flutter_favorite_badge.png
 [flutter_favorite]: https://flutter.dev/docs/development/packages-and-plugins/favorites
-
 [behind_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/behind_motion.gif
 [drawer_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/drawer_motion.gif
 [scroll_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/scroll_motion.gif
 [stretch_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/stretch_motion.gif
+[issue]: https://github.com/letsar/flutter_slidable/issues
+[pr]: https://github.com/letsar/flutter_slidable/pulls

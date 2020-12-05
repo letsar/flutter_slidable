@@ -100,7 +100,7 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
     final gestureDirection =
         primaryDelta >= 0 ? GestureDirection.opening : GestureDirection.closing;
 
-    widget.controller.handleEndGesture(
+    widget.controller.dispatchEndGesture(
       details.primaryVelocity,
       gestureDirection,
     );

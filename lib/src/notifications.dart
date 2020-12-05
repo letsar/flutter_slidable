@@ -2,17 +2,48 @@ import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
 
+/// Signature for [SlidableNotification] listeners.
+///
+/// Used by [SlidableNotificationListener.onNotification].
 typedef SlidableNotificationCallback = void Function(
   SlidableNotification notification,
 );
 
+/// A [Slidable] notification that can bubble up the widget tree.
+///
+/// You can determine the type of a notification using the `is` operator to
+/// check the [runtimeType] of the notification.
+///
+/// To listen for notifications in a subtree, use a
+/// [SlidableNotificationListener].
+///
+/// To send a notification, call [dispatch] on the notification you wish to
+/// send. The notification will be delivered to the closest
+/// [SlidableNotificationListener] widget.
 @immutable
 class SlidableNotification {
+  /// Abstract const constructor. This constructor enables subclasses to provide
+  /// const constructors so that they can be used in const expressions.
   const SlidableNotification({
     @required this.tag,
   });
 
+  /// A tag representing the [Slidable] from which the notification is sent.
   final Object tag;
+
+  /// Start bubbling this notification at the given build context.
+  ///
+  /// The notification will be delivered to the closest
+  /// [SlidableNotificationListener] widget.
+  /// If the [BuildContext] is null, the notification is not dispatched.
+  void dispatch(BuildContext context, SlidableController controller) {
+    final scope = context
+        ?.getElementForInheritedWidgetOfExactType<
+            _SlidableNotificationListenerScope>()
+        ?.widget as _SlidableNotificationListenerScope;
+
+    scope?.state?.acceptNotification(controller, this);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -32,13 +63,16 @@ class SlidableNotification {
   String toString() => 'SlidableNotification(tag: $tag)';
 }
 
+/// A specific [SlidableNotification] which holds the current ratio value.
 @immutable
 class SlidableRatioNotification extends SlidableNotification {
+  /// Creates a [SlidableRatioNotification].
   const SlidableRatioNotification({
     @required Object tag,
     @required this.ratio,
   }) : super(tag: tag);
 
+  /// The ratio value of the [SlidableController].
   final double ratio;
 
   @override
@@ -55,7 +89,11 @@ class SlidableRatioNotification extends SlidableNotification {
   String toString() => 'SlidableRatioNotification(tag: $tag, ratio: $ratio)';
 }
 
+/// A widget that listens for [SlidableNotification]s bubbling up the tree.
+///
+/// To dispatch notifications, use the [SlidableNotification.dispatch] method.
 class SlidableNotificationListener extends StatefulWidget {
+  /// Creates a [SlidableNotificationListener].
   const SlidableNotificationListener({
     Key key,
     this.onNotification,
@@ -69,8 +107,19 @@ class SlidableNotificationListener extends StatefulWidget {
         assert(child != null),
         super(key: key);
 
+  /// The widget directly below this widget in the tree.
+  ///
+  /// This is not necessarily the widget that dispatched the notification.
+  ///
+  /// {@macro flutter.widgets.child}
   final Widget child;
+
+  /// Called when a notification of the appropriate arrives at this location in
+  /// the tree.
   final SlidableNotificationCallback onNotification;
+
+  /// Whether to automatically close any [Slidable] with a given tag when
+  /// another [Slidable] with the same tag opens.
   final bool autoClose;
 
   @override
@@ -83,7 +132,7 @@ class _SlidableNotificationListenerState
   final Map<Object, SlidableController> openControllers =
       <Object, SlidableController>{};
 
-  void sendNotification(
+  void acceptNotification(
     SlidableController controller,
     SlidableNotification notification,
   ) {
@@ -137,6 +186,8 @@ class _SlidableNotificationListenerScope extends InheritedWidget {
   }
 }
 
+// Internal use.
+// ignore_for_file: public_member_api_docs
 class SlidableNotificationSender extends StatefulWidget {
   const SlidableNotificationSender({
     Key key,
@@ -200,7 +251,7 @@ class _SlidableNotificationSenderState
       tag: widget.tag,
       ratio: controller.ratio,
     );
-    listenerState.sendNotification(controller, notification);
+    listenerState.acceptNotification(controller, notification);
   }
 
   @override

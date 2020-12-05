@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'action_pane.dart';
 import 'flex_exit_transition.dart';
 import 'slidable.dart';
 
+/// A [DismissiblePane] motion which will make the furthest action grows faster
+/// as the [Slidable] dismisses.
 class InversedDrawerMotion extends StatelessWidget {
+  /// Creates a [InversedDrawerMotion].
   const InversedDrawerMotion({
     Key key,
   }) : super(key: key);

@@ -181,14 +181,14 @@ void main() {
 
       await tester.fling(finder, posDelta, speed);
 
-      verify(mockSlidableController.handleEndGesture(
+      verify(mockSlidableController.dispatchEndGesture(
         any,
         GestureDirection.opening,
       ));
 
       await tester.fling(finder, negDelta, speed);
 
-      verify(mockSlidableController.handleEndGesture(
+      verify(mockSlidableController.dispatchEndGesture(
         any,
         GestureDirection.closing,
       ));

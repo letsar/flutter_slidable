@@ -14,7 +14,17 @@ const Duration _kResizeDuration = Duration(milliseconds: 300);
 /// Used by [DismissiblePane.confirmDismiss].
 typedef ConfirmDismissCallback = Future<bool> Function();
 
+/// A widget wich controls how a [Slidable] dismisses.
 class DismissiblePane extends StatefulWidget {
+  /// Creates a [DismissiblePane].
+  ///
+  /// The [onDismissed], [dismissThreshold], [dismissalDuration],
+  /// [resizeDuration], [closeOnCancel], and [motion] arguments must not be
+  /// null.
+  ///
+  /// The [dismissThreshold] must be between 0 and 1 (both exclusives).
+  ///
+  /// You must set the key of the enclosing [Slidable] to use this widget.
   const DismissiblePane({
     Key key,
     @required this.onDismissed,
@@ -25,15 +35,27 @@ class DismissiblePane extends StatefulWidget {
     this.closeOnCancel = false,
     this.motion = const InversedDrawerMotion(),
   })  : assert(onDismissed != null),
-        assert(dismissThreshold != null),
+        assert(dismissThreshold != null &&
+            dismissThreshold > 0 &&
+            dismissThreshold < 1),
         assert(dismissalDuration != null),
         assert(resizeDuration != null),
         assert(closeOnCancel != null),
         assert(motion != null),
         super(key: key);
 
+  /// The threshold from which a dismiss will be triggered if the user stops
+  /// to drag the [Slidable].
+  ///
+  /// This value must be between 0 and 1 (both exclusives.)
+  ///
+  /// Defaults to 0.75.
   final double dismissThreshold;
 
+  /// The amount of time the widget will spend to complete the dissmiss
+  /// animation.
+  ///
+  /// Defaults to 300ms.
   final Duration dismissalDuration;
 
   /// The amount of time the widget will spend contracting before [onDismissed]
@@ -42,9 +64,23 @@ class DismissiblePane extends StatefulWidget {
   /// If null, the widget will not contract and [onDismissed] will be called
   /// immediately after the widget is dismissed.
   final Duration resizeDuration;
+
+  /// Gives the app an opportunity to confirm or veto a pending dismissal.
+  ///
+  /// If the returned Future<bool> completes true, then this widget will be
+  /// dismissed, otherwise it will be moved back to its original location.
+  ///
+  /// If the returned Future<bool> completes to false or null the [onDismissed]
+  /// callback will not run.
   final ConfirmDismissCallback confirmDismiss;
+
+  /// Called when the widget has been dismissed, after finishing resizing.
   final VoidCallback onDismissed;
+
+  /// Whether closing the [Slidable] if the app cancels the dismiss.
   final bool closeOnCancel;
+
+  /// The widget which animates while the [Slidable] is currently dismissing.
   final Widget motion;
 
   @override
@@ -53,7 +89,6 @@ class DismissiblePane extends StatefulWidget {
 
 class _DismissiblePaneState extends State<DismissiblePane> {
   SlidableController controller;
-  // DismissGesture dismissGesture;
 
   @override
   void initState() {

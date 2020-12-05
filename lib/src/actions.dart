@@ -13,8 +13,8 @@ const bool _kAutoClose = true;
 class CustomSlidableAction extends StatelessWidget {
   /// Creates a [CustomSlidableAction].
   ///
-  /// The [flex], [backgroundColor], [foregroundColor] and [autoClose] arguments
-  /// must not be null.
+  /// The [flex], [backgroundColor], [autoClose] and [child] arguments must not
+  /// be null.
   ///
   /// The [flex] argument must also be greater than 0.
   const CustomSlidableAction({
@@ -106,7 +106,16 @@ class CustomSlidableAction extends StatelessWidget {
   }
 }
 
+/// An action for [Slidable] which can show an icon, a label, or both.
 class SlidableAction extends StatelessWidget {
+  /// Creates a [SlidableAction].
+  ///
+  /// The [flex], [backgroundColor], [autoClose] and [spacing] arguments
+  /// must not be null.
+  ///
+  /// You must set either an [icon] or a [label].
+  ///
+  /// The [flex] argument must also be greater than 0.
   const SlidableAction({
     Key key,
     this.flex = _kFlex,
@@ -139,10 +148,15 @@ class SlidableAction extends StatelessWidget {
   /// {@macro slidable.actions.onPressed}
   final SlidableActionCallback onPressed;
 
+  /// An icon to display above the [label].
   final IconData icon;
 
+  /// The space between [icon] and [label] if both set.
+  ///
+  /// Defaults to 4.
   final double spacing;
 
+  /// A label to display below the [icon].
   final String label;
 
   @override

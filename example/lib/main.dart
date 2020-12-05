@@ -1,236 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const AppState(
-        direction: Axis.horizontal,
-        child: MyHomePage(),
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({
+  const MyApp({
     Key key,
   }) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  bool alive = true;
-
-  @override
   Widget build(BuildContext context) {
-    final direction = AppState.of(context).direction;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Slidable'),
-      ),
-      body: SlidableNotificationListener(
-        onNotification: (notification) {},
-        child: ListView(
-          scrollDirection: flipAxis(direction),
+    return MaterialApp(
+      title: 'Slidable Example',
+      home: Scaffold(
+        body: ListView(
           children: [
-            Directionality(
-              textDirection: TextDirection.rtl,
-              child: Slidable(
-                groupTag: '0',
-                direction: direction,
-                startActionPane: const ActionPane(
-                  openThreshold: 0.1,
-                  closeThreshold: 0.4,
-                  motion: BehindMotion(),
-                  children: [
-                    SlideAction(color: Colors.green, icon: Icons.share),
-                    SlideAction(color: Colors.amber, icon: Icons.delete),
-                  ],
-                ),
-                endActionPane: const ActionPane(
-                  motion: BehindMotion(),
-                  children: [
-                    SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                    SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                  ],
-                ),
-                child: const Tile(color: Colors.grey, text: 'hello'),
-              ),
-            ),
             Slidable(
-              groupTag: '0',
-              direction: direction,
-              startActionPane: const ActionPane(
-                motion: StretchMotion(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: const ActionPane(
-                motion: StretchMotion(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 3),
-                ],
-              ),
-              child: const Tile(color: Colors.pink, text: 'hello 2'),
-            ),
-            Slidable(
-              direction: direction,
-              startActionPane: const ActionPane(
-                motion: ScrollMotion(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: const ActionPane(
-                motion: ScrollMotion(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: const Tile(color: Colors.yellow, text: 'hello 3'),
-            ),
-            if (alive)
-              Slidable(
-                key: const ValueKey(4),
-                direction: direction,
-                startActionPane: ActionPane(
-                  motion: const DrawerMotion(),
-                  dismissible: DismissiblePane(
-                    onDismissed: () {
-                      setState(() {
-                        alive = false;
-                      });
-                    },
-                    closeOnCancel: true,
-                    confirmDismiss: () async {
-                      return showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Are you sure?'),
-                            content: const Text('Are you sure to dismiss?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: const Text('Yes'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: const Text('No'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
+              // Specify a key if the Slidable is dismissible.
+              key: const ValueKey(0),
+
+              // The start action pane is the one at the left or the top side.
+              startActionPane: ActionPane(
+                // A motion is a widget used to control how the pane animates.
+                motion: const ScrollMotion(),
+
+                // A pane can dismiss the Slidable.
+                dismissible: DismissiblePane(onDismissed: () {}),
+
+                // All actions are defined in the children parameter.
+                children: const [
+                  // A SlidableAction can have an icon and/or a label.
+                  SlidableAction(
+                    onPressed: doNothing,
+                    backgroundColor: Color(0xFFFE4A49),
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: 'Delete',
                   ),
-                  children: const [
-                    SlideAction(color: Colors.green, icon: Icons.share),
-                    SlideAction(color: Colors.amber, icon: Icons.delete),
-                  ],
-                ),
-                endActionPane: const ActionPane(
-                  motion: DrawerMotion(),
-                  children: [
-                    SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                    SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                  ],
-                ),
-                child: const Tile(color: Colors.lime, text: 'hello 4'),
-              ),
-            Slidable(
-              direction: direction,
-              startActionPane: const ActionPane(
-                motion: BehindMotion(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
+                  SlidableAction(
+                    onPressed: doNothing,
+                    backgroundColor: Color(0xFF21B7CA),
+                    foregroundColor: Colors.white,
+                    icon: Icons.share,
+                    label: 'Share',
+                  ),
                 ],
               ),
+
+              // The end action pane is the one at the right or the bottom side.
               endActionPane: const ActionPane(
-                motion: BehindMotion(),
+                motion: ScrollMotion(),
                 children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                  SlidableAction(
+                    // An action can be bigger than the others.
+                    flex: 2,
+                    onPressed: doNothing,
+                    backgroundColor: Color(0xFF7BC043),
+                    foregroundColor: Colors.white,
+                    icon: Icons.archive,
+                    label: 'Archive',
+                  ),
+                  SlidableAction(
+                    onPressed: doNothing,
+                    backgroundColor: Color(0xFF0392CF),
+                    foregroundColor: Colors.white,
+                    icon: Icons.save,
+                    label: 'Save',
+                  ),
                 ],
               ),
-              child: const Tile(color: Colors.grey, text: 'hello'),
-            ),
-            Slidable(
-              direction: direction,
-              startActionPane: const ActionPane(
-                motion: BehindMotion(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: const ActionPane(
-                motion: BehindMotion(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: const Tile(color: Colors.grey, text: 'hello'),
-            ),
-            Slidable(
-              direction: direction,
-              startActionPane: const ActionPane(
-                motion: BehindMotion(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: const ActionPane(
-                motion: BehindMotion(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: const Tile(color: Colors.grey, text: 'hello'),
-            ),
-            Slidable(
-              direction: direction,
-              startActionPane: const ActionPane(
-                motion: BehindMotion(),
-                children: [
-                  SlideAction(color: Colors.green, icon: Icons.share),
-                  SlideAction(color: Colors.amber, icon: Icons.delete),
-                ],
-              ),
-              endActionPane: const ActionPane(
-                motion: BehindMotion(),
-                children: [
-                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
-                ],
-              ),
-              child: const Tile(color: Colors.grey, text: 'hello'),
+
+              // The child of the Slidable is what the user sees when the
+              // component is not dragged.
+              child: const ListTile(title: Text('Slide me')),
             ),
           ],
         ),
@@ -239,71 +81,4 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class SlideAction extends StatelessWidget {
-  const SlideAction({
-    Key key,
-    @required this.color,
-    @required this.icon,
-    this.flex = 1,
-  }) : super(key: key);
-
-  final Color color;
-  final IconData icon;
-  final int flex;
-
-  @override
-  Widget build(BuildContext context) {
-    return SlidableAction(
-      flex: flex,
-      backgroundColor: color,
-      foregroundColor: Colors.white,
-      onPressed: (_) {},
-      icon: icon,
-      label: 'hello',
-    );
-  }
-}
-
-class Tile extends StatelessWidget {
-  const Tile({
-    Key key,
-    @required this.color,
-    @required this.text,
-  }) : super(key: key);
-
-  final Color color;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final direction = AppState.of(context).direction;
-    return GestureDetector(
-      onLongPress: () => Slidable.of(context).openEndActionPane(),
-      child: Container(
-        color: color,
-        height: direction == Axis.horizontal ? 100 : double.infinity,
-        width: direction == Axis.horizontal ? double.infinity : 100,
-        child: Center(child: Text(text)),
-      ),
-    );
-  }
-}
-
-class AppState extends InheritedWidget {
-  const AppState({
-    Key key,
-    @required this.direction,
-    @required Widget child,
-  }) : super(key: key, child: child);
-
-  final Axis direction;
-
-  @override
-  bool updateShouldNotify(covariant AppState oldWidget) {
-    return direction != oldWidget.direction;
-  }
-
-  static AppState of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<AppState>();
-  }
-}
+void doNothing(BuildContext context) {}

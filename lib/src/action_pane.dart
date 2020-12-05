@@ -73,7 +73,7 @@ class ActionPane extends StatefulWidget {
   /// A widget which animates when the [Slidable] moves.
   final Widget motion;
 
-  /// A widget which control how the [Slidable] dismisses.
+  /// A widget which controls how the [Slidable] dismisses.
   final Widget dismissible;
 
   /// The fraction of the total extent from where the [Slidable] will
@@ -107,8 +107,7 @@ class ActionPane extends StatefulWidget {
   }
 }
 
-class _ActionPaneState extends State<ActionPane>
-    implements ActionPaneConfigurator {
+class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
   SlidableController controller;
   double openThreshold;
   double closeThreshold;
@@ -126,7 +125,7 @@ class _ActionPaneState extends State<ActionPane>
     if (widget.dismissible != null) {
       controller.animation.addListener(handleRatioChanged);
     }
-    controller.actionPaneConfiguration = this;
+    controller.actionPaneConfigurator = this;
     showMotion = true;
     updateThresholds();
   }
@@ -156,7 +155,7 @@ class _ActionPaneState extends State<ActionPane>
   void dispose() {
     controller.endGesture.removeListener(handleEndGestureChanged);
     controller.animation.removeListener(handleRatioChanged);
-    controller.actionPaneConfiguration = null;
+    controller.actionPaneConfigurator = null;
     super.dispose();
   }
 

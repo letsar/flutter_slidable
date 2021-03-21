@@ -195,11 +195,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       actions: <Widget>[
                         FlatButton(
                           child: Text('Cancel'),
-                          onPressed: () => Navigator.of(context)!.pop(false),
+                          onPressed: () => Navigator.of(context).pop(false),
                         ),
                         FlatButton(
                           child: Text('Ok'),
-                          onPressed: () => Navigator.of(context)!.pop(true),
+                          onPressed: () => Navigator.of(context).pop(true),
                         ),
                       ],
                     );
@@ -245,11 +245,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         actions: <Widget>[
                           FlatButton(
                             child: Text('Cancel'),
-                            onPressed: () => Navigator.of(context)!.pop(false),
+                            onPressed: () => Navigator.of(context).pop(false),
                           ),
                           FlatButton(
                             child: Text('Ok'),
-                            onPressed: () => Navigator.of(context)!.pop(true),
+                            onPressed: () => Navigator.of(context).pop(true),
                           ),
                         ],
                       );

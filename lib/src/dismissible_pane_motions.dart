@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter/widgets.dart';
 
 import 'action_pane.dart';
 import 'flex_exit_transition.dart';

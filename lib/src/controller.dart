@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 const _defaultMovementDuration = Duration(milliseconds: 200);

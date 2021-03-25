@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/controller.dart';
 import 'package:flutter_slidable/src/gesture_detector.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'common.dart';
 
@@ -154,13 +154,16 @@ void main() {
     testWidgets('handleEndGesture should be called with the correct direction',
         (tester) async {
       double ratio = 0;
-      when(mockSlidableController.ratio).thenAnswer((realInvocation) => ratio);
-      when(mockSlidableController.ratio = any).thenAnswer((realInvocation) {
+      when(() => mockSlidableController.ratio)
+          .thenAnswer((realInvocation) => ratio);
+      when(() => mockSlidableController.ratio = any())
+          .thenAnswer((realInvocation) {
         ratio = realInvocation.positionalArguments[0] as double;
+        return ratio;
       });
 
       final mockActionPanelType = ValueNotifier(ActionPaneType.none);
-      when(mockSlidableController.actionPaneType)
+      when(() => mockSlidableController.actionPaneType)
           .thenReturn(mockActionPanelType);
 
       await tester.pumpWidget(Center(
@@ -181,17 +184,21 @@ void main() {
 
       await tester.fling(finder, posDelta, speed);
 
-      verify(mockSlidableController.dispatchEndGesture(
-        any,
-        GestureDirection.opening,
-      ));
+      verify(
+        () => mockSlidableController.dispatchEndGesture(
+          any(),
+          GestureDirection.opening,
+        ),
+      );
 
       await tester.fling(finder, negDelta, speed);
 
-      verify(mockSlidableController.dispatchEndGesture(
-        any,
-        GestureDirection.closing,
-      ));
+      verify(
+        () => mockSlidableController.dispatchEndGesture(
+          any(),
+          GestureDirection.closing,
+        ),
+      );
     });
   });
 }

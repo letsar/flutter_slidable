@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/scrolling_behavior.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'common.dart';
 
@@ -10,6 +10,7 @@ final mockSlidableController = MockSlidableController();
 void main() {
   setUp(() {
     reset(mockSlidableController);
+    _registerFallbackValues();
   });
 
   group('SlidableScrollingBehavior -', () {
@@ -61,17 +62,21 @@ void main() {
         ),
       );
 
-      verifyNever(mockSlidableController.close(
-        duration: anyNamed('duration'),
-        curve: anyNamed('curve'),
-      ));
+      verifyNever(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      );
 
       await tester.drag(find.byType(ListView), const Offset(0, -250));
 
-      verify(mockSlidableController.close(
-        duration: anyNamed('duration'),
-        curve: anyNamed('curve'),
-      ));
+      verify(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      );
     });
 
     testWidgets(
@@ -97,17 +102,21 @@ void main() {
         ),
       );
 
-      verifyNever(mockSlidableController.close(
-        duration: anyNamed('duration'),
-        curve: anyNamed('curve'),
-      ));
+      verifyNever(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      );
 
       await tester.drag(find.byType(ListView), const Offset(0, -250));
 
-      verifyNever(mockSlidableController.close(
-        duration: anyNamed('duration'),
-        curve: anyNamed('curve'),
-      ));
+      verifyNever(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      );
     });
 
     testWidgets(
@@ -132,17 +141,21 @@ void main() {
         ),
       );
 
-      verifyNever(mockSlidableController.close(
-        duration: anyNamed('duration'),
-        curve: anyNamed('curve'),
-      ));
+      verifyNever(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      );
 
       await tester.drag(find.byType(ListView), const Offset(0, -250));
 
-      verify(mockSlidableController.close(
-        duration: anyNamed('duration'),
-        curve: anyNamed('curve'),
-      ));
+      verify(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      );
 
       clearInteractions(mockSlidableController);
 
@@ -168,10 +181,17 @@ void main() {
 
       await tester.drag(find.byType(ListView), const Offset(0, -250));
 
-      verifyNever(mockSlidableController.close(
-        duration: anyNamed('duration'),
-        curve: anyNamed('curve'),
-      ));
+      verifyNever(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      );
     });
   });
+}
+
+void _registerFallbackValues() {
+  registerFallbackValue(Duration.zero);
+  registerFallbackValue(Curves.linear);
 }

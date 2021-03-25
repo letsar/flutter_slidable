@@ -1,6 +1,5 @@
 library flutter_slidable;
 
-export 'src/action_pane.dart';
 export 'src/action_pane_motions.dart';
 export 'src/actions.dart';
 export 'src/controller.dart' show SlidableController, ActionPaneType;

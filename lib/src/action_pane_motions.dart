@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import 'action_pane.dart';
 import 'flex_entrance_transition.dart';
 import 'slidable.dart';
 

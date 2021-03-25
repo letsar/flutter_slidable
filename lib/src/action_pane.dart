@@ -1,8 +1,4 @@
-import 'package:flutter/widgets.dart';
-
-import 'action_pane_configuration.dart';
-import 'controller.dart';
-import 'slidable.dart';
+part of 'slidable.dart';
 
 const _defaultExtentRatio = 0.5;
 

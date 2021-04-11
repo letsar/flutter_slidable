@@ -193,13 +193,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: Text('Delete'),
                       content: Text('Item will be deleted'),
                       actions: <Widget>[
-                        FlatButton(
+                        TextButton(
                           child: Text('Cancel'),
-                          onPressed: () => Navigator.of(context)!.pop(false),
+                          onPressed: () => Navigator.of(context).pop(false),
                         ),
-                        FlatButton(
+                        TextButton(
                           child: Text('Ok'),
-                          onPressed: () => Navigator.of(context)!.pop(true),
+                          onPressed: () => Navigator.of(context).pop(true),
                         ),
                       ],
                     );
@@ -243,13 +243,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         title: Text('Delete'),
                         content: Text('Item will be deleted'),
                         actions: <Widget>[
-                          FlatButton(
+                          TextButton(
                             child: Text('Cancel'),
-                            onPressed: () => Navigator.of(context)!.pop(false),
+                            onPressed: () => Navigator.of(context).pop(false),
                           ),
-                          FlatButton(
+                          TextButton(
                             child: Text('Ok'),
-                            onPressed: () => Navigator.of(context)!.pop(true),
+                            onPressed: () => Navigator.of(context).pop(true),
                           ),
                         ],
                       );

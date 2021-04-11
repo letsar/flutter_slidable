@@ -11,9 +11,9 @@ class FractionallyAlignedSizedBox extends StatelessWidget {
   ///
   /// If non-null, the [widthFactor] and [heightFactor] arguments must be
   /// non-negative.
-  FractionallyAlignedSizedBox({
-    Key key,
-    @required this.child,
+  const FractionallyAlignedSizedBox({
+    Key? key,
+    required this.child,
     this.leftFactor,
     this.topFactor,
     this.rightFactor,
@@ -29,22 +29,22 @@ class FractionallyAlignedSizedBox extends StatelessWidget {
         super(key: key);
 
   /// The relative distance that the child's left edge is inset from the left of the parent.
-  final double leftFactor;
+  final double? leftFactor;
 
   /// The relative distance that the child's top edge is inset from the top of the parent.
-  final double topFactor;
+  final double? topFactor;
 
   /// The relative distance that the child's right edge is inset from the right of the parent.
-  final double rightFactor;
+  final double? rightFactor;
 
   /// The relative distance that the child's bottom edge is inset from the bottom of the parent.
-  final double bottomFactor;
+  final double? bottomFactor;
 
   /// The child's width relative to its parent's width.
-  final double widthFactor;
+  final double? widthFactor;
 
   /// The child's height relative to its parent's height.
-  final double heightFactor;
+  final double? heightFactor;
 
   /// The widget below this widget in the tree.
   final Widget child;
@@ -53,8 +53,8 @@ class FractionallyAlignedSizedBox extends StatelessWidget {
   Widget build(BuildContext context) {
     double dx = 0;
     double dy = 0;
-    double width = widthFactor;
-    double height = heightFactor;
+    double? width = widthFactor;
+    double? height = heightFactor;
 
     if (widthFactor == null) {
       final left = leftFactor ?? 0;
@@ -77,17 +77,17 @@ class FractionallyAlignedSizedBox extends StatelessWidget {
 
     if (widthFactor != null && widthFactor != 1) {
       if (leftFactor != null) {
-        dx = leftFactor / (1 - widthFactor);
+        dx = leftFactor! / (1 - widthFactor!);
       } else if (leftFactor == null && rightFactor != null) {
-        dx = (1 - widthFactor - rightFactor) / (1 - widthFactor);
+        dx = (1 - widthFactor! - rightFactor!) / (1 - widthFactor!);
       }
     }
 
     if (heightFactor != null && heightFactor != 1) {
       if (topFactor != null) {
-        dy = topFactor / (1 - heightFactor);
+        dy = topFactor! / (1 - heightFactor!);
       } else if (topFactor == null && bottomFactor != null) {
-        dy = (1 - heightFactor - bottomFactor) / (1 - heightFactor);
+        dy = (1 - heightFactor! - bottomFactor!) / (1 - heightFactor!);
       }
     }
 

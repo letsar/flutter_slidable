@@ -1,3 +1,7 @@
+## 0.6.0
+### Added
+* Null Safety Support
+
 ## 0.5.7
 ### Fixed
 * Formatting issues

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/widgets/slidable.dart';
 
-const Duration _kResizeDuration = const Duration(milliseconds: 300);
+const Duration _kResizeDuration = Duration(milliseconds: 300);
 
 /// A widget that controls how the [Slidable] is dismissed.
 ///
@@ -18,7 +18,8 @@ const Duration _kResizeDuration = const Duration(milliseconds: 300);
 class SlidableDismissal extends StatelessWidget {
   /// Creates a widget that controls how the [Slidable] is dismissed.
   const SlidableDismissal({
-    @required this.child,
+    Key? key,
+    required this.child,
     this.dismissThresholds = const <SlideActionType, double>{},
     this.onResize,
     this.onDismissed,
@@ -27,7 +28,7 @@ class SlidableDismissal extends StatelessWidget {
     this.onWillDismiss,
     this.closeOnCanceled = false,
     this.dragDismissible = true,
-  }) : assert(dismissThresholds != null);
+  }) : super(key: key);
 
   /// Specifies if the widget can be dismissed by sliding.
   ///
@@ -53,13 +54,13 @@ class SlidableDismissal extends StatelessWidget {
   final Map<SlideActionType, double> dismissThresholds;
 
   /// Called when the widget has been dismissed, after finishing resizing.
-  final DismissSlideActionCallback onDismissed;
+  final DismissSlideActionCallback? onDismissed;
 
   /// Called before the widget is dismissed. If the call returns false, the
   /// item will not be dismissed.
   ///
   /// If null, the widget will always be dismissed.
-  final SlideActionWillBeDismissed onWillDismiss;
+  final SlideActionWillBeDismissed? onWillDismiss;
 
   /// Specifies to close this slidable after canceling dismiss.
   ///
@@ -67,13 +68,13 @@ class SlidableDismissal extends StatelessWidget {
   final bool closeOnCanceled;
 
   /// Called when the widget changes size (i.e., when contracting before being dismissed).
-  final VoidCallback onResize;
+  final VoidCallback? onResize;
 
   /// The amount of time the widget will spend contracting before [onDismissed] is called.
   ///
   /// If null, the widget will not contract and [onDismissed] will be called
   /// immediately after the widget is dismissed.
-  final Duration resizeDuration;
+  final Duration? resizeDuration;
 
   /// Defines the end offset across the main axis after the card is dismissed.
   ///
@@ -86,18 +87,18 @@ class SlidableDismissal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData data = SlidableData.of(context)!;
 
     return AnimatedBuilder(
       animation: data.overallMoveAnimation,
-      child: child,
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         if (data.overallMoveAnimation.value > data.totalActionsExtent) {
-          return child;
+          return child!;
         } else {
           return data.slidable.actionPane;
         }
       },
+      child: child,
     );
   }
 }
@@ -108,11 +109,11 @@ class SlidableDismissal extends StatelessWidget {
 class SlidableDrawerDismissal extends StatelessWidget {
   /// Creates a specific dismissal that creates slide actions that are displayed like drawers
   /// while the item is dismissing.
-  const SlidableDrawerDismissal({Key key}) : super(key: key);
+  const SlidableDrawerDismissal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData data = SlidableData.of(context)!;
 
     final animation = Tween<Offset>(
       begin: Offset.zero,
@@ -121,14 +122,14 @@ class SlidableDrawerDismissal extends StatelessWidget {
 
     final count = data.actionCount;
 
-    final extentAnimations = Iterable.generate(count).map((index) {
+    final extentAnimations = Iterable<int>.generate(count).map((index) {
       return Tween<double>(
         begin: data.actionExtentRatio,
         end: 1 - data.actionExtentRatio * (data.actionCount - index - 1),
       ).animate(
         CurvedAnimation(
           parent: data.overallMoveAnimation,
-          curve: Interval(data.totalActionsExtent, 1.0),
+          curve: Interval(data.totalActionsExtent, 1),
         ),
       );
     }).toList();
@@ -142,14 +143,14 @@ class SlidableDrawerDismissal extends StatelessWidget {
                 child: Stack(
                   children: List.generate(data.actionCount, (index) {
                     // For the main actions we have to reverse the order if we want the last item at the bottom of the stack.
-                    int displayIndex =
+                    final displayIndex =
                         data.showActions ? data.actionCount - index - 1 : index;
 
                     return data.createFractionallyAlignedSizedBox(
                       positionFactor: data.actionExtentRatio *
                           (data.actionCount - index - 1),
                       extentFactor: extentAnimations[index].value,
-                      child: data.actionDelegate.build(context, displayIndex,
+                      child: data.actionDelegate!.build(context, displayIndex,
                           data.actionsMoveAnimation, data.renderingMode),
                     );
                   }),

@@ -8,18 +8,13 @@ import 'controller.dart';
 
 class SlidableGestureDetector extends StatefulWidget {
   const SlidableGestureDetector({
-    Key key,
+    Key? key,
     this.enabled = true,
-    @required this.controller,
-    @required this.direction,
-    @required this.child,
+    required this.controller,
+    required this.direction,
+    required this.child,
     this.dragStartBehavior = DragStartBehavior.start,
-  })  : assert(enabled != null),
-        assert(controller != null),
-        assert(direction != null),
-        assert(child != null),
-        assert(dragStartBehavior != null),
-        super(key: key);
+  }) : super(key: key);
 
   final SlidableController controller;
   final Widget child;
@@ -50,8 +45,8 @@ class SlidableGestureDetector extends StatefulWidget {
 
 class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   double dragExtent = 0;
-  Offset startPosition;
-  Offset lastPosition;
+  late Offset startPosition;
+  late Offset lastPosition;
 
   bool get directionIsXAxis {
     return widget.direction == Axis.horizontal;
@@ -75,8 +70,8 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   }
 
   double get overallDragAxisExtent {
-    final Size size = context.size;
-    return directionIsXAxis ? size.width : size.height;
+    final Size? size = context.size;
+    return directionIsXAxis ? size!.width : size!.height;
   }
 
   void handleDragStart(DragStartDetails details) {
@@ -88,7 +83,7 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   }
 
   void handleDragUpdate(DragUpdateDetails details) {
-    final delta = details.primaryDelta;
+    final delta = details.primaryDelta!;
     dragExtent += delta;
     lastPosition = details.localPosition;
     widget.controller.ratio = dragExtent / overallDragAxisExtent;

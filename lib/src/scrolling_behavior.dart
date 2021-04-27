@@ -7,14 +7,11 @@ import 'controller.dart';
 
 class SlidableScrollingBehavior extends StatefulWidget {
   const SlidableScrollingBehavior({
-    Key key,
-    @required this.controller,
+    Key? key,
+    required this.controller,
     this.closeOnScroll = true,
-    @required this.child,
-  })  : assert(controller != null),
-        assert(closeOnScroll != null),
-        assert(child != null),
-        super(key: key);
+    required this.child,
+  }) : super(key: key);
 
   final SlidableController controller;
 
@@ -35,7 +32,7 @@ class SlidableScrollingBehavior extends StatefulWidget {
 }
 
 class _SlidableScrollingBehaviorState extends State<SlidableScrollingBehavior> {
-  ScrollPosition scrollPosition;
+  ScrollPosition? scrollPosition;
 
   @override
   void didChangeDependencies() {
@@ -63,19 +60,19 @@ class _SlidableScrollingBehaviorState extends State<SlidableScrollingBehavior> {
     if (widget.closeOnScroll) {
       scrollPosition = Scrollable.of(context)?.position;
       if (scrollPosition != null) {
-        scrollPosition.isScrollingNotifier.addListener(handleScrollingChanged);
+        scrollPosition!.isScrollingNotifier.addListener(handleScrollingChanged);
       }
     }
   }
 
   void removeScrollingNotifierListener() {
-    scrollPosition?.isScrollingNotifier?.removeListener(handleScrollingChanged);
+    scrollPosition?.isScrollingNotifier.removeListener(handleScrollingChanged);
   }
 
   void handleScrollingChanged() {
     if (widget.closeOnScroll &&
         scrollPosition != null &&
-        scrollPosition.isScrollingNotifier.value) {
+        scrollPosition!.isScrollingNotifier.value) {
       widget.controller.close();
     }
   }

@@ -14,25 +14,6 @@ void main() {
   });
 
   group('SlidableNotificationSender -', () {
-    test(
-      'constructor asserts',
-      () {
-        final values = [
-          mockSlidableController,
-          const SizedBox(),
-        ];
-
-        testConstructorAsserts(
-          values: values,
-          factory: (valueOrNull) => SlidableNotificationSender(
-            tag: null,
-            controller: valueOrNull(0),
-            child: valueOrNull(1),
-          ),
-        );
-      },
-    );
-
     testWidgets(
       'should build outside of a SlidableNotificationListener',
       (tester) async {
@@ -58,31 +39,6 @@ void main() {
         );
       },
     );
-  });
-
-  group('SlidableNotificationListener -', () {
-    test('constructor asserts', () {
-      final values = [
-        true,
-        const SizedBox(),
-      ];
-
-      testConstructorAsserts(
-        values: values,
-        factory: (valueOrNull) => SlidableNotificationListener(
-          autoClose: valueOrNull(0),
-          child: valueOrNull(1),
-        ),
-      );
-
-      expect(
-        () => SlidableNotificationListener(
-          autoClose: false,
-          child: const SizedBox(),
-        ),
-        throwsAssertionError,
-      );
-    });
   });
 
   group('SlidableNotificationListener & SlidableNotificationSender -', () {

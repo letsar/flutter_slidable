@@ -7,14 +7,11 @@ import 'controller.dart';
 
 class SlidableDismissal extends StatefulWidget {
   const SlidableDismissal({
-    Key key,
-    @required this.axis,
-    @required this.controller,
-    @required this.child,
-  })  : assert(axis != null),
-        assert(controller != null),
-        assert(child != null),
-        super(key: key);
+    Key? key,
+    required this.axis,
+    required this.controller,
+    required this.child,
+  }) : super(key: key);
 
   final Axis axis;
   final Widget child;
@@ -27,8 +24,8 @@ class SlidableDismissal extends StatefulWidget {
 class _SlidableDismissalState extends State<SlidableDismissal>
     with SingleTickerProviderStateMixin {
   bool resized = false;
-  AnimationController animationController;
-  Animation<double> resizeAnimation;
+  late AnimationController animationController;
+  late Animation<double> resizeAnimation;
 
   @override
   void initState() {
@@ -60,9 +57,9 @@ class _SlidableDismissalState extends State<SlidableDismissal>
     final resizeRequest = widget.controller.resizeRequest.value;
 
     if (widget.controller.animation.status == AnimationStatus.completed) {
-      animationController.duration = resizeRequest.duration;
+      animationController.duration = resizeRequest!.duration;
       animationController.forward(from: 0).then((_) {
-        resizeRequest.onDismissed?.call();
+        resizeRequest.onDismissed.call();
       });
       setState(() {
         resized = true;

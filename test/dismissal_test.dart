@@ -9,26 +9,6 @@ import 'common.dart';
 
 void main() {
   group('SlidableDismissal', () {
-    test(
-      'constructor asserts',
-      () {
-        final values = [
-          Axis.horizontal,
-          SlidableController(const TestVSync()),
-          const SizedBox(),
-        ];
-
-        testConstructorAsserts(
-          values: values,
-          factory: (valueOrNull) => SlidableDismissal(
-            axis: valueOrNull(0),
-            controller: valueOrNull(1),
-            child: valueOrNull(2),
-          ),
-        );
-      },
-    );
-
     testWidgets('has 0 height when horizontal and dismissed', (tester) async {
       final slidableController = SlidableController(const TestVSync());
 
@@ -113,8 +93,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      FlutterError flutterError;
-      flutterError = tester.takeException() as FlutterError;
+      FlutterError? flutterError;
+      flutterError = tester.takeException() as FlutterError?;
       expect(flutterError, isNull);
 
       await tester.pumpWidget(
@@ -132,7 +112,7 @@ void main() {
         ),
       );
 
-      flutterError = tester.takeException() as FlutterError;
+      flutterError = tester.takeException() as FlutterError?;
       expect(flutterError, isNotNull);
     });
 

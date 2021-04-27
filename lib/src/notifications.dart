@@ -25,11 +25,11 @@ class SlidableNotification {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
   const SlidableNotification({
-    @required this.tag,
+    required this.tag,
   });
 
   /// A tag representing the [Slidable] from which the notification is sent.
-  final Object tag;
+  final Object? tag;
 
   /// Start bubbling this notification at the given build context.
   ///
@@ -38,11 +38,11 @@ class SlidableNotification {
   /// If the [BuildContext] is null, the notification is not dispatched.
   void dispatch(BuildContext context, SlidableController controller) {
     final scope = context
-        ?.getElementForInheritedWidgetOfExactType<
+        .getElementForInheritedWidgetOfExactType<
             _SlidableNotificationListenerScope>()
-        ?.widget as _SlidableNotificationListenerScope;
+        ?.widget as _SlidableNotificationListenerScope?;
 
-    scope?.state?.acceptNotification(controller, this);
+    scope?.state.acceptNotification(controller, this);
   }
 
   @override
@@ -68,8 +68,8 @@ class SlidableNotification {
 class SlidableRatioNotification extends SlidableNotification {
   /// Creates a [SlidableRatioNotification].
   const SlidableRatioNotification({
-    @required Object tag,
-    @required this.ratio,
+    required Object? tag,
+    required this.ratio,
   }) : super(tag: tag);
 
   /// The ratio value of the [SlidableController].
@@ -95,16 +95,14 @@ class SlidableRatioNotification extends SlidableNotification {
 class SlidableNotificationListener extends StatefulWidget {
   /// Creates a [SlidableNotificationListener].
   const SlidableNotificationListener({
-    Key key,
+    Key? key,
     this.onNotification,
     this.autoClose = true,
-    @required this.child,
-  })  : assert(autoClose != null),
-        assert(
+    required this.child,
+  })   : assert(
           autoClose || onNotification != null,
           'Either autoClose or onNotification must be set.',
         ),
-        assert(child != null),
         super(key: key);
 
   /// The widget directly below this widget in the tree.
@@ -116,7 +114,7 @@ class SlidableNotificationListener extends StatefulWidget {
 
   /// Called when a notification of the appropriate arrives at this location in
   /// the tree.
-  final SlidableNotificationCallback onNotification;
+  final SlidableNotificationCallback? onNotification;
 
   /// Whether to automatically close any [Slidable] with a given tag when
   /// another [Slidable] with the same tag opens.
@@ -129,8 +127,8 @@ class SlidableNotificationListener extends StatefulWidget {
 
 class _SlidableNotificationListenerState
     extends State<SlidableNotificationListener> {
-  final Map<Object, SlidableController> openControllers =
-      <Object, SlidableController>{};
+  final Map<Object?, SlidableController> openControllers =
+      <Object?, SlidableController>{};
 
   void acceptNotification(
     SlidableController controller,
@@ -154,7 +152,7 @@ class _SlidableNotificationListenerState
     }
   }
 
-  void clearController(SlidableController controller, Object tag) {
+  void clearController(SlidableController controller, Object? tag) {
     final lastOpenController = openControllers[tag];
     if (lastOpenController == controller) {
       openControllers.remove(tag);
@@ -172,9 +170,9 @@ class _SlidableNotificationListenerState
 
 class _SlidableNotificationListenerScope extends InheritedWidget {
   const _SlidableNotificationListenerScope({
-    Key key,
-    @required this.state,
-    @required Widget child,
+    Key? key,
+    required this.state,
+    required Widget child,
   }) : super(key: key, child: child);
 
   final _SlidableNotificationListenerState state;
@@ -190,15 +188,13 @@ class _SlidableNotificationListenerScope extends InheritedWidget {
 // ignore_for_file: public_member_api_docs
 class SlidableNotificationSender extends StatefulWidget {
   const SlidableNotificationSender({
-    Key key,
-    @required this.tag,
-    @required this.controller,
-    @required this.child,
-  })  : assert(controller != null),
-        assert(child != null),
-        super(key: key);
+    Key? key,
+    required this.tag,
+    required this.controller,
+    required this.child,
+  }) : super(key: key);
 
-  final Object tag;
+  final Object? tag;
   final SlidableController controller;
   final Widget child;
 
@@ -209,7 +205,7 @@ class SlidableNotificationSender extends StatefulWidget {
 
 class _SlidableNotificationSenderState
     extends State<SlidableNotificationSender> {
-  _SlidableNotificationListenerState listenerState;
+  _SlidableNotificationListenerState? listenerState;
 
   @override
   void didChangeDependencies() {
@@ -232,7 +228,7 @@ class _SlidableNotificationSenderState
   void dispose() {
     if (listenerState != null) {
       removeListeners();
-      listenerState.clearController(widget.controller, widget.tag);
+      listenerState!.clearController(widget.controller, widget.tag);
     }
     super.dispose();
   }
@@ -251,7 +247,7 @@ class _SlidableNotificationSenderState
       tag: widget.tag,
       ratio: controller.ratio,
     );
-    listenerState.acceptNotification(controller, notification);
+    listenerState!.acceptNotification(controller, notification);
   }
 
   @override

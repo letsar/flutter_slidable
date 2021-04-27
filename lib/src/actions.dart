@@ -18,17 +18,14 @@ class CustomSlidableAction extends StatelessWidget {
   ///
   /// The [flex] argument must also be greater than 0.
   const CustomSlidableAction({
-    Key key,
+    Key? key,
     this.flex = _kFlex,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
-    @required this.onPressed,
-    @required this.child,
-  })  : assert(flex != null && flex > 0),
-        assert(backgroundColor != null),
-        assert(autoClose != null),
-        assert(child != null),
+    required this.onPressed,
+    required this.child,
+  })   : assert(flex > 0),
         super(key: key);
 
   /// {@template slidable.actions.flex}
@@ -54,7 +51,7 @@ class CustomSlidableAction extends StatelessWidget {
   /// [Brightness.light], or to [Colors.white] if [background]'s brightness is
   /// [Brightness.dark].
   /// {@endtemplate}
-  final Color foregroundColor;
+  final Color? foregroundColor;
 
   /// {@template slidable.actions.autoClose}
   /// Whether the enclosing [Slidable] will be closed after [onPressed]
@@ -67,7 +64,7 @@ class CustomSlidableAction extends StatelessWidget {
   ///
   /// If this callback is null, then the action will be disabled.
   /// {@endtemplate}
-  final SlidableActionCallback onPressed;
+  final SlidableActionCallback? onPressed;
 
   /// Typically the action's icon or label.
   final Widget child;
@@ -117,20 +114,17 @@ class SlidableAction extends StatelessWidget {
   ///
   /// The [flex] argument must also be greater than 0.
   const SlidableAction({
-    Key key,
+    Key? key,
     this.flex = _kFlex,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
-    @required this.onPressed,
+    required this.onPressed,
     this.icon,
     this.spacing = 4,
     this.label,
-  })  : assert(flex != null && flex > 0),
-        assert(backgroundColor != null),
-        assert(autoClose != null),
+  })  : assert(flex > 0),
         assert(icon != null || label != null),
-        assert(spacing != null),
         super(key: key);
 
   /// {@macro slidable.actions.flex}
@@ -140,16 +134,16 @@ class SlidableAction extends StatelessWidget {
   final Color backgroundColor;
 
   /// {@macro slidable.actions.foregroundColor}
-  final Color foregroundColor;
+  final Color? foregroundColor;
 
   /// {@macro slidable.actions.autoClose}
   final bool autoClose;
 
   /// {@macro slidable.actions.onPressed}
-  final SlidableActionCallback onPressed;
+  final SlidableActionCallback? onPressed;
 
   /// An icon to display above the [label].
-  final IconData icon;
+  final IconData? icon;
 
   /// The space between [icon] and [label] if both set.
   ///
@@ -157,7 +151,7 @@ class SlidableAction extends StatelessWidget {
   final double spacing;
 
   /// A label to display below the [icon].
-  final String label;
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +172,7 @@ class SlidableAction extends StatelessWidget {
 
       children.add(
         Text(
-          label,
+          label!,
           overflow: TextOverflow.ellipsis,
         ),
       );

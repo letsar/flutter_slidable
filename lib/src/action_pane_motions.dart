@@ -11,12 +11,12 @@ class BehindMotion extends StatelessWidget {
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/behind_motion.mp4}
   const BehindMotion({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final paneData = ActionPane.of(context);
+    final paneData = ActionPane.of(context)!;
     return Flex(
       direction: paneData.direction,
       children: paneData.children,
@@ -31,18 +31,18 @@ class StretchMotion extends StatelessWidget {
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/stretch_motion.mp4}
   const StretchMotion({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final paneData = ActionPane.of(context);
-    final controller = Slidable.of(context);
+    final controller = Slidable.of(context)!;
 
     return AnimatedBuilder(
       animation: controller.animation,
-      builder: (BuildContext context, Widget child) {
-        final value = controller.animation.value / paneData.extentRatio;
+      builder: (BuildContext context, Widget? child) {
+        final value = controller.animation.value / paneData!.extentRatio;
 
         return FractionallySizedBox(
           alignment: paneData.alignment,
@@ -63,13 +63,13 @@ class ScrollMotion extends StatelessWidget {
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/scroll_motion.mp4}
   const ScrollMotion({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final paneData = ActionPane.of(context);
-    final controller = Slidable.of(context);
+    final paneData = ActionPane.of(context)!;
+    final controller = Slidable.of(context)!;
 
     // Each child starts just outside of the Slidable.
     final startOffset = Offset(paneData.alignment.x, paneData.alignment.y);
@@ -91,13 +91,13 @@ class DrawerMotion extends StatelessWidget {
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/drawer_motion.mp4}
   const DrawerMotion({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final paneData = ActionPane.of(context);
-    final controller = Slidable.of(context);
+    final paneData = ActionPane.of(context)!;
+    final controller = Slidable.of(context)!;
     final animation = controller.animation
         .drive(CurveTween(curve: Interval(0, paneData.extentRatio)));
 

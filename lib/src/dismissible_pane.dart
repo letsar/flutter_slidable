@@ -26,22 +26,15 @@ class DismissiblePane extends StatefulWidget {
   ///
   /// You must set the key of the enclosing [Slidable] to use this widget.
   const DismissiblePane({
-    Key key,
-    @required this.onDismissed,
+    Key? key,
+    required this.onDismissed,
     this.dismissThreshold = _kDismissThreshold,
     this.dismissalDuration = _kDismissalDuration,
     this.resizeDuration = _kResizeDuration,
     this.confirmDismiss,
     this.closeOnCancel = false,
     this.motion = const InversedDrawerMotion(),
-  })  : assert(onDismissed != null),
-        assert(dismissThreshold != null &&
-            dismissThreshold > 0 &&
-            dismissThreshold < 1),
-        assert(dismissalDuration != null),
-        assert(resizeDuration != null),
-        assert(closeOnCancel != null),
-        assert(motion != null),
+  })  : assert(dismissThreshold > 0 && dismissThreshold < 1),
         super(key: key);
 
   /// The threshold from which a dismiss will be triggered if the user stops
@@ -72,7 +65,7 @@ class DismissiblePane extends StatefulWidget {
   ///
   /// If the returned Future<bool> completes to false or null the [onDismissed]
   /// callback will not run.
-  final ConfirmDismissCallback confirmDismiss;
+  final ConfirmDismissCallback? confirmDismiss;
 
   /// Called when the widget has been dismissed, after finishing resizing.
   final VoidCallback onDismissed;
@@ -88,13 +81,13 @@ class DismissiblePane extends StatefulWidget {
 }
 
 class _DismissiblePaneState extends State<DismissiblePane> {
-  SlidableController controller;
+  SlidableController? controller;
 
   @override
   void initState() {
     super.initState();
     assert(() {
-      final slidable = context.findAncestorWidgetOfExactType<Slidable>();
+      final slidable = context.findAncestorWidgetOfExactType<Slidable>()!;
       if (slidable.key == null) {
         throw FlutterError.fromParts(<DiagnosticsNode>[
           ErrorSummary('DismissiblePane created on a Slidable without a Key.'),
@@ -118,37 +111,37 @@ class _DismissiblePaneState extends State<DismissiblePane> {
       return true;
     }());
     controller = Slidable.of(context);
-    controller.dismissGesture.addListener(handleDismissGestureChanged);
+    controller!.dismissGesture.addListener(handleDismissGestureChanged);
   }
 
   @override
   void dispose() {
-    controller.dismissGesture.removeListener(handleDismissGestureChanged);
+    controller!.dismissGesture.removeListener(handleDismissGestureChanged);
     super.dispose();
   }
 
   Future<void> handleDismissGestureChanged() async {
-    final endGesture = controller.dismissGesture.value.endGesture;
-    final position = controller.animation.value;
+    final endGesture = controller!.dismissGesture.value!.endGesture;
+    final position = controller!.animation.value;
 
     if (endGesture is OpeningGesture ||
         endGesture is StillGesture && position >= widget.dismissThreshold) {
       bool canDismiss = true;
       if (widget.confirmDismiss != null) {
-        canDismiss = (await widget.confirmDismiss()) ?? false;
+        canDismiss = await widget.confirmDismiss!();
       }
       if (canDismiss) {
-        controller.dismiss(
+        controller!.dismiss(
           ResizeRequest(widget.resizeDuration, widget.onDismissed),
           duration: widget.dismissalDuration,
         );
       } else if (widget.closeOnCancel) {
-        controller.close();
+        controller!.close();
       }
       return;
     }
 
-    controller.openCurrentActionPane();
+    controller!.openCurrentActionPane();
   }
 
   @override

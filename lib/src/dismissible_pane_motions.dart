@@ -8,13 +8,13 @@ import 'slidable.dart';
 class InversedDrawerMotion extends StatelessWidget {
   /// Creates a [InversedDrawerMotion].
   const InversedDrawerMotion({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final paneData = ActionPane.of(context);
-    final controller = Slidable.of(context);
+    final paneData = ActionPane.of(context)!;
+    final controller = Slidable.of(context)!;
     final animation = controller.animation
         .drive(CurveTween(curve: Interval(paneData.extentRatio, 1)));
 

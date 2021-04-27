@@ -17,7 +17,7 @@ class Slidable extends StatefulWidget {
   /// The [enabled], [closeOnScroll], [direction], [dragStartBehavior],
   /// [useTextDirection] and [child] arguments must not be null.
   const Slidable({
-    Key key,
+    Key? key,
     this.groupTag,
     this.enabled = true,
     this.closeOnScroll = true,
@@ -26,14 +26,8 @@ class Slidable extends StatefulWidget {
     this.direction = Axis.horizontal,
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
-    @required this.child,
-  })  : assert(enabled != null),
-        assert(closeOnScroll != null),
-        assert(direction != null),
-        assert(dragStartBehavior != null),
-        assert(useTextDirection != null),
-        assert(child != null),
-        super(key: key);
+    required this.child,
+  }) : super(key: key);
 
   /// Whether this slidable is interactive.
   ///
@@ -52,21 +46,21 @@ class Slidable extends StatefulWidget {
   ///
   /// This is used by [SlidableNotificationListener] to keep only one [Slidable]
   /// of the same group, open.
-  final Object groupTag;
+  final Object? groupTag;
 
   /// A widget which is shown when the user drags the [Slidable] to the right or
   /// to the bottom.
   ///
   /// When [direction] is [Axis.horizontal] and [useTextDirection] is true, the
   /// [startActionPane] is determined by the ambient [TextDirection].
-  final ActionPane startActionPane;
+  final ActionPane? startActionPane;
 
   /// A widget which is shown when the user drags the [Slidable] to the left or
   /// to the top.
   ///
   /// When [direction] is [Axis.horizontal] and [useTextDirection] is true, the
   /// [startActionPane] is determined by the ambient [TextDirection].
-  final ActionPane endActionPane;
+  final ActionPane? endActionPane;
 
   /// The direction in which this [Slidable] can be dragged.
   ///
@@ -117,19 +111,19 @@ class Slidable extends StatefulWidget {
   /// SlidableController controller = Slidable.of(context);
   /// ```
   /// {@end-tool}
-  static SlidableController of(BuildContext context) {
+  static SlidableController? of(BuildContext context) {
     final scope = context
         .getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()
-        ?.widget as _SlidableControllerScope;
+        ?.widget as _SlidableControllerScope?;
     return scope?.controller;
   }
 }
 
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  SlidableController controller;
-  Animation<Offset> moveAnimation;
-  bool keepPanesOrder;
+  SlidableController? controller;
+  late Animation<Offset> moveAnimation;
+  late bool keepPanesOrder;
 
   @override
   bool get wantKeepAlive => !widget.closeOnScroll;
@@ -158,26 +152,25 @@ class _SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
-    controller.dispose();
+    controller!.actionPaneType.removeListener(handleActionPanelTypeChanged);
+    controller!.dispose();
     super.dispose();
   }
 
   void updateController() {
-    controller
+    controller!
       ..enableStartActionPane = widget.startActionPane != null
-      ..startActionPaneExtentRatio = startActionPane?.extentRatio;
+      ..startActionPaneExtentRatio = startActionPane?.extentRatio ?? 0;
 
-    controller
+    controller!
       ..enableEndActionPane = widget.endActionPane != null
-      ..endActionPaneExtentRatio = endActionPane?.extentRatio;
+      ..endActionPaneExtentRatio = endActionPane?.extentRatio ?? 0;
   }
 
   void updateIsLeftToRight() {
     final textDirection = Directionality.of(context);
     keepPanesOrder = widget.direction == Axis.vertical ||
         !widget.useTextDirection ||
-        textDirection == null ||
         textDirection == TextDirection.ltr;
   }
 
@@ -188,14 +181,14 @@ class _SlidableState extends State<Slidable>
   }
 
   void handleDismissing() {
-    if (controller.resizeRequest != null) {
+    if (controller!.resizeRequest.value != null) {
       setState(() {});
     }
   }
 
   void updateMoveAnimation() {
-    final double end = controller.actionPaneType.value.toSign();
-    moveAnimation = controller.animation.drive(
+    final double end = controller!.actionPaneType.value.toSign();
+    moveAnimation = controller!.animation.drive(
       Tween<Offset>(
         begin: Offset.zero,
         end: widget.direction == Axis.horizontal
@@ -205,8 +198,8 @@ class _SlidableState extends State<Slidable>
     );
   }
 
-  Widget get actionPane {
-    switch (controller.actionPaneType.value) {
+  Widget? get actionPane {
+    switch (controller!.actionPaneType.value) {
       case ActionPaneType.start:
         return startActionPane;
       case ActionPaneType.end:
@@ -216,13 +209,13 @@ class _SlidableState extends State<Slidable>
     }
   }
 
-  ActionPane get startActionPane =>
+  ActionPane? get startActionPane =>
       keepPanesOrder ? widget.startActionPane : widget.endActionPane;
-  ActionPane get endActionPane =>
+  ActionPane? get endActionPane =>
       keepPanesOrder ? widget.endActionPane : widget.startActionPane;
 
   Alignment get actionPaneAlignment {
-    final sign = controller.actionPaneType.value.toSign();
+    final sign = controller!.actionPaneType.value.toSign();
     if (widget.direction == Axis.horizontal) {
       return Alignment(-sign, 0);
     } else {
@@ -246,7 +239,7 @@ class _SlidableState extends State<Slidable>
             child: ClipRect(
               clipper: _SlidableClipper(
                 axis: widget.direction,
-                controller: controller,
+                controller: controller!,
               ),
               child: actionPane,
             ),
@@ -257,23 +250,23 @@ class _SlidableState extends State<Slidable>
 
     return SlidableGestureDetector(
       enabled: widget.enabled,
-      controller: controller,
+      controller: controller!,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
       child: SlidableNotificationSender(
         tag: widget.groupTag,
-        controller: controller,
+        controller: controller!,
         child: SlidableScrollingBehavior(
-          controller: controller,
+          controller: controller!,
           closeOnScroll: widget.closeOnScroll,
           child: SlidableDismissal(
             axis: flipAxis(widget.direction),
-            controller: controller,
+            controller: controller!,
             child: ActionPaneConfiguration(
               alignment: actionPaneAlignment,
               direction: widget.direction,
               isStartActionPane:
-                  controller.actionPaneType.value == ActionPaneType.start,
+                  controller!.actionPaneType.value == ActionPaneType.start,
               child: _SlidableControllerScope(
                 controller: controller,
                 child: content,
@@ -288,12 +281,12 @@ class _SlidableState extends State<Slidable>
 
 class _SlidableControllerScope extends InheritedWidget {
   const _SlidableControllerScope({
-    Key key,
-    @required this.controller,
-    Widget child,
+    Key? key,
+    required this.controller,
+    required Widget child,
   }) : super(key: key, child: child);
 
-  final SlidableController controller;
+  final SlidableController? controller;
 
   @override
   bool updateShouldNotify(_SlidableControllerScope old) {
@@ -303,18 +296,15 @@ class _SlidableControllerScope extends InheritedWidget {
 
 class _SlidableClipper extends CustomClipper<Rect> {
   _SlidableClipper({
-    @required this.axis,
-    @required this.controller,
-  })  : assert(axis != null),
-        assert(controller != null),
-        super(reclip: controller.animation);
+    required this.axis,
+    required this.controller,
+  }) : super(reclip: controller.animation);
 
   final Axis axis;
   final SlidableController controller;
 
   @override
   Rect getClip(Size size) {
-    assert(axis != null);
     switch (axis) {
       case Axis.horizontal:
         final double offset = controller.ratio * size.width;
@@ -334,7 +324,6 @@ class _SlidableClipper extends CustomClipper<Rect> {
         }
         return Rect.fromLTRB(0, 0, size.width, offset);
     }
-    return null;
   }
 
   @override

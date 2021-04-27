@@ -42,9 +42,9 @@ void main() {
 }
 
 void testMotionForAllModes({
-  @required Widget motion,
-  @required List<double> startCenters,
-  @required List<double> endCenters,
+  required Widget motion,
+  required List<double> startCenters,
+  required List<double> endCenters,
 }) {
   const directions = Axis.values;
   final isStartValues = [true, false];
@@ -67,11 +67,11 @@ void testMotionForAllModes({
 }
 
 Future<void> testMotion({
-  @required WidgetTester tester,
-  @required Widget motion,
-  @required bool isStart,
-  @required Axis direction,
-  @required List<double> centers,
+  required WidgetTester tester,
+  required Widget motion,
+  required bool isStart,
+  required Axis direction,
+  required List<double> centers,
 }) async {
   const key1 = ValueKey(1);
   const key2 = ValueKey(2);

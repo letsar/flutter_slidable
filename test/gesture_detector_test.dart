@@ -16,27 +16,6 @@ void main() {
   });
 
   group('SlidableGestureDetector -', () {
-    test('constructor asserts', () {
-      final values = [
-        true,
-        mockSlidableController,
-        Axis.horizontal,
-        DragStartBehavior.down,
-        const SizedBox(),
-      ];
-
-      testConstructorAsserts(
-        values: values,
-        factory: (valueOrNull) => SlidableGestureDetector(
-          enabled: valueOrNull(0),
-          controller: valueOrNull(1),
-          direction: valueOrNull(2),
-          dragStartBehavior: valueOrNull(3),
-          child: valueOrNull(4),
-        ),
-      );
-    });
-
     testWidgets('can slide horizontally', (tester) async {
       final slidableController = SlidableController(const TestVSync());
 
@@ -153,13 +132,13 @@ void main() {
 
     testWidgets('handleEndGesture should be called with the correct direction',
         (tester) async {
-      double ratio = 0;
+      double? ratio = 0;
       when(() => mockSlidableController.ratio)
-          .thenAnswer((realInvocation) => ratio);
+          .thenAnswer((realInvocation) => ratio!);
       when(() => mockSlidableController.ratio = any())
           .thenAnswer((realInvocation) {
-        ratio = realInvocation.positionalArguments[0] as double;
-        return ratio;
+        ratio = realInvocation.positionalArguments[0] as double?;
+        return ratio!;
       });
 
       final mockActionPanelType = ValueNotifier(ActionPaneType.none);

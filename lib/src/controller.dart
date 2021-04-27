@@ -53,7 +53,7 @@ class DismissGesture {
   const DismissGesture(this.endGesture);
 
   /// The [EndGesture] provoking this one.
-  final EndGesture endGesture;
+  final EndGesture? endGesture;
 }
 
 /// Represents the end of a gesture on [Slidable].
@@ -113,42 +113,36 @@ class SlidableController {
 
   /// The extent ratio of the start action pane.
   double get startActionPaneExtentRatio => _startActionPaneExtentRatio;
-  double _startActionPaneExtentRatio;
+  double _startActionPaneExtentRatio = 0;
   set startActionPaneExtentRatio(double value) {
-    if (_startActionPaneExtentRatio != value &&
-        value != null &&
-        value >= 0 &&
-        value <= 1) {
+    if (_startActionPaneExtentRatio != value && value >= 0 && value <= 1) {
       _startActionPaneExtentRatio = value;
     }
   }
 
   /// The extent ratio of the end action pane.
   double get endActionPaneExtentRatio => _endActionPaneExtentRatio;
-  double _endActionPaneExtentRatio;
+  double _endActionPaneExtentRatio = 0;
   set endActionPaneExtentRatio(double value) {
-    if (_endActionPaneExtentRatio != value &&
-        value != null &&
-        value >= 0 &&
-        value <= 1) {
+    if (_endActionPaneExtentRatio != value && value >= 0 && value <= 1) {
       _endActionPaneExtentRatio = value;
     }
   }
 
   /// The current action pane configurator.
-  RatioConfigurator actionPaneConfigurator;
+  RatioConfigurator? actionPaneConfigurator;
 
   /// The value of the ratio over time.
   Animation<double> get animation => _animationController.view;
 
   /// Track the end gestures.
-  final ValueNotifier<EndGesture> endGesture;
+  final ValueNotifier<EndGesture?> endGesture;
 
   /// Track the dismiss gestures.
-  final ValueNotifier<DismissGesture> dismissGesture;
+  final ValueNotifier<DismissGesture?> dismissGesture;
 
   /// Track the resize requests.
-  final ValueNotifier<ResizeRequest> resizeRequest;
+  final ValueNotifier<ResizeRequest?> resizeRequest;
 
   /// Track the type of the action pane.
   final ValueNotifier<ActionPaneType> actionPaneType;
@@ -163,7 +157,7 @@ class SlidableController {
             ((ratio > 0 && enableStartActionPane) ||
                     (ratio < 0 && enableEndActionPane)) &&
                 (actionPaneConfigurator == null ||
-                    actionPaneConfigurator.canChangeRatio(ratio.abs())));
+                    actionPaneConfigurator!.canChangeRatio(ratio.abs())));
   }
 
   /// The current ratio of the full size of the [Slidable] that is already
@@ -186,7 +180,7 @@ class SlidableController {
 
   /// Dispatches a new [EndGesture] determined by the given [velocity] and
   /// [direction].
-  void dispatchEndGesture(double velocity, GestureDirection direction) {
+  void dispatchEndGesture(double? velocity, GestureDirection direction) {
     if (velocity == 0 || velocity == null) {
       endGesture.value = StillGesture(direction);
     } else if (velocity.sign == actionPaneType.value.toSign()) {
@@ -215,11 +209,8 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
-    assert(actionPaneConfigurator != null);
-    assert(duration != null);
-
     return openTo(
-      actionPaneConfigurator.extentRatio,
+      actionPaneConfigurator!.extentRatio,
       duration: duration,
       curve: curve,
     );
@@ -230,8 +221,6 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
-    assert(duration != null);
-
     if (actionPaneType.value != ActionPaneType.start) {
       actionPaneType.value = ActionPaneType.start;
       ratio = 0;
@@ -249,8 +238,6 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
-    assert(duration != null);
-
     if (actionPaneType.value != ActionPaneType.end) {
       actionPaneType.value = ActionPaneType.end;
       ratio = 0;
@@ -269,8 +256,7 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
-    assert(ratio != null && ratio >= -1 && ratio <= 1);
-    assert(duration != null);
+    assert(ratio >= -1 && ratio <= 1);
 
     if (_closing) {
       return;

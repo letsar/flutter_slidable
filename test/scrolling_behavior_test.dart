@@ -14,23 +14,6 @@ void main() {
   });
 
   group('SlidableScrollingBehavior -', () {
-    test('constructor asserts', () {
-      final values = [
-        mockSlidableController,
-        true,
-        const SizedBox(),
-      ];
-
-      testConstructorAsserts(
-        values: values,
-        factory: (valueOrNull) => SlidableScrollingBehavior(
-          controller: valueOrNull(0),
-          closeOnScroll: valueOrNull(1),
-          child: valueOrNull(2),
-        ),
-      );
-    });
-
     testWidgets('should build outside a Scrollable', (tester) async {
       await tester.pumpWidget(
         SlidableScrollingBehavior(
@@ -43,6 +26,13 @@ void main() {
     testWidgets(
         'should close the slidable when scrolling and closeOnScroll is true',
         (tester) async {
+      when(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      ).thenAnswer((invocation) => Future.value());
+
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -122,6 +112,13 @@ void main() {
     testWidgets(
         'should not close the slidable when scrolling and closeOnScroll become false',
         (tester) async {
+      when(
+        () => mockSlidableController.close(
+          duration: any(named: 'duration'),
+          curve: any(named: 'curve'),
+        ),
+      ).thenAnswer((invocation) => Future.value());
+
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,

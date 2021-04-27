@@ -12,29 +12,6 @@ import 'common.dart';
 
 void main() {
   group('DismissiblePane', () {
-    test('constructor asserts', () {
-      final values = [
-        () {},
-        0.75,
-        const Duration(milliseconds: 300),
-        const Duration(milliseconds: 300),
-        true,
-        const InversedDrawerMotion(),
-      ];
-
-      testConstructorAsserts(
-        values: values,
-        factory: (valueOrNull) => DismissiblePane(
-          onDismissed: valueOrNull(0),
-          dismissThreshold: valueOrNull(1),
-          dismissalDuration: valueOrNull(2),
-          resizeDuration: valueOrNull(3),
-          closeOnCancel: valueOrNull(4),
-          motion: valueOrNull(5),
-        ),
-      );
-    });
-
     testWidgets('throws if Slidable has not key', (tester) async {
       void handleDismissed() {}
 
@@ -74,7 +51,7 @@ void main() {
         const Duration(milliseconds: 400),
       );
 
-      final flutterError = tester.takeException() as FlutterError;
+      final flutterError = tester.takeException() as FlutterError?;
       expect(flutterError, isNotNull);
     });
 
@@ -245,7 +222,7 @@ void main() {
       }
 
       const startActionPaneKey = ValueKey('start');
-      SlidableController controller;
+      SlidableController? controller;
 
       await tester.pumpWidget(
         Directionality(
@@ -294,7 +271,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(dismissed, isFalse);
-      expect(controller.ratio, 0);
+      expect(controller!.ratio, 0);
     });
   });
 }

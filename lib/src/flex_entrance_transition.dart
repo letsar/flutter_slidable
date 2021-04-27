@@ -6,15 +6,12 @@ import 'package:flutter/rendering.dart';
 
 class FlexEntranceTransition extends MultiChildRenderObjectWidget {
   FlexEntranceTransition({
-    Key key,
-    @required this.mainAxisPosition,
-    @required this.direction,
-    @required this.startToEnd,
-    @required List<Widget> children,
-  })  : assert(mainAxisPosition != null),
-        assert(direction != null),
-        assert(startToEnd != null),
-        super(key: key, children: children);
+    Key? key,
+    required this.mainAxisPosition,
+    required this.direction,
+    required this.startToEnd,
+    required List<Widget> children,
+  }) : super(key: key, children: children);
 
   /// The direction to use as the main axis.
   final Axis direction;
@@ -45,7 +42,7 @@ class FlexEntranceTransition extends MultiChildRenderObjectWidget {
 }
 
 class _FlexEntranceTransitionParentData extends FlexParentData {
-  Tween<double> mainAxisPosition;
+  late Tween<double> mainAxisPosition;
 }
 
 class _RenderFlexEntranceTransition extends RenderBox
@@ -55,14 +52,11 @@ class _RenderFlexEntranceTransition extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderBox,
             _FlexEntranceTransitionParentData> {
   _RenderFlexEntranceTransition({
-    List<RenderBox> children,
+    List<RenderBox>? children,
     Axis direction = Axis.horizontal,
-    Animation<double> mainAxisPosition,
-    bool startToEnd,
-  })  : assert(direction != null),
-        assert(mainAxisPosition != null),
-        assert(startToEnd != null),
-        _direction = direction,
+    required Animation<double> mainAxisPosition,
+    required bool startToEnd,
+  })   : _direction = direction,
         _mainAxisPosition = mainAxisPosition,
         _startToEnd = startToEnd {
     addAll(children);
@@ -72,7 +66,6 @@ class _RenderFlexEntranceTransition extends RenderBox
   Axis get direction => _direction;
   Axis _direction;
   set direction(Axis value) {
-    assert(value != null);
     if (_direction != value) {
       _direction = value;
       markNeedsLayout();
@@ -82,7 +75,6 @@ class _RenderFlexEntranceTransition extends RenderBox
   bool get startToEnd => _startToEnd;
   bool _startToEnd;
   set startToEnd(bool value) {
-    assert(value != null);
     if (_startToEnd != value) {
       _startToEnd = value;
       markNeedsLayout();
@@ -92,7 +84,6 @@ class _RenderFlexEntranceTransition extends RenderBox
   Animation<double> get mainAxisPosition => _mainAxisPosition;
   Animation<double> _mainAxisPosition;
   set mainAxisPosition(Animation<double> value) {
-    assert(value != null);
     if (_mainAxisPosition != value) {
       if (attached) {
         _mainAxisPosition.removeListener(markNeedsOffsets);
@@ -132,8 +123,8 @@ class _RenderFlexEntranceTransition extends RenderBox
   }
 
   void updateChildOffsets(RenderObject child) {
-    final parentData = child.parentData as _FlexEntranceTransitionParentData;
-    final mainAxisPosition = parentData.mainAxisPosition.evaluate(
+    final parentData = child.parentData as _FlexEntranceTransitionParentData?;
+    final mainAxisPosition = parentData!.mainAxisPosition.evaluate(
       _mainAxisPosition,
     );
     switch (_direction) {
@@ -149,9 +140,9 @@ class _RenderFlexEntranceTransition extends RenderBox
   int getTotalFlex() {
     int totalFlex = 0;
     visitChildren((child) {
-      final parentData = child.parentData as _FlexEntranceTransitionParentData;
+      final parentData = child.parentData as _FlexEntranceTransitionParentData?;
       assert(() {
-        if (parentData.flex != null) {
+        if (parentData!.flex != null) {
           return true;
         } else {
           throw FlutterError.fromParts(
@@ -167,7 +158,7 @@ class _RenderFlexEntranceTransition extends RenderBox
           );
         }
       }());
-      totalFlex += parentData.flex;
+      totalFlex += parentData!.flex!;
     });
     return totalFlex;
   }
@@ -179,11 +170,11 @@ class _RenderFlexEntranceTransition extends RenderBox
     size = constraints.biggest;
 
     visitChildren((child) {
-      final parentData = child.parentData as _FlexEntranceTransitionParentData;
-      final extentFactor = parentData.flex / totalFlex;
-      BoxConstraints innerConstraints;
-      double mainAxisExtent;
-      double begin;
+      final parentData = child.parentData as _FlexEntranceTransitionParentData?;
+      final extentFactor = parentData!.flex! / totalFlex;
+      late BoxConstraints innerConstraints;
+      double? mainAxisExtent;
+      double? begin;
       switch (_direction) {
         case Axis.horizontal:
           mainAxisExtent = constraints.maxWidth * extentFactor;
@@ -213,18 +204,18 @@ class _RenderFlexEntranceTransition extends RenderBox
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {@required Offset position}) {
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
     // The x, y parameters have the top left of the node's box as the origin.
-    RenderBox child = startToEnd ? firstChild : lastChild;
+    RenderBox? child = startToEnd ? firstChild : lastChild;
     while (child != null) {
       final childParentData =
-          child.parentData as _FlexEntranceTransitionParentData;
+          child.parentData as _FlexEntranceTransitionParentData?;
       final bool isHit = result.addWithPaintOffset(
-        offset: childParentData.offset,
+        offset: childParentData!.offset,
         position: position,
         hitTest: (BoxHitTestResult result, Offset transformed) {
           assert(transformed == position - childParentData.offset);
-          return child.hitTest(result, position: transformed);
+          return child!.hitTest(result, position: transformed);
         },
       );
       if (isHit) {
@@ -240,11 +231,11 @@ class _RenderFlexEntranceTransition extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    RenderBox child = startToEnd ? lastChild : firstChild;
+    RenderBox? child = startToEnd ? lastChild : firstChild;
     while (child != null) {
       final childParentData =
-          child.parentData as _FlexEntranceTransitionParentData;
-      context.paintChild(child, childParentData.offset + offset);
+          child.parentData as _FlexEntranceTransitionParentData?;
+      context.paintChild(child, childParentData!.offset + offset);
 
       child = startToEnd
           ? childParentData.previousSibling

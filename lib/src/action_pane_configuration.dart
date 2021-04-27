@@ -5,11 +5,11 @@ import 'package:flutter/widgets.dart';
 
 class ActionPaneConfiguration extends InheritedWidget {
   const ActionPaneConfiguration({
-    Key key,
-    @required this.alignment,
-    @required this.direction,
-    @required this.isStartActionPane,
-    Widget child,
+    Key? key,
+    required this.alignment,
+    required this.direction,
+    required this.isStartActionPane,
+    required Widget child,
   }) : super(key: key, child: child);
 
   final Alignment alignment;
@@ -23,7 +23,7 @@ class ActionPaneConfiguration extends InheritedWidget {
         isStartActionPane != oldWidget.isStartActionPane;
   }
 
-  static ActionPaneConfiguration of(BuildContext context) {
+  static ActionPaneConfiguration? of(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<ActionPaneConfiguration>();
   }

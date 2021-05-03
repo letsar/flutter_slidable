@@ -186,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onWillDismiss: (item.index != 10)
             ? null
             : (actionType) {
-                return showDialog<bool>(
+                return showDialog<bool?>(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
@@ -204,8 +204,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     );
                   },
-                ) as FutureOr<bool>;
-              } as FutureOr<bool> Function(SlideActionType?)?,
+                );
+              } as Future<bool?> Function(SlideActionType?)?,
         onDismissed: (actionType) {
           _showSnackBar(
               context,
@@ -254,9 +254,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       );
                     },
-                  ) as FutureOr<bool>);
+                  ));
 
-                  if (dismiss) {
+                  if (dismiss!) {
                     state!.dismiss();
                   }
                 },

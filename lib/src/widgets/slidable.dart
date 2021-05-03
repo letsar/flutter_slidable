@@ -45,7 +45,7 @@ typedef DismissSlideActionCallback = void Function(SlideActionType? actionType);
 /// given [actionType].
 ///
 /// Used by [SlideToDismissDelegate.onWillDismiss].
-typedef SlideActionWillBeDismissed = FutureOr<bool> Function(
+typedef SlideActionWillBeDismissed = Future<bool?> Function(
     SlideActionType? actionType);
 
 /// Signature for the builder callback used to create slide actions.
@@ -840,7 +840,7 @@ class SlidableState extends State<Slidable>
           _overallMoveController.value == _overallMoveController.upperBound &&
           !_dragUnderway) {
         if (widget.dismissal!.onWillDismiss == null ||
-            await widget.dismissal!.onWillDismiss!(actionType)) {
+            await widget.dismissal!.onWillDismiss!(actionType) == true) {
           _startResizeAnimation();
         } else {
           _dismissing = false;

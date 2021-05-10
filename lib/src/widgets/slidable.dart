@@ -802,6 +802,10 @@ class SlidableState extends State<Slidable>
       } else {
         open();
       }
+    } else if ((_actionType == SlideActionType.secondary &&
+            velocity.sign > 0) ||
+        (_actionType == SlideActionType.primary && velocity.sign < 0)) {
+      close();
     } else if (_actionsMoveAnimation!.value >= widget.showAllActionsThreshold ||
         (shouldOpen && fast)) {
       open();

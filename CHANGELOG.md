@@ -1,4 +1,4 @@
-## 1.0.0
+## 1.0.0-dev.1
 ### Changed
 * Complete package rewriting in order to be more flexible and simple to use.
 

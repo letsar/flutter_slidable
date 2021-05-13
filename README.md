@@ -11,8 +11,9 @@
 
 A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
 
-## Migration from 0.5.7
-TODO
+## Migration from 0.6.0
+
+You can read this small guide to migrate from the 0.6 to the 1.0 version: https://github.com/letsar/flutter_slidable/wiki/Migration-from-version-0.6.0-to-version-1.0.0
 
 ## Features
 
@@ -135,6 +136,10 @@ The actions follow the `Slidable` while it's moving:
 Animate the actions as if they were streched while the `Slidable` is moving:
 
 ![Stretch Motion][stretch_motion]
+
+## FAQ
+
+You can read the FAQ here: https://github.com/letsar/flutter_slidable/wiki/FAQ
 
 ## Sponsoring
 

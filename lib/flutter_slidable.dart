@@ -6,5 +6,8 @@ export 'src/controller.dart' show SlidableController, ActionPaneType;
 export 'src/dismissible_pane.dart';
 export 'src/dismissible_pane_motions.dart';
 export 'src/notifications.dart'
-    show SlidableNotification, SlidableNotificationListener;
+    show
+        SlidableNotification,
+        SlidableRatioNotification,
+        SlidableNotificationListener;
 export 'src/slidable.dart';

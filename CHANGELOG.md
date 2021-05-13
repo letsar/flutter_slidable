@@ -1,3 +1,7 @@
+## 1.0.0-dev.2
+### Changed
+* Flutter Favorite package logo
+
 ## 1.0.0-dev.1
 ### Changed
 * Complete package rewriting in order to be more flexible and simple to use.

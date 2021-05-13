@@ -4,7 +4,8 @@
 [![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
 
 
-![Flutter Favorite][flutter_favorite_badge]
+[<img src="https://raw.githubusercontent.com/rrousselGit/provider/master/resources/flutter_favorite.png" width="200" />][flutter_favorite]
+
 **Slidable is a [Flutter Favorite][flutter_favorite] package!**
 
 # flutter_slidable
@@ -161,7 +162,7 @@ If you fixed a bug or implemented a feature, please send a [pull request][pr].
 [codecov_badge]: https://codecov.io/gh/letsar/flutter_slidable/branch/main/graph/badge.svg
 [buy_me_a_coffee]: https://www.buymeacoffee.com/romainrastel
 [buy_me_a_coffee_badge]: https://img.buymeacoffee.com/button-api/?text=Donate&emoji=&slug=romainrastel&button_colour=29b6f6&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00
-[flutter_favorite_badge]: https://raw.githubusercontent.com/letsar/flutter_slidable/master/doc/images/flutter_favorite_badge.png
+[flutter_favorite_badge]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/flutter_favorite.png
 [flutter_favorite]: https://flutter.dev/docs/development/packages-and-plugins/favorites
 [behind_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/behind_motion.gif
 [drawer_motion]: https://raw.githubusercontent.com/letsar/flutter_slidable/assets/drawer_motion.gif

@@ -211,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
               context,
               actionType == SlideActionType.primary
                   ? 'Dismiss Archive'
-                  : 'Dimiss Delete');
+                  : 'Dismiss Delete');
           setState(() {
             items.removeAt(index);
           });

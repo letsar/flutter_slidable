@@ -13,4 +13,5 @@ dev_dependencies:
   test: ^1.5.1
 
 environment:
-  sdk: ">=1.19.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
+  flutter: ">=1.22.0"

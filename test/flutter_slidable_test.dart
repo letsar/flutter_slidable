@@ -104,7 +104,7 @@ Offset getOffset(AxisDirection gestureDirection, double value) {
 Future<Null> flingElement(
   WidgetTester tester,
   Finder finder, {
-  @required AxisDirection gestureDirection,
+  required AxisDirection gestureDirection,
   double initialOffsetFactor = 0.0,
 }) async {
   final double itemExtent =
@@ -119,8 +119,8 @@ Future<Null> flingElement(
 Future<Null> dragElement(
   WidgetTester tester,
   Finder finder, {
-  @required AxisDirection gestureDirection,
-  double endOffsetFactor,
+  required AxisDirection gestureDirection,
+  double endOffsetFactor = 0,
 }) async {
   final double itemExtent =
       axisDirectionToAxis(gestureDirection) == Axis.horizontal
@@ -141,8 +141,8 @@ Future<Null> dragElement(
 Future<Null> dragItem(
   WidgetTester tester,
   int item, {
-  @required AxisDirection gestureDirection,
-  double endOffsetFactor,
+  required AxisDirection gestureDirection,
+  double endOffsetFactor = 0,
 }) async {
   await dragElement(
     tester,
@@ -156,7 +156,7 @@ Future<Null> dragItem(
 Future<Null> flingItem(
   WidgetTester tester,
   int item, {
-  @required AxisDirection gestureDirection,
+  required AxisDirection gestureDirection,
   double initialOffsetFactor = 0.0,
 }) async {
   await flingElement(tester, find.text('item $item'),
@@ -185,12 +185,12 @@ void checkActions(int index,
 }
 
 void checkAction({
-  @required int index,
-  @required int key,
-  @required WidgetTester tester,
-  @required AxisDirection gestureDirection,
-  @required double edgeRatio,
-  @required double extentRatio,
+  required int index,
+  required int key,
+  required WidgetTester tester,
+  required AxisDirection gestureDirection,
+  required double edgeRatio,
+  required double extentRatio,
 }) {
   Finder finder = find.byKey(ValueKey(getSlideActionBaseKey(index) + key));
   double actualEdge;
@@ -230,7 +230,7 @@ void checkAction({
           'ts are not equal');
 }
 
-typedef List<_CheckActionValues> SlidableDelegateTestMethod(
+typedef List<_CheckActionValues>? SlidableDelegateTestMethod(
     AxisDirection direction);
 
 void testSlidableDelegate(
@@ -250,7 +250,7 @@ void testSlidableDelegate(
   });
 }
 
-List<_CheckActionValues> getSlidableStrechDelegateHalfValues(
+List<_CheckActionValues>? getSlidableStrechDelegateHalfValues(
     AxisDirection direction) {
   final double extentRatio = actionExtentRatio / 2;
 
@@ -280,7 +280,7 @@ List<_CheckActionValues> getSlidableStrechDelegateHalfValues(
   }
 }
 
-List<_CheckActionValues> getSlidableBehindDelegateHalfValues(
+List<_CheckActionValues>? getSlidableBehindDelegateHalfValues(
     AxisDirection direction) {
   // All the actions are entirely built.
   final double extentRatio = actionExtentRatio;
@@ -311,7 +311,7 @@ List<_CheckActionValues> getSlidableBehindDelegateHalfValues(
   }
 }
 
-List<_CheckActionValues> getSlidableScrollDelegateHalfValues(
+List<_CheckActionValues>? getSlidableScrollDelegateHalfValues(
     AxisDirection direction) {
   final double extentRatio = actionExtentRatio;
 
@@ -341,7 +341,7 @@ List<_CheckActionValues> getSlidableScrollDelegateHalfValues(
   }
 }
 
-List<_CheckActionValues> getSlidableDrawerDelegateHalfValues(
+List<_CheckActionValues>? getSlidableDrawerDelegateHalfValues(
     AxisDirection direction) {
   final double extentRatio = actionExtentRatio;
 
@@ -377,7 +377,7 @@ void testSlidableDelegateScenario(
     double endOffsetFactor,
     SlidableDelegateTestMethod slidableDelegateTestMethod,
     AxisDirection direction) {
-  final List<_CheckActionValues> values = slidableDelegateTestMethod(direction);
+  final List<_CheckActionValues>? values = slidableDelegateTestMethod(direction);
 
   Axis scrollDirection = flipAxis(axisDirectionToAxis(direction));
   testWidgets(
@@ -397,7 +397,7 @@ void testSlidableDelegateScenario(
 
     checkActions(
       index,
-      visible: values.map((v) => v.key).toList(),
+      visible: values!.map((v) => v.key).toList(),
       hidden: allActions
           .where((i) => !values.map((v) => v.key).contains(i))
           .toList(),

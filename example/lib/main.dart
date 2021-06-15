@@ -18,16 +18,16 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  SlidableController slidableController;
+  late SlidableController slidableController;
   final List<_HomeItem> items = List.generate(
     20,
     (i) => _HomeItem(
@@ -47,10 +47,10 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  Animation<double> _rotationAnimation;
+  Animation<double>? _rotationAnimation;
   Color _fabColor = Colors.blue;
 
-  void handleSlideAnimationChanged(Animation<double> slideAnimation) {
+  void handleSlideAnimationChanged(Animation<double>? slideAnimation) {
     setState(() {
       _rotationAnimation = slideAnimation;
     });
@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title ?? ''),
       ),
       body: Center(
         child: OrientationBuilder(
@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: _rotationAnimation == null
             ? Icon(Icons.add)
             : RotationTransition(
-                turns: _rotationAnimation,
+                turns: _rotationAnimation!,
                 child: Icon(Icons.add),
               ),
       ),
@@ -112,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final _HomeItem item = items[index];
     //final int t = index;
     return Slidable(
-      key: Key(item.title),
+      key: Key(item.title ?? ''),
       controller: slidableController,
       direction: direction,
       dismissal: SlidableDismissal(
@@ -175,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final _HomeItem item = items[index];
 
     return Slidable.builder(
-      key: Key(item.title),
+      key: Key(item.title ?? ''),
       controller: slidableController,
       direction: direction,
       dismissal: SlidableDismissal(
@@ -183,8 +183,8 @@ class _MyHomePageState extends State<MyHomePage> {
         closeOnCanceled: true,
         onWillDismiss: (item.index != 10)
             ? null
-            : (actionType) {
-                return showDialog<bool>(
+            : (actionType) async {
+                return await showDialog<bool>(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     );
                   },
-                );
+                ) ?? false;
               },
         onDismissed: (actionType) {
           _showSnackBar(
@@ -254,8 +254,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                   );
 
-                  if (dismiss) {
-                    state.dismiss();
+                  if (dismiss!) {
+                    state!.dismiss();
                   }
                 },
               );
@@ -297,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  static Widget _getActionPane(int index) {
+  static Widget? _getActionPane(int index) {
     switch (index % 4) {
       case 0:
         return SlidableBehindActionPane();
@@ -312,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  static Color _getAvatarColor(int index) {
+  static Color? _getAvatarColor(int index) {
     switch (index % 4) {
       case 0:
         return Colors.red;
@@ -327,7 +327,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  static String _getSubtitle(int index) {
+  static String? _getSubtitle(int index) {
     switch (index % 4) {
       case 0:
         return 'SlidableBehindActionPane';
@@ -368,7 +368,7 @@ class HorizontalListItem extends StatelessWidget {
           Expanded(
             child: Center(
               child: Text(
-                item.subtitle,
+                item.subtitle ?? '',
               ),
             ),
           ),
@@ -397,8 +397,8 @@ class VerticalListItem extends StatelessWidget {
             child: Text('${item.index}'),
             foregroundColor: Colors.white,
           ),
-          title: Text(item.title),
-          subtitle: Text(item.subtitle),
+          title: Text(item.title ?? ''),
+          subtitle: Text(item.subtitle ?? ''),
         ),
       ),
     );
@@ -414,7 +414,7 @@ class _HomeItem {
   );
 
   final int index;
-  final String title;
-  final String subtitle;
-  final Color color;
+  final String? title;
+  final String? subtitle;
+  final Color? color;
 }

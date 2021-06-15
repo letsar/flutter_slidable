@@ -18,7 +18,7 @@ const Duration _kResizeDuration = const Duration(milliseconds: 300);
 class SlidableDismissal extends StatelessWidget {
   /// Creates a widget that controls how the [Slidable] is dismissed.
   const SlidableDismissal({
-    @required this.child,
+    required this.child,
     this.dismissThresholds = const <SlideActionType, double>{},
     this.onResize,
     this.onDismissed,
@@ -27,7 +27,7 @@ class SlidableDismissal extends StatelessWidget {
     this.onWillDismiss,
     this.closeOnCanceled = false,
     this.dragDismissible = true,
-  }) : assert(dismissThresholds != null);
+  });
 
   /// Specifies if the widget can be dismissed by sliding.
   ///
@@ -53,13 +53,13 @@ class SlidableDismissal extends StatelessWidget {
   final Map<SlideActionType, double> dismissThresholds;
 
   /// Called when the widget has been dismissed, after finishing resizing.
-  final DismissSlideActionCallback onDismissed;
+  final DismissSlideActionCallback? onDismissed;
 
   /// Called before the widget is dismissed. If the call returns false, the
   /// item will not be dismissed.
   ///
   /// If null, the widget will always be dismissed.
-  final SlideActionWillBeDismissed onWillDismiss;
+  final SlideActionWillBeDismissed? onWillDismiss;
 
   /// Specifies to close this slidable after canceling dismiss.
   ///
@@ -67,7 +67,7 @@ class SlidableDismissal extends StatelessWidget {
   final bool closeOnCanceled;
 
   /// Called when the widget changes size (i.e., when contracting before being dismissed).
-  final VoidCallback onResize;
+  final VoidCallback? onResize;
 
   /// The amount of time the widget will spend contracting before [onDismissed] is called.
   ///
@@ -86,16 +86,16 @@ class SlidableDismissal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData? data = SlidableData.of(context);
 
     return AnimatedBuilder(
-      animation: data.overallMoveAnimation,
+      animation: data!.overallMoveAnimation,
       child: child,
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         if (data.overallMoveAnimation.value > data.totalActionsExtent) {
-          return child;
+          return child!;
         } else {
-          return data.slidable.actionPane;
+          return data.slidable.actionPane!;
         }
       },
     );
@@ -108,15 +108,15 @@ class SlidableDismissal extends StatelessWidget {
 class SlidableDrawerDismissal extends StatelessWidget {
   /// Creates a specific dismissal that creates slide actions that are displayed like drawers
   /// while the item is dismissing.
-  const SlidableDrawerDismissal({Key key}) : super(key: key);
+  const SlidableDrawerDismissal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final SlidableData data = SlidableData.of(context);
+    final SlidableData? data = SlidableData.of(context);
 
     final animation = Tween<Offset>(
       begin: Offset.zero,
-      end: data.createOffset(data.actionSign),
+      end: data!.createOffset(data.actionSign),
     ).animate(data.overallMoveAnimation);
 
     final count = data.actionCount;
@@ -149,8 +149,8 @@ class SlidableDrawerDismissal extends StatelessWidget {
                       positionFactor: data.actionExtentRatio *
                           (data.actionCount - index - 1),
                       extentFactor: extentAnimations[index].value,
-                      child: data.actionDelegate.build(context, displayIndex,
-                          data.actionsMoveAnimation, data.renderingMode),
+                      child: data.actionDelegate!.build(context, displayIndex,
+                          data.actionsMoveAnimation!, data.renderingMode),
                     );
                   }),
                 ),

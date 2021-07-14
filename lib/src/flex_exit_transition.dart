@@ -166,31 +166,44 @@ class _RenderFlexExitTransition extends RenderBox
     final totalFlex = getTotalFlex();
     double totalMainAxisExtentSoFar = 0;
 
-    visitChildren((child) {
+    RenderBox? child = startToEnd ? firstChild : lastChild;
+
+    while (child != null) {
       final parentData = child.parentData as _FlexExitTransitionParentData?;
       final extentFactor = parentData!.flex! / totalFlex * initialExtentRatio;
       late BoxConstraints innerConstraints;
       double? initialMainAxisExtent;
+      final begin = startToEnd
+          ? totalMainAxisExtentSoFar
+          : totalMainAxisExtent - totalMainAxisExtentSoFar;
       switch (_direction) {
         case Axis.horizontal:
-          parentData.offset = Offset(totalMainAxisExtentSoFar, 0);
           initialMainAxisExtent = constraints.maxWidth * extentFactor;
+          final extent = Tween(
+                  begin: initialMainAxisExtent,
+                  end: totalMainAxisExtent - totalMainAxisExtentSoFar)
+              .evaluate(_mainAxisExtent);
+          final begin = startToEnd
+              ? totalMainAxisExtentSoFar
+              : totalMainAxisExtent - totalMainAxisExtentSoFar - extent;
+          parentData.offset = Offset(begin, 0);
           innerConstraints = BoxConstraints.tightFor(
             height: constraints.maxHeight,
-            width: Tween(
-                    begin: initialMainAxisExtent,
-                    end: totalMainAxisExtent - totalMainAxisExtentSoFar)
-                .evaluate(_mainAxisExtent),
+            width: extent,
           );
           break;
         case Axis.vertical:
-          parentData.offset = Offset(0, totalMainAxisExtentSoFar);
           initialMainAxisExtent = constraints.maxHeight * extentFactor;
+          final extent = Tween(
+                  begin: initialMainAxisExtent,
+                  end: totalMainAxisExtent - totalMainAxisExtentSoFar)
+              .evaluate(_mainAxisExtent);
+          final begin = startToEnd
+              ? totalMainAxisExtentSoFar
+              : totalMainAxisExtent - totalMainAxisExtentSoFar - extent;
+          parentData.offset = Offset(0, begin);
           innerConstraints = BoxConstraints.tightFor(
-            height: Tween(
-                    begin: initialMainAxisExtent,
-                    end: totalMainAxisExtent - totalMainAxisExtentSoFar)
-                .evaluate(_mainAxisExtent),
+            height: extent,
             width: constraints.maxWidth,
           );
           break;
@@ -199,7 +212,12 @@ class _RenderFlexExitTransition extends RenderBox
       totalMainAxisExtentSoFar += initialMainAxisExtent;
 
       child.layout(innerConstraints);
-    });
+      final _FlexExitTransitionParentData childParentData =
+          child.parentData! as _FlexExitTransitionParentData;
+      child = startToEnd
+          ? childParentData.nextSibling
+          : childParentData.previousSibling;
+    }
   }
 
   @override

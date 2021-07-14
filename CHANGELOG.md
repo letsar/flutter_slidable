@@ -1,3 +1,7 @@
+## 1.0.0-dev.3
+### Changed
+* Fixes Dismissal issue with endActionPane (https://github.com/letsar/flutter_slidable/issues/216).
+
 ## 1.0.0-dev.2
 ### Changed
 * Flutter Favorite package logo

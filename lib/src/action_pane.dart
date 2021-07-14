@@ -182,7 +182,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
   }
 
   void handleRatioChanged() {
-    final show = controller!.ratio <= widget.extentRatio;
+    final show = controller!.ratio.abs() <= widget.extentRatio;
     if (show != showMotion) {
       setState(() {
         showMotion = show;

@@ -1,16 +1,26 @@
 <!-- [![Build][github_action_badge]][github_action] -->
-[![Pub][pub_badge]][pub]
-<!-- [![Codecov][codecov_badge]][codecov] -->
-[![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
+[![Pub][pub_badge]][pub] [![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
 
+[<img src="https://github.com/letsar/flutter_slidable/blob/assets/flutter_favorite.png" width="100" />][flutter_favorite] **Slidable is a [Flutter Favorite][flutter_favorite] package!**
 
-[<img src="https://raw.githubusercontent.com/rrousselGit/provider/master/resources/flutter_favorite.png" width="200" />][flutter_favorite]
-
-**Slidable is a [Flutter Favorite][flutter_favorite] package!**
 
 # flutter_slidable
 
 A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
+
+## Sponsors
+
+Our top sponsors are shown below! [[Become a Sponsor](https://github.com/sponsors/letsar)]
+
+<table>    
+    <tbody>
+        <tr>
+            <td align="center">
+                <a href="https://getstream.io/chat/flutter/tutorial/?utm_source=https://github.com/letsar/flutter_slidable&utm_medium=github&utm_content=developer&utm_term=flutter" target="_blank"><img width="250px" src="https://stream-blog.s3.amazonaws.com/blog/wp-content/uploads/fc148f0fc75d02841d017bb36e14e388/Stream-logo-with-background-.png"/></a><br/><span><a href="https://getstream.io/chat/flutter/tutorial/?utm_source=https://github.com/letsar/flutter_slidable&utm_medium=github&utm_content=developer&utm_term=flutter" target="_blank">Try the Flutter Chat Tutorial &nbsp💬</a></span>
+            </td>            
+        </tr>
+    </tbody>
+</table>
 
 ## Migration from 0.6.0
 

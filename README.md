@@ -1,7 +1,7 @@
 <!-- [![Build][github_action_badge]][github_action] -->
 [![Pub][pub_badge]][pub] [![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
 
-[<img src="https://github.com/letsar/flutter_slidable/blob/assets/flutter_favorite.png" width="100" />][flutter_favorite] **Slidable is a [Flutter Favorite][flutter_favorite] package!**
+[<img src="https://raw.githubusercontent.com/letsar/flutter_slidable/assets/flutter_favorite.png" width="100" />][flutter_favorite] **Slidable is a [Flutter Favorite][flutter_favorite] package!**
 
 
 # flutter_slidable

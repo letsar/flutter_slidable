@@ -173,9 +173,6 @@ class _RenderFlexExitTransition extends RenderBox
       final extentFactor = parentData!.flex! / totalFlex * initialExtentRatio;
       late BoxConstraints innerConstraints;
       double? initialMainAxisExtent;
-      final begin = startToEnd
-          ? totalMainAxisExtentSoFar
-          : totalMainAxisExtent - totalMainAxisExtentSoFar;
       switch (_direction) {
         case Axis.horizontal:
           initialMainAxisExtent = constraints.maxWidth * extentFactor;

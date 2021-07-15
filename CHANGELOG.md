@@ -1,5 +1,9 @@
+## 1.0.0-dev.4
+### Added
+* ResizeRequest is now available, and the SlidableController.dismiss method can be used from outside.
+
 ## 1.0.0-dev.3
-### Changed
+### Fixed
 * Fixes Dismissal issue with endActionPane (https://github.com/letsar/flutter_slidable/issues/216).
 
 ## 1.0.0-dev.2

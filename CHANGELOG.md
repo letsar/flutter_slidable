@@ -1,3 +1,7 @@
+## 1.0.0-dev.5
+### Fixed
+* Fixes an issue preventing the Slidable to reach the extentRatio manually (https://github.com/letsar/flutter_slidable/issues/225).
+
 ## 1.0.0-dev.4
 ### Added
 * ResizeRequest is now available, and the SlidableController.dismiss method can be used from outside.

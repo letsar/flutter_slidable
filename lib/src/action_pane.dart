@@ -155,8 +155,16 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
   }
 
   @override
-  bool canChangeRatio(double ratio) {
-    return widget.dismissible != null || ratio <= widget.extentRatio;
+  double normalizeRatio(double ratio) {
+    if (widget.dismissible != null) {
+      return ratio;
+    }
+
+    final absoluteRatio = ratio.abs().clamp(0.0, widget.extentRatio);
+    if (ratio < 0) {
+      return -absoluteRatio;
+    }
+    return absoluteRatio;
   }
 
   void handleEndGestureChanged() {

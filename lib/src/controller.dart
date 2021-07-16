@@ -17,8 +17,8 @@ enum ActionPaneType {
 
 /// Represents how the ratio should changes.
 abstract class RatioConfigurator {
-  /// Whether the given [ratio] is accepted.
-  bool canChangeRatio(double ratio);
+  /// Makes sure the given [ratio] is between the bounds.
+  double normalizeRatio(double ratio);
 
   /// The total extent ratio of this configurator.
   double get extentRatio;
@@ -155,9 +155,7 @@ class SlidableController {
     return !_closing &&
         (ratio == 0 ||
             ((ratio > 0 && enableStartActionPane) ||
-                    (ratio < 0 && enableEndActionPane)) &&
-                (actionPaneConfigurator == null ||
-                    actionPaneConfigurator!.canChangeRatio(ratio.abs())));
+                (ratio < 0 && enableEndActionPane)));
   }
 
   /// The current ratio of the full size of the [Slidable] that is already
@@ -171,10 +169,11 @@ class SlidableController {
   double get ratio =>
       _animationController.value * actionPaneType.value.toSign();
   set ratio(double value) {
-    if (_acceptRatio(value) && value != ratio) {
-      final index = value.sign.toInt() + 1;
+    final newRatio = (actionPaneConfigurator?.normalizeRatio(value)) ?? value;
+    if (_acceptRatio(newRatio) && newRatio != ratio) {
+      final index = newRatio.sign.toInt() + 1;
       actionPaneType.value = ActionPaneType.values[index];
-      _animationController.value = value.abs();
+      _animationController.value = newRatio.abs();
     }
   }
 

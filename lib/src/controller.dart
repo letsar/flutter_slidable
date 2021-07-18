@@ -101,7 +101,9 @@ class SlidableController {
         endGesture = ValueNotifier(null),
         dismissGesture = ValueNotifier(null),
         resizeRequest = ValueNotifier(null),
-        actionPaneType = ValueNotifier(ActionPaneType.none);
+        actionPaneType = ValueNotifier(ActionPaneType.none) {
+    _animationController.addListener(_onRatioChanged);
+  }
 
   final AnimationController _animationController;
 
@@ -175,6 +177,11 @@ class SlidableController {
       actionPaneType.value = ActionPaneType.values[index];
       _animationController.value = newRatio.abs();
     }
+  }
+
+  void _onRatioChanged() {
+    final index = ratio.sign.toInt() + 1;
+    actionPaneType.value = ActionPaneType.values[index];
   }
 
   /// Dispatches a new [EndGesture] determined by the given [velocity] and
@@ -289,6 +296,7 @@ class SlidableController {
 
   /// Disposes the controller.
   void dispose() {
+    _animationController.removeListener(_onRatioChanged);
     _animationController.stop();
     _animationController.dispose();
   }

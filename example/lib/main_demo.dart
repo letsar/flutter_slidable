@@ -279,15 +279,57 @@ class Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final direction = AppState.of(context).direction;
-    return GestureDetector(
-      onLongPress: () => Slidable.of(context).openEndActionPane(),
-      child: Container(
-        color: color,
-        height: direction == Axis.horizontal ? 100 : double.infinity,
-        width: direction == Axis.horizontal ? double.infinity : 100,
-        child: Center(child: Text(text)),
+    return ActionTypeListener(
+      child: GestureDetector(
+        onLongPress: () => Slidable.of(context).openEndActionPane(),
+        child: Container(
+          color: color,
+          height: direction == Axis.horizontal ? 100 : double.infinity,
+          width: direction == Axis.horizontal ? double.infinity : 100,
+          child: Center(child: Text(text)),
+        ),
       ),
     );
+  }
+}
+
+class ActionTypeListener extends StatefulWidget {
+  const ActionTypeListener({
+    Key key,
+    @required this.child,
+  }) : super(key: key);
+
+  final Widget child;
+
+  @override
+  _ActionTypeListenerState createState() => _ActionTypeListenerState();
+}
+
+class _ActionTypeListenerState extends State<ActionTypeListener> {
+  ValueNotifier<ActionPaneType> _actionPaneTypeValueNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _actionPaneTypeValueNotifier = Slidable.of(context)?.actionPaneType;
+    _actionPaneTypeValueNotifier?.addListener(_onActionPaneTypeChanged);
+  }
+
+  @override
+  void dispose() {
+    _actionPaneTypeValueNotifier?.removeListener(_onActionPaneTypeChanged);
+    super.dispose();
+  }
+
+  void _onActionPaneTypeChanged() {
+    print(
+      'Value is ${_actionPaneTypeValueNotifier?.value}',
+    ); // I receive ActionPaneType.start 1 time and after that nothing (unless I get ActionPaneType.end, after which ActionPaneType.start starts working, but .end stops).
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }
 

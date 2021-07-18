@@ -1,3 +1,7 @@
+## 1.0.0-dev.6
+### Fixed
+* Fixes an issue preventing the actionPaneType to be updated when it animates (https://github.com/letsar/flutter_slidable/issues/226).
+
 ## 1.0.0-dev.5
 ### Fixed
 * Fixes an issue preventing the Slidable to reach the extentRatio manually (https://github.com/letsar/flutter_slidable/issues/225).

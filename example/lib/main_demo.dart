@@ -322,9 +322,7 @@ class _ActionTypeListenerState extends State<ActionTypeListener> {
   }
 
   void _onActionPaneTypeChanged() {
-    print(
-      'Value is ${_actionPaneTypeValueNotifier?.value}',
-    ); // I receive ActionPaneType.start 1 time and after that nothing (unless I get ActionPaneType.end, after which ActionPaneType.start starts working, but .end stops).
+    debugPrint('Value is ${_actionPaneTypeValueNotifier?.value}');
   }
 
   @override

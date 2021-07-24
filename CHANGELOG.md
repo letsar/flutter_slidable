@@ -1,3 +1,7 @@
+## 1.0.0-dev.7
+### Fixed
+* Fixes an issue where the Slidable animation stopped in middle when the gesture was too fast.
+
 ## 1.0.0-dev.6
 ### Fixed
 * Fixes an issue preventing the actionPaneType to be updated when it animates (https://github.com/letsar/flutter_slidable/issues/226).

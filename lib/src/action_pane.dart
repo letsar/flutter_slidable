@@ -106,7 +106,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
   SlidableController? controller;
   late double openThreshold;
   late double closeThreshold;
-  bool? showMotion;
+  bool showMotion = true;
 
   @override
   double get extentRatio => widget.extentRatio;
@@ -120,7 +120,6 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     if (widget.dismissible != null) {
       controller!.animation.addListener(handleRatioChanged);
     }
-    showMotion = true;
     updateThresholds();
     controller!.actionPaneConfigurator = this;
   }
@@ -173,7 +172,13 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     final position = controller!.animation.value;
 
     if (widget.dismissible != null && position > widget.extentRatio) {
-      controller!.dismissGesture.value = DismissGesture(gesture);
+      if (controller!.isDismissibleReady) {
+        controller!.dismissGesture.value = DismissGesture(gesture);
+      } else {
+        // If the dismissible is not ready, the animation will stop.
+        // So we prefere to open the action pane instead.
+        controller!.openCurrentActionPane();
+      }
       return;
     }
 
@@ -190,7 +195,8 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
   }
 
   void handleRatioChanged() {
-    final show = controller!.ratio.abs() <= widget.extentRatio;
+    final show = controller!.ratio.abs() <= widget.extentRatio &&
+        !controller!.isDismissibleReady;
     if (show != showMotion) {
       setState(() {
         showMotion = show;
@@ -204,7 +210,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
 
     Widget? child;
 
-    if (showMotion!) {
+    if (showMotion) {
       final factor = widget.extentRatio;
       child = FractionallySizedBox(
         alignment: config.alignment,

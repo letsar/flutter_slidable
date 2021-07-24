@@ -102,13 +102,14 @@ class SlidableController {
   SlidableController(TickerProvider vsync)
       : _animationController = AnimationController(vsync: vsync),
         endGesture = ValueNotifier(null),
-        dismissGesture = ValueNotifier(null),
+        _dismissGesture = _ValueNotifier(null),
         resizeRequest = ValueNotifier(null),
         actionPaneType = ValueNotifier(ActionPaneType.none) {
     _animationController.addListener(_onRatioChanged);
   }
 
   final AnimationController _animationController;
+  final _ValueNotifier<DismissGesture?> _dismissGesture;
 
   /// Whether the start action pane is enabled.
   bool enableStartActionPane = true;
@@ -156,13 +157,16 @@ class SlidableController {
   final ValueNotifier<EndGesture?> endGesture;
 
   /// Track the dismiss gestures.
-  final ValueNotifier<DismissGesture?> dismissGesture;
+  ValueNotifier<DismissGesture?> get dismissGesture => _dismissGesture;
 
   /// Track the resize requests.
   final ValueNotifier<ResizeRequest?> resizeRequest;
 
   /// Track the type of the action pane.
   final ValueNotifier<ActionPaneType> actionPaneType;
+
+  /// Indicates whether the dismissible registered to gestures.
+  bool get isDismissibleReady => _dismissGesture._hasListeners;
 
   /// Whether this [close()] method has been called and not finished.
   bool get closing => _closing;
@@ -321,6 +325,12 @@ class SlidableController {
     _animationController.stop();
     _animationController.dispose();
   }
+}
+
+class _ValueNotifier<T> extends ValueNotifier<T> {
+  _ValueNotifier(T value) : super(value);
+
+  bool get _hasListeners => hasListeners;
 }
 
 /// Extensions for [ActionPaneType].

@@ -1,3 +1,7 @@
+## 1.0.0-dev.8
+### Fixed
+* Fixes an issue where the Dismissible animation stopped in middle when the gesture was too fast.
+
 ## 1.0.0-dev.7
 ### Fixed
 * Fixes an issue where the Slidable animation stopped in middle when the gesture was too fast.

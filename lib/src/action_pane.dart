@@ -120,9 +120,9 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     if (widget.dismissible != null) {
       controller!.animation.addListener(handleRatioChanged);
     }
-    controller!.actionPaneConfigurator = this;
     showMotion = true;
     updateThresholds();
+    controller!.actionPaneConfigurator = this;
   }
 
   void updateThresholds() {
@@ -167,6 +167,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     return absoluteRatio;
   }
 
+  @override
   void handleEndGestureChanged() {
     final gesture = controller!.endGesture.value;
     final position = controller!.animation.value;
@@ -181,7 +182,6 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
             ((gesture.opening && position >= openThreshold) ||
                 gesture.closing && position > closeThreshold)) {
       controller!.openCurrentActionPane();
-
       return;
     }
 

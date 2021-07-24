@@ -22,6 +22,9 @@ abstract class RatioConfigurator {
 
   /// The total extent ratio of this configurator.
   double get extentRatio;
+
+  /// A method to call when the end gesture changed.
+  void handleEndGestureChanged();
 }
 
 /// The direction of a gesture in the context of [Slidable].
@@ -132,7 +135,19 @@ class SlidableController {
   }
 
   /// The current action pane configurator.
-  RatioConfigurator? actionPaneConfigurator;
+  RatioConfigurator? get actionPaneConfigurator => _actionPaneConfigurator;
+  RatioConfigurator? _actionPaneConfigurator;
+  set actionPaneConfigurator(RatioConfigurator? value) {
+    if (_actionPaneConfigurator != value) {
+      _actionPaneConfigurator = value;
+      if (_replayEndGesture && value != null) {
+        _replayEndGesture = false;
+        value.handleEndGestureChanged();
+      }
+    }
+  }
+
+  bool _replayEndGesture = false;
 
   /// The value of the ratio over time.
   Animation<double> get animation => _animationController.view;
@@ -193,6 +208,12 @@ class SlidableController {
       endGesture.value = OpeningGesture(velocity);
     } else {
       endGesture.value = ClosingGesture(velocity.abs());
+    }
+
+    // If the movement is too fast, the actionPaneConfigurator may still be
+    // null. So we have to replay the end gesture when it will not be null.
+    if (actionPaneConfigurator == null) {
+      _replayEndGesture = true;
     }
   }
 

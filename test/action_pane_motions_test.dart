@@ -127,8 +127,7 @@ Future<void> testMotion({
     ),
   );
 
-  await tester.drag(findSlidable, drag);
-  await tester.pumpAndSettle();
+  await tester.dragAndHold(findSlidable, drag);
 
   double centerKey1 = centers[0];
   double centerKey2 = centers[1];
@@ -136,8 +135,7 @@ Future<void> testMotion({
   expect(getCenter(findKey1), moreOrLessEquals(centerKey1));
   expect(getCenter(findKey2), moreOrLessEquals(centerKey2));
 
-  await tester.drag(findSlidable, drag);
-  await tester.pumpAndSettle();
+  await tester.dragAndHold(findSlidable, drag);
 
   centerKey1 = 12.5;
   centerKey2 = 62.5;
@@ -149,4 +147,12 @@ Future<void> testMotion({
 
   expect(getCenter(findKey1), moreOrLessEquals(centerKey1));
   expect(getCenter(findKey2), moreOrLessEquals(centerKey2));
+}
+
+extension on WidgetTester {
+  Future<void> dragAndHold(Finder finder, Offset offset) async {
+    final gesture = await startGesture(getCenter(finder));
+    await gesture.moveBy(offset);
+    await pump();
+  }
 }

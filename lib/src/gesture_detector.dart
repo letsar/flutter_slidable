@@ -90,14 +90,17 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   }
 
   void handleDragEnd(DragEndDetails details) {
-    final delta = lastPosition - startPosition;
-    final primaryDelta = directionIsXAxis ? delta.dx : delta.dy;
-    final gestureDirection =
-        primaryDelta >= 0 ? GestureDirection.opening : GestureDirection.closing;
+    try {
+      final delta = lastPosition - startPosition;
+      final primaryDelta = directionIsXAxis ? delta.dx : delta.dy;
+      final gestureDirection = primaryDelta >= 0
+          ? GestureDirection.opening
+          : GestureDirection.closing;
 
-    widget.controller.dispatchEndGesture(
-      details.primaryVelocity,
-      gestureDirection,
-    );
+      widget.controller.dispatchEndGesture(
+        details.primaryVelocity,
+        gestureDirection,
+      );
+    } catch (_) {}
   }
 }

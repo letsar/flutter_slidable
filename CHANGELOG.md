@@ -1,3 +1,7 @@
+## 1.0.0-dev.9
+### Fixed
+* Fixes an issue where we click on the Slidable instead of dragging it (https://github.com/letsar/flutter_slidable/pull/235).
+
 ## 1.0.0-dev.8
 ### Fixed
 * Fixes an issue where the Dismissible animation stopped in middle when the gesture was too fast.

@@ -23,9 +23,11 @@ class CustomSlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
+    this.shape = const RoundedRectangleBorder(),
+    this.side = BorderSide.none,
     required this.onPressed,
     required this.child,
-  })   : assert(flex > 0),
+  })  : assert(flex > 0),
         super(key: key);
 
   /// {@template slidable.actions.flex}
@@ -69,6 +71,17 @@ class CustomSlidableAction extends StatelessWidget {
   /// Typically the action's icon or label.
   final Widget child;
 
+  /// {@template slidable.actions.shape}
+  /// [OutlinedBorder] of action, if is null, then [RoundedRectangleBorder]
+  /// used by default
+  /// {@endtemplate}
+  final OutlinedBorder shape;
+
+  /// {@template slidable.actions.side}
+  /// [BorderSide] of action, if is null, then [BorderSide.none] used by default
+  /// {@endtemplate}
+  final BorderSide side;
+
   @override
   Widget build(BuildContext context) {
     final effectiveForegroundColor = foregroundColor ??
@@ -76,7 +89,6 @@ class CustomSlidableAction extends StatelessWidget {
                 Brightness.light
             ? Colors.black
             : Colors.white);
-
     return Expanded(
       flex: flex,
       child: SizedBox.expand(
@@ -86,8 +98,8 @@ class CustomSlidableAction extends StatelessWidget {
             backgroundColor: backgroundColor,
             primary: effectiveForegroundColor,
             onSurface: effectiveForegroundColor,
-            shape: const RoundedRectangleBorder(),
-            side: BorderSide.none,
+            shape: shape,
+            side: side,
           ),
           child: child,
         ),
@@ -123,6 +135,8 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
+    this.shape = const RoundedRectangleBorder(),
+    this.side = BorderSide.none,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -152,6 +166,12 @@ class SlidableAction extends StatelessWidget {
 
   /// A label to display below the [icon].
   final String? label;
+
+  /// {@macro slidable.actions.shape}
+  final OutlinedBorder shape;
+
+  /// {@macro slidable.actions.side}
+  final BorderSide side;
 
   @override
   Widget build(BuildContext context) {
@@ -197,6 +217,8 @@ class SlidableAction extends StatelessWidget {
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       flex: flex,
+      shape: shape,
+      side: side,
       child: child,
     );
   }

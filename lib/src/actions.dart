@@ -25,7 +25,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.autoClose = _kAutoClose,
     required this.onPressed,
     required this.child,
-  })   : assert(flex > 0),
+  })  : assert(flex > 0),
         super(key: key);
 
   /// {@template slidable.actions.flex}
@@ -123,6 +123,7 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
+    this.labelStyle,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -153,6 +154,9 @@ class SlidableAction extends StatelessWidget {
   /// A label to display below the [icon].
   final String? label;
 
+  /// The style to use for the label
+  final TextStyle? labelStyle;
+
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
@@ -174,6 +178,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
+          style: labelStyle,
         ),
       );
     }

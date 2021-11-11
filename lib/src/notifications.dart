@@ -99,7 +99,7 @@ class SlidableNotificationListener extends StatefulWidget {
     this.onNotification,
     this.autoClose = true,
     required this.child,
-  })   : assert(
+  })  : assert(
           autoClose || onNotification != null,
           'Either autoClose or onNotification must be set.',
         ),

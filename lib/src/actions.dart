@@ -25,7 +25,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.autoClose = _kAutoClose,
     required this.onPressed,
     required this.child,
-  })   : assert(flex > 0),
+  })  : assert(flex > 0),
         super(key: key);
 
   /// {@template slidable.actions.flex}

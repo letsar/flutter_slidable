@@ -61,7 +61,7 @@ class _RenderFlexExitTransition extends RenderBox
     required Animation<double> mainAxisExtent,
     double? initialExtentRatio,
     required bool startToEnd,
-  })   : _direction = direction,
+  })  : _direction = direction,
         _mainAxisExtent = mainAxisExtent,
         _initialExtentRatio = initialExtentRatio,
         _startToEnd = startToEnd {

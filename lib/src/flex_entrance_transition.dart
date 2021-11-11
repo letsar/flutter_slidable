@@ -56,7 +56,7 @@ class _RenderFlexEntranceTransition extends RenderBox
     Axis direction = Axis.horizontal,
     required Animation<double> mainAxisPosition,
     required bool startToEnd,
-  })   : _direction = direction,
+  })  : _direction = direction,
         _mainAxisPosition = mainAxisPosition,
         _startToEnd = startToEnd {
     addAll(children);

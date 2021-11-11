@@ -1,3 +1,6 @@
+## 1.0.0
+Same as 1.0.0-dev.9. This is just for making it clear that it's now stable.
+
 ## 1.0.0-dev.9
 ### Fixed
 * Fixes an issue where we click on the Slidable instead of dragging it (https://github.com/letsar/flutter_slidable/pull/235).

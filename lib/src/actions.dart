@@ -20,9 +20,12 @@ class CustomSlidableAction extends StatelessWidget {
   const CustomSlidableAction({
     Key? key,
     this.flex = _kFlex,
+    this.margin,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
+    this.shape,
+    this.side,
     required this.onPressed,
     required this.child,
   })  : assert(flex > 0),
@@ -69,6 +72,22 @@ class CustomSlidableAction extends StatelessWidget {
   /// Typically the action's icon or label.
   final Widget child;
 
+  /// {@template slidable.actions.margin}
+  /// Empty space to surround the slidable actions.
+  /// {@endtemplate}
+  final EdgeInsetsGeometry? margin;
+
+  /// {@template slidable.actions.shape}
+  /// [OutlinedBorder] of action, if is null, then [RoundedRectangleBorder]
+  /// used by default
+  /// {@endtemplate}
+  final OutlinedBorder? shape;
+
+  /// {@template slidable.actions.side}
+  /// [BorderSide] of action, if is null, then [BorderSide.none] used by default
+  /// {@endtemplate}
+  final BorderSide? side;
+
   @override
   Widget build(BuildContext context) {
     final effectiveForegroundColor = foregroundColor ??
@@ -79,15 +98,18 @@ class CustomSlidableAction extends StatelessWidget {
 
     return Expanded(
       flex: flex,
-      child: SizedBox.expand(
+      child: Container(
+        margin: margin,
+        width: double.infinity,
+        height: double.infinity,
         child: OutlinedButton(
           onPressed: () => _handleTap(context),
           style: OutlinedButton.styleFrom(
             backgroundColor: backgroundColor,
             primary: effectiveForegroundColor,
             onSurface: effectiveForegroundColor,
-            shape: const RoundedRectangleBorder(),
-            side: BorderSide.none,
+            shape: shape ?? const RoundedRectangleBorder(),
+            side: side ?? BorderSide.none,
           ),
           child: child,
         ),
@@ -116,6 +138,7 @@ class SlidableAction extends StatelessWidget {
   const SlidableAction({
     Key? key,
     this.flex = _kFlex,
+    this.margin,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
@@ -123,6 +146,9 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
+    this.labelStyle,
+    this.shape,
+    this.side,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -143,24 +169,34 @@ class SlidableAction extends StatelessWidget {
   final SlidableActionCallback? onPressed;
 
   /// An icon to display above the [label].
-  final IconData? icon;
+  final Icon? icon;
 
   /// The space between [icon] and [label] if both set.
   ///
   /// Defaults to 4.
   final double spacing;
 
+  /// Empty space to surround the slidable actions.
+  final EdgeInsetsGeometry? margin;
+
   /// A label to display below the [icon].
   final String? label;
+
+  /// The style to use for the label
+  final TextStyle? labelStyle;
+
+  /// The shape for slidable action
+  final OutlinedBorder? shape;
+
+  /// The side for slidable action
+  final BorderSide? side;
 
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
 
     if (icon != null) {
-      children.add(
-        Icon(icon),
-      );
+      children.add(icon!);
     }
 
     if (label != null) {
@@ -174,6 +210,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
+          style: labelStyle,
         ),
       );
     }
@@ -192,10 +229,13 @@ class SlidableAction extends StatelessWidget {
           );
 
     return CustomSlidableAction(
+      margin: margin,
       onPressed: onPressed,
       autoClose: autoClose,
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
+      shape: shape,
+      side: side,
       flex: flex,
       child: child,
     );

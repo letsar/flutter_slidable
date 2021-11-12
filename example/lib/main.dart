@@ -28,51 +28,78 @@ class MyApp extends StatelessWidget {
                 dismissible: DismissiblePane(onDismissed: () {}),
 
                 // All actions are defined in the children parameter.
-                children: const [
+                children: [
                   // A SlidableAction can have an icon and/or a label.
                   SlidableAction(
                     onPressed: doNothing,
-                    backgroundColor: Color(0xFFFE4A49),
+                    backgroundColor: const Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
-                    icon: Icons.delete,
+                    icon: const Icon(Icons.delete),
                     label: 'Delete',
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
                   ),
                   SlidableAction(
                     onPressed: doNothing,
-                    backgroundColor: Color(0xFF21B7CA),
+                    backgroundColor: const Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
-                    icon: Icons.share,
+                    icon: const Icon(Icons.share),
                     label: 'Share',
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
                   ),
                 ],
               ),
 
               // The end action pane is the one at the right or the bottom side.
-              endActionPane: const ActionPane(
-                motion: ScrollMotion(),
+              endActionPane: ActionPane(
+                motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
                     // An action can be bigger than the others.
-                    flex: 2,
                     onPressed: doNothing,
-                    backgroundColor: Color(0xFF7BC043),
+                    backgroundColor: const Color(0xFF7BC043),
                     foregroundColor: Colors.white,
-                    icon: Icons.archive,
+                    icon: const Icon(Icons.archive),
                     label: 'Archive',
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
                   ),
                   SlidableAction(
                     onPressed: doNothing,
-                    backgroundColor: Color(0xFF0392CF),
+                    backgroundColor: const Color(0xFF0392CF),
                     foregroundColor: Colors.white,
-                    icon: Icons.save,
+                    icon: const Icon(Icons.save),
                     label: 'Save',
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
                   ),
                 ],
               ),
 
               // The child of the Slidable is what the user sees when the
               // component is not dragged.
-              child: const ListTile(title: Text('Slide me')),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.teal,
+                ),
+                child: const ListTile(
+                  title: Text(
+                    'Slide me',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
             ),
             Slidable(
               // Specify a key if the Slidable is dismissible.
@@ -90,14 +117,14 @@ class MyApp extends StatelessWidget {
                     onPressed: doNothing,
                     backgroundColor: Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
-                    icon: Icons.delete,
+                    icon: Icon(Icons.delete),
                     label: 'Delete',
                   ),
                   SlidableAction(
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
-                    icon: Icons.share,
+                    icon: Icon(Icons.share),
                     label: 'Share',
                   ),
                 ],
@@ -114,14 +141,14 @@ class MyApp extends StatelessWidget {
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF7BC043),
                     foregroundColor: Colors.white,
-                    icon: Icons.archive,
+                    icon: Icon(Icons.archive),
                     label: 'Archive',
                   ),
                   SlidableAction(
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF0392CF),
                     foregroundColor: Colors.white,
-                    icon: Icons.save,
+                    icon: Icon(Icons.save),
                     label: 'Save',
                   ),
                 ],

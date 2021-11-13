@@ -41,8 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('Flutter Slidable'),
       ),
-      body: SlidableNotificationListener(
-        onNotification: (notification) {},
+      body: SlidableAutoCloseBehavior(
         child: Column(
           children: [
             Directionality(

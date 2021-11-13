@@ -1,11 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_slidable/src/auto_close_behavior.dart';
+import 'package:flutter_slidable/src/notifications_old.dart';
 
 import 'action_pane_configuration.dart';
 import 'controller.dart';
 import 'dismissal.dart';
 import 'gesture_detector.dart';
-import 'notifications.dart';
 import 'scrolling_behavior.dart';
 
 part 'action_pane.dart';
@@ -42,10 +43,12 @@ class Slidable extends StatefulWidget {
   /// Defaults to true.
   final bool closeOnScroll;
 
+  /// {@template slidable.groupTag}
   /// The tag shared by all the [Slidable]s of the same group.
   ///
-  /// This is used by [SlidableNotificationListener] to keep only one [Slidable]
+  /// This is used by [SlidableAutoCloseBehavior] to keep only one [Slidable]
   /// of the same group, open.
+  /// {@endtemplate}
   final Object? groupTag;
 
   /// A widget which is shown when the user drags the [Slidable] to the right or
@@ -256,20 +259,28 @@ class _SlidableState extends State<Slidable>
       child: SlidableNotificationSender(
         tag: widget.groupTag,
         controller: controller,
-        child: SlidableScrollingBehavior(
+        child: SlidableAutoCloseNotificationSender(
+          groupTag: widget.groupTag,
           controller: controller,
-          closeOnScroll: widget.closeOnScroll,
-          child: SlidableDismissal(
-            axis: flipAxis(widget.direction),
+          child: SlidableAutoCloseBehaviorListener(
+            groupTag: widget.groupTag,
             controller: controller,
-            child: ActionPaneConfiguration(
-              alignment: actionPaneAlignment,
-              direction: widget.direction,
-              isStartActionPane:
-                  controller.actionPaneType.value == ActionPaneType.start,
-              child: _SlidableControllerScope(
+            child: SlidableScrollingBehavior(
+              controller: controller,
+              closeOnScroll: widget.closeOnScroll,
+              child: SlidableDismissal(
+                axis: flipAxis(widget.direction),
                 controller: controller,
-                child: content,
+                child: ActionPaneConfiguration(
+                  alignment: actionPaneAlignment,
+                  direction: widget.direction,
+                  isStartActionPane:
+                      controller.actionPaneType.value == ActionPaneType.start,
+                  child: _SlidableControllerScope(
+                    controller: controller,
+                    child: content,
+                  ),
+                ),
               ),
             ),
           ),

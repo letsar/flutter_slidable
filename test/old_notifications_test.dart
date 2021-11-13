@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/controller.dart';
-import 'package:flutter_slidable/src/notifications.dart';
+import 'package:flutter_slidable/src/notifications_old.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -16,19 +16,6 @@ void main() {
   group('SlidableNotificationSender -', () {
     testWidgets(
       'should build outside of a SlidableNotificationListener',
-      (tester) async {
-        await tester.pumpWidget(
-          SlidableNotificationSender(
-            tag: null,
-            controller: mockSlidableController,
-            child: const SizedBox(),
-          ),
-        );
-      },
-    );
-
-    testWidgets(
-      'notification build outside of a SlidableNotificationListener',
       (tester) async {
         await tester.pumpWidget(
           SlidableNotificationSender(

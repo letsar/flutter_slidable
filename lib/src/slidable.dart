@@ -121,7 +121,7 @@ class Slidable extends StatefulWidget {
 
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  SlidableController? controller;
+  late final SlidableController controller;
   late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
 
@@ -152,17 +152,17 @@ class _SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    controller!.actionPaneType.removeListener(handleActionPanelTypeChanged);
-    controller!.dispose();
+    controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
+    controller.dispose();
     super.dispose();
   }
 
   void updateController() {
-    controller!
+    controller
       ..enableStartActionPane = widget.startActionPane != null
       ..startActionPaneExtentRatio = startActionPane?.extentRatio ?? 0;
 
-    controller!
+    controller
       ..enableEndActionPane = widget.endActionPane != null
       ..endActionPaneExtentRatio = endActionPane?.extentRatio ?? 0;
   }
@@ -181,14 +181,14 @@ class _SlidableState extends State<Slidable>
   }
 
   void handleDismissing() {
-    if (controller!.resizeRequest.value != null) {
+    if (controller.resizeRequest.value != null) {
       setState(() {});
     }
   }
 
   void updateMoveAnimation() {
-    final double end = controller!.actionPaneType.value.toSign();
-    moveAnimation = controller!.animation.drive(
+    final double end = controller.actionPaneType.value.toSign();
+    moveAnimation = controller.animation.drive(
       Tween<Offset>(
         begin: Offset.zero,
         end: widget.direction == Axis.horizontal
@@ -199,7 +199,7 @@ class _SlidableState extends State<Slidable>
   }
 
   Widget? get actionPane {
-    switch (controller!.actionPaneType.value) {
+    switch (controller.actionPaneType.value) {
       case ActionPaneType.start:
         return startActionPane;
       case ActionPaneType.end:
@@ -215,7 +215,7 @@ class _SlidableState extends State<Slidable>
       keepPanesOrder ? widget.endActionPane : widget.startActionPane;
 
   Alignment get actionPaneAlignment {
-    final sign = controller!.actionPaneType.value.toSign();
+    final sign = controller.actionPaneType.value.toSign();
     if (widget.direction == Axis.horizontal) {
       return Alignment(-sign, 0);
     } else {
@@ -239,7 +239,7 @@ class _SlidableState extends State<Slidable>
             child: ClipRect(
               clipper: _SlidableClipper(
                 axis: widget.direction,
-                controller: controller!,
+                controller: controller,
               ),
               child: actionPane,
             ),
@@ -250,23 +250,23 @@ class _SlidableState extends State<Slidable>
 
     return SlidableGestureDetector(
       enabled: widget.enabled,
-      controller: controller!,
+      controller: controller,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
       child: SlidableNotificationSender(
         tag: widget.groupTag,
-        controller: controller!,
+        controller: controller,
         child: SlidableScrollingBehavior(
-          controller: controller!,
+          controller: controller,
           closeOnScroll: widget.closeOnScroll,
           child: SlidableDismissal(
             axis: flipAxis(widget.direction),
-            controller: controller!,
+            controller: controller,
             child: ActionPaneConfiguration(
               alignment: actionPaneAlignment,
               direction: widget.direction,
               isStartActionPane:
-                  controller!.actionPaneType.value == ActionPaneType.start,
+                  controller.actionPaneType.value == ActionPaneType.start,
               child: _SlidableControllerScope(
                 controller: controller,
                 child: content,

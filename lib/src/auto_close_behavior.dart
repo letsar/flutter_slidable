@@ -130,15 +130,17 @@ class _SlidableAutoCloseNotificationSenderState
   }
 
   void addListeners() {
-    widget.controller.animation.addListener(handleRatioChanged);
+    widget.controller.animation.addStatusListener(handleStatusChanged);
   }
 
   void removeListeners() {
-    widget.controller.animation.removeListener(handleRatioChanged);
+    widget.controller.animation.addStatusListener(handleStatusChanged);
   }
 
-  void handleRatioChanged() {
-    if (!widget.controller.closing) {
+  void handleStatusChanged(AnimationStatus status) {
+    final moving =
+        status == AnimationStatus.forward || status == AnimationStatus.reverse;
+    if (moving && !widget.controller.closing) {
       SlidableGroupNotification.dispatch(
         context,
         SlidableAutoCloseNotification(

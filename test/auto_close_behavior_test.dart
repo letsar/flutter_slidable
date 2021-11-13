@@ -66,7 +66,7 @@ void main() {
         expect(notifications.length, 1);
 
         controller.ratio = 0.1;
-        expect(notifications.length, 2);
+        expect(notifications.length, 1);
       },
     );
 
@@ -117,7 +117,7 @@ void main() {
         );
 
         controller.ratio = 0.1;
-        expect(notifications.length, 2);
+        expect(notifications.length, 1);
 
         await tester.pumpWidget(
           SlidableAutoCloseNotificationSender(
@@ -128,7 +128,7 @@ void main() {
         );
 
         controller.ratio = 0.2;
-        expect(notifications.length, 2);
+        expect(notifications.length, 1);
 
         await tester.pumpWidget(
           SlidableAutoCloseBehavior(
@@ -144,7 +144,7 @@ void main() {
         );
 
         controller.ratio = 0.3;
-        expect(notifications.length, 3);
+        expect(notifications.length, 1);
 
         await tester.pumpWidget(
           SlidableGroupBehaviorListener<SlidableAutoCloseNotification>(
@@ -154,7 +154,7 @@ void main() {
         );
 
         controller.ratio = 0.2;
-        expect(notifications.length, 3);
+        expect(notifications.length, 1);
       },
     );
 

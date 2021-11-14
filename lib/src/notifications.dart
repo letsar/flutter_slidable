@@ -4,6 +4,39 @@ import 'package:flutter/widgets.dart';
 class SlidableGroupNotification {
   const SlidableGroupNotification._();
 
+  /// Creates a dispatcher used to dispatch the [notification] to the closest
+  /// [SlidableGroupBehavior] with the given type.
+  ///
+  /// [assertParentExists] is only used internally to not throws an assertion
+  /// error if there are no [SlidableGroupBehavior]s in the tree.
+  ///
+  /// It can be useful to call this method instead of [dispatch] in case you
+  /// want to send a last notification before disposing a StatefulWidget.
+  static SlidableGroupNotificationDispatcher<T>? createDispatcher<T>(
+    BuildContext context, {
+    bool assertParentExists = true,
+  }) {
+    final widget = context
+        .getElementForInheritedWidgetOfExactType<
+            _InheritedSlidableNotification<T>>()
+        ?.widget as _InheritedSlidableNotification<T>?;
+
+    assert(() {
+      if (assertParentExists && widget == null) {
+        throw FlutterError(
+          'SlidableGroupBehavior.of<$T> called with a context that '
+          'does not contain a SlidableGroupBehavior<$T>.',
+        );
+      }
+      return true;
+    }());
+    if (widget != null) {
+      return SlidableGroupNotificationDispatcher<T>._(widget);
+    }
+
+    return null;
+  }
+
   /// Dispatches the [notification] to the closest [SlidableGroupBehavior] with
   /// the given type.
   ///
@@ -14,23 +47,33 @@ class SlidableGroupNotification {
     T notification, {
     bool assertParentExists = true,
   }) {
-    final widget = context
-        .getElementForInheritedWidgetOfExactType<
-            _InheritedSlidableNotification<T>>()
-        ?.widget as _InheritedSlidableNotification<T>?;
+    final dispatcher = createDispatcher<T>(
+      context,
+      assertParentExists: assertParentExists,
+    );
+    dispatcher?.dispatch(notification);
+  }
+}
 
-    final notifier = widget?.notifier;
-    assert(() {
-      if (assertParentExists && notifier == null) {
-        throw FlutterError(
-          'SlidableGroupBehavior.of<$T> called with a context that '
-          'does not contain a SlidableGroupBehavior<$T>.',
-        );
-      }
-      return true;
-    }());
-    if (notifier != null) {
-      notifier.value = notification;
+/// A dispatcher used to dispatch a Slidable notification.
+class SlidableGroupNotificationDispatcher<T> {
+  SlidableGroupNotificationDispatcher._(this._inheritedSlidableNotification);
+
+  final _InheritedSlidableNotification<T> _inheritedSlidableNotification;
+
+  /// Dispatches the [notification] to the closest [SlidableGroupBehavior] with
+  /// the given type.
+  ///
+  /// [assertParentExists] is only used internally to not throws an assertion
+  /// error if there are no [SlidableGroupBehavior]s in the tree.
+  void dispatch(T notification) {
+    final notifier = _inheritedSlidableNotification.notifier;
+    final onNotification = _inheritedSlidableNotification.onNotification;
+    final effectiveNotification =
+        onNotification != null ? onNotification(notification) : notification;
+
+    if (effectiveNotification != null) {
+      notifier.value = effectiveNotification;
     }
   }
 }
@@ -40,8 +83,15 @@ class SlidableGroupBehavior<T> extends StatefulWidget {
   /// Creates a SlidableGroupBehavior.
   const SlidableGroupBehavior({
     Key? key,
+    this.onNotification,
     required this.child,
   }) : super(key: key);
+
+  /// Callback that can modified a notification before to be dispatched to
+  /// listeners.
+  ///
+  /// If the result if null, then the notitication is not dispatched.
+  final T? Function(T notification)? onNotification;
 
   /// The widget below this widget in the tree.
   ///
@@ -59,6 +109,7 @@ class _SlidableGroupBehaviorState<T> extends State<SlidableGroupBehavior<T>> {
   @override
   Widget build(BuildContext context) {
     return _InheritedSlidableNotification(
+      onNotification: widget.onNotification,
       notifier: valueNotifier,
       child: widget.child,
     );
@@ -68,6 +119,7 @@ class _SlidableGroupBehaviorState<T> extends State<SlidableGroupBehavior<T>> {
 class _InheritedSlidableNotification<T> extends InheritedWidget {
   const _InheritedSlidableNotification({
     Key? key,
+    required this.onNotification,
     required this.notifier,
     required Widget child,
   }) : super(
@@ -75,6 +127,7 @@ class _InheritedSlidableNotification<T> extends InheritedWidget {
           child: child,
         );
 
+  final T? Function(T notification)? onNotification;
   final ValueNotifier<T?> notifier;
 
   static ValueNotifier<T?>? of<T>(BuildContext context) {

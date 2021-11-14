@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_slidable/src/auto_close_behavior.dart';
@@ -22,7 +24,7 @@ void main() {
       'should build outside of a SlidableAutoCloseBehavior',
       (tester) async {
         await tester.pumpWidget(
-          _SlidableAutoCloseSenderAndListener(
+          SlidableAutoCloseInteractor(
             groupTag: null,
             controller: mockSlidableController,
             child: const SizedBox(),
@@ -169,7 +171,7 @@ void main() {
           child: Column(
             children: [
               ...controllers.map(
-                (controller) => _SlidableAutoCloseSenderAndListener(
+                (controller) => SlidableAutoCloseInteractor(
                   groupTag: 'tag',
                   controller: controller,
                   child: const SizedBox(),
@@ -213,7 +215,7 @@ void main() {
           child: Column(
             children: [
               ...controllers.map(
-                (controller) => _SlidableAutoCloseSenderAndListener(
+                (controller) => SlidableAutoCloseInteractor(
                   groupTag: 'tag',
                   controller: controller,
                   child: const SizedBox(),
@@ -249,7 +251,7 @@ void main() {
           child: Column(
             children: [
               for (int i = 0; i < 4; i++)
-                _SlidableAutoCloseSenderAndListener(
+                SlidableAutoCloseInteractor(
                   groupTag: i.isEven ? 'even' : 'odd',
                   controller: controllers[i],
                   child: const SizedBox(),
@@ -284,7 +286,7 @@ void main() {
           child: Column(
             children: [
               for (int i = 0; i < 4; i++)
-                _SlidableAutoCloseSenderAndListener(
+                SlidableAutoCloseInteractor(
                   groupTag: 'tag',
                   controller: controllers[i],
                   child: const SizedBox(),
@@ -305,30 +307,145 @@ void main() {
       expect(controllers[1].ratio, 0);
     });
   });
-}
 
-class _SlidableAutoCloseSenderAndListener extends StatelessWidget {
-  const _SlidableAutoCloseSenderAndListener({
-    Key? key,
-    required this.groupTag,
-    required this.controller,
-    required this.child,
-  }) : super(key: key);
+  testWidgets(
+      'when a Slidable is tapped while another is opened, all the group are closed',
+      (tester) async {
+    final controllers = List.generate(
+      4,
+      (index) => SlidableController(const TestVSync()),
+    );
 
-  final Object? groupTag;
-  final SlidableController controller;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return SlidableAutoCloseBehaviorListener(
-      groupTag: groupTag,
-      controller: controller,
-      child: SlidableAutoCloseNotificationSender(
-        groupTag: groupTag,
-        controller: controller,
-        child: child,
+    await tester.pumpWidget(
+      SlidableAutoCloseBehavior(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ...controllers.mapIndexed(
+              (index, controller) => SlidableAutoCloseBehaviorInteractor(
+                key: ValueKey('tag_$index'),
+                groupTag: 'tag',
+                controller: controller,
+                child: Container(height: 40, width: 100, color: Colors.red),
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }
+
+    const duration = Duration(milliseconds: 100);
+    controllers[1].openTo(0.5, duration: duration);
+    await tester.pumpAndSettle();
+
+    expect(controllers[0].ratio, 0);
+    expect(controllers[1].ratio, 0.5);
+    expect(controllers[2].ratio, 0);
+    expect(controllers[3].ratio, 0);
+
+    await tester.tap(find.byKey(const ValueKey('tag_0')));
+    await tester.pumpAndSettle();
+
+    expect(controllers[0].ratio, 0);
+    expect(controllers[1].ratio, 0);
+    expect(controllers[2].ratio, 0);
+    expect(controllers[3].ratio, 0);
+  });
+
+  testWidgets(
+      "when the Slidable's child is tapped while it is opened, it is automatically closed",
+      (tester) async {
+    final controllers = List.generate(
+      4,
+      (index) => SlidableController(const TestVSync()),
+    );
+
+    await tester.pumpWidget(
+      SlidableAutoCloseBehavior(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ...controllers.mapIndexed(
+              (index, controller) => SlidableAutoCloseBehaviorInteractor(
+                key: ValueKey('tag_$index'),
+                groupTag: 'tag',
+                controller: controller,
+                child: Container(height: 40, width: 100, color: Colors.red),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    const duration = Duration(milliseconds: 100);
+    controllers[1].openTo(0.5, duration: duration);
+    await tester.pumpAndSettle();
+
+    expect(controllers[0].ratio, 0);
+    expect(controllers[1].ratio, 0.5);
+    expect(controllers[2].ratio, 0);
+    expect(controllers[3].ratio, 0);
+
+    await tester.tap(find.byKey(const ValueKey('tag_1')));
+    await tester.pumpAndSettle();
+
+    expect(controllers[0].ratio, 0);
+    expect(controllers[1].ratio, 0);
+    expect(controllers[2].ratio, 0);
+    expect(controllers[3].ratio, 0);
+  });
+
+  testWidgets(
+      'GestureDetector onTap callback is called on the child only if not opened',
+      (tester) async {
+    final List<int> tapped = [];
+
+    final controllers = List.generate(
+      4,
+      (index) => SlidableController(const TestVSync()),
+    );
+
+    await tester.pumpWidget(
+      SlidableAutoCloseBehavior(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ...controllers.mapIndexed(
+              (index, controller) => SlidableAutoCloseBehaviorInteractor(
+                key: ValueKey('tag_$index'),
+                groupTag: 'tag',
+                controller: controller,
+                child: GestureDetector(
+                  onTap: () => tapped.add(index),
+                  child: Container(height: 40, width: 100, color: Colors.red),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    const duration = Duration(milliseconds: 100);
+    controllers[1].openTo(0.5, duration: duration);
+    await tester.pumpAndSettle();
+
+    expect(controllers[0].ratio, 0);
+    expect(controllers[1].ratio, 0.5);
+    expect(controllers[2].ratio, 0);
+    expect(controllers[3].ratio, 0);
+
+    await tester.tap(find.byKey(const ValueKey('tag_1')));
+    await tester.pumpAndSettle();
+    expect(controllers[0].ratio, 0);
+    expect(controllers[1].ratio, 0);
+    expect(controllers[2].ratio, 0);
+    expect(controllers[3].ratio, 0);
+    expect(tapped, isEmpty);
+
+    await tester.tap(find.byKey(const ValueKey('tag_1')));
+    await tester.pumpAndSettle();
+    expect(tapped, [1]);
+  });
 }

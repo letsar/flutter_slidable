@@ -259,27 +259,23 @@ class _SlidableState extends State<Slidable>
       child: SlidableNotificationSender(
         tag: widget.groupTag,
         controller: controller,
-        child: SlidableAutoCloseNotificationSender(
+        child: SlidableAutoCloseBehaviorInteractor(
           groupTag: widget.groupTag,
           controller: controller,
-          child: SlidableAutoCloseBehaviorListener(
-            groupTag: widget.groupTag,
+          child: SlidableScrollingBehavior(
             controller: controller,
-            child: SlidableScrollingBehavior(
+            closeOnScroll: widget.closeOnScroll,
+            child: SlidableDismissal(
+              axis: flipAxis(widget.direction),
               controller: controller,
-              closeOnScroll: widget.closeOnScroll,
-              child: SlidableDismissal(
-                axis: flipAxis(widget.direction),
-                controller: controller,
-                child: ActionPaneConfiguration(
-                  alignment: actionPaneAlignment,
-                  direction: widget.direction,
-                  isStartActionPane:
-                      controller.actionPaneType.value == ActionPaneType.start,
-                  child: _SlidableControllerScope(
-                    controller: controller,
-                    child: content,
-                  ),
+              child: ActionPaneConfiguration(
+                alignment: actionPaneAlignment,
+                direction: widget.direction,
+                isStartActionPane:
+                    controller.actionPaneType.value == ActionPaneType.start,
+                child: _SlidableControllerScope(
+                  controller: controller,
+                  child: content,
                 ),
               ),
             ),

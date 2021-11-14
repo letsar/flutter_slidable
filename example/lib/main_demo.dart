@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Directionality(
               textDirection: TextDirection.rtl,
               child: Slidable(
+                key: const ValueKey(1),
                 groupTag: '0',
                 direction: direction,
                 startActionPane: const ActionPane(
@@ -72,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Slidable(
+              key: const ValueKey(2),
               groupTag: '0',
               direction: direction,
               startActionPane: const ActionPane(
@@ -91,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.pink, text: 'hello 2'),
             ),
             Slidable(
+              key: const ValueKey(3),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: ScrollMotion(),
@@ -163,6 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Tile(color: Colors.lime, text: 'hello 4'),
               ),
             Slidable(
+              key: const ValueKey(5),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -181,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
+              key: const ValueKey(6),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -199,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
+              key: const ValueKey(7),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -217,6 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
+              key: const ValueKey(8),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -281,6 +288,9 @@ class Tile extends StatelessWidget {
     final direction = AppState.of(context)!.direction;
     return ActionTypeListener(
       child: GestureDetector(
+        onTap: () {
+          print('$text');
+        },
         onLongPress: () => Slidable.of(context)!.openEndActionPane(),
         child: Container(
           color: color,

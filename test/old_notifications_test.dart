@@ -2,17 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/controller.dart';
 import 'package:flutter_slidable/src/notifications_old.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-
-import 'common.dart';
-
-final mockSlidableController = MockSlidableController();
 
 void main() {
-  setUp(() {
-    reset(mockSlidableController);
-  });
-
   group('SlidableNotificationSender -', () {
     testWidgets(
       'should build outside of a SlidableNotificationListener',
@@ -20,7 +11,7 @@ void main() {
         await tester.pumpWidget(
           SlidableNotificationSender(
             tag: null,
-            controller: mockSlidableController,
+            controller: SlidableController(const TestVSync()),
             child: const SizedBox(),
           ),
         );

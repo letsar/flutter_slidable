@@ -104,8 +104,9 @@ class SlidableController {
         endGesture = ValueNotifier(null),
         _dismissGesture = _ValueNotifier(null),
         resizeRequest = ValueNotifier(null),
-        actionPaneType = ValueNotifier(ActionPaneType.none) {
-    _animationController.addListener(_onRatioChanged);
+        actionPaneType = ValueNotifier(ActionPaneType.none),
+        direction = ValueNotifier(0) {
+    direction.addListener(_onDirectionChanged);
   }
 
   final AnimationController _animationController;
@@ -116,6 +117,18 @@ class SlidableController {
 
   /// Whether the end action pane is enabled.
   bool enableEndActionPane = true;
+
+  /// Whether the start action pane is at the left (if horizontal).
+  /// Defaults to true.
+  bool isLeftToRight = true;
+
+  /// Whether the positive action pane is enabled.
+  bool get enablePositiveActionPane =>
+      isLeftToRight ? enableStartActionPane : enableEndActionPane;
+
+  /// Whether the negative action pane is enabled.
+  bool get enableNegativeActionPane =>
+      isLeftToRight ? enableEndActionPane : enableStartActionPane;
 
   /// The extent ratio of the start action pane.
   double get startActionPaneExtentRatio => _startActionPaneExtentRatio;
@@ -165,6 +178,13 @@ class SlidableController {
   /// Track the type of the action pane.
   final ValueNotifier<ActionPaneType> actionPaneType;
 
+  /// Track the direction in which the slidable moves.
+  ///
+  /// -1 means that the slidable is moving to the left.
+  ///  0 means that the slidable is not moving.
+  ///  1 means that the slidable is moving to the right.
+  final ValueNotifier<int> direction;
+
   /// Indicates whether the dismissible registered to gestures.
   bool get isDismissibleReady => _dismissGesture._hasListeners;
 
@@ -175,8 +195,8 @@ class SlidableController {
   bool _acceptRatio(double ratio) {
     return !_closing &&
         (ratio == 0 ||
-            ((ratio > 0 && enableStartActionPane) ||
-                (ratio < 0 && enableEndActionPane)));
+            ((ratio > 0 && enablePositiveActionPane) ||
+                (ratio < 0 && enableNegativeActionPane)));
   }
 
   /// The current ratio of the full size of the [Slidable] that is already
@@ -187,19 +207,18 @@ class SlidableController {
   /// [ActionPaneType.end].
   /// Between 0 (exclusive) and 1 (inclusive), the action pane is
   /// [ActionPaneType.start].
-  double get ratio =>
-      _animationController.value * actionPaneType.value.toSign();
+  double get ratio => _animationController.value * direction.value;
   set ratio(double value) {
     final newRatio = (actionPaneConfigurator?.normalizeRatio(value)) ?? value;
     if (_acceptRatio(newRatio) && newRatio != ratio) {
-      final index = newRatio.sign.toInt() + 1;
-      actionPaneType.value = ActionPaneType.values[index];
+      direction.value = newRatio.sign.toInt();
       _animationController.value = newRatio.abs();
     }
   }
 
-  void _onRatioChanged() {
-    final index = ratio.sign.toInt() + 1;
+  void _onDirectionChanged() {
+    final mulitiplier = isLeftToRight ? 1 : -1;
+    final index = (direction.value * mulitiplier) + 1;
     actionPaneType.value = ActionPaneType.values[index];
   }
 
@@ -208,7 +227,7 @@ class SlidableController {
   void dispatchEndGesture(double? velocity, GestureDirection direction) {
     if (velocity == 0 || velocity == null) {
       endGesture.value = StillGesture(direction);
-    } else if (velocity.sign == actionPaneType.value.toSign()) {
+    } else if (velocity.sign == this.direction.value) {
       endGesture.value = OpeningGesture(velocity);
     } else {
       endGesture.value = ClosingGesture(velocity.abs());
@@ -232,6 +251,7 @@ class SlidableController {
       duration: duration,
       curve: curve,
     );
+    direction.value = 0;
     _closing = false;
   }
 
@@ -253,7 +273,7 @@ class SlidableController {
     Curve curve = _defaultCurve,
   }) async {
     if (actionPaneType.value != ActionPaneType.start) {
-      actionPaneType.value = ActionPaneType.start;
+      direction.value = isLeftToRight ? 1 : -1;
       ratio = 0;
     }
 
@@ -270,7 +290,7 @@ class SlidableController {
     Curve curve = _defaultCurve,
   }) async {
     if (actionPaneType.value != ActionPaneType.end) {
-      actionPaneType.value = ActionPaneType.end;
+      direction.value = isLeftToRight ? -1 : 1;
       ratio = 0;
     }
 
@@ -321,9 +341,10 @@ class SlidableController {
 
   /// Disposes the controller.
   void dispose() {
-    _animationController.removeListener(_onRatioChanged);
     _animationController.stop();
     _animationController.dispose();
+    direction.removeListener(_onDirectionChanged);
+    direction.dispose();
   }
 }
 
@@ -331,19 +352,4 @@ class _ValueNotifier<T> extends ValueNotifier<T> {
   _ValueNotifier(T value) : super(value);
 
   bool get _hasListeners => hasListeners;
-}
-
-/// Extensions for [ActionPaneType].
-extension ActionPaneTypeX on ActionPaneType {
-  /// Transforms this [ActionPaneType] to a sign.
-  double toSign() {
-    switch (this) {
-      case ActionPaneType.start:
-        return 1;
-      case ActionPaneType.end:
-        return -1;
-      default:
-        return 0;
-    }
-  }
 }

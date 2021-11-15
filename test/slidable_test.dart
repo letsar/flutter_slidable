@@ -278,4 +278,83 @@ void main() {
 
     expect(tester.getTopLeft(find.byKey(childKey)), const Offset(0, 0));
   });
+
+  testWidgets(
+      'should work if TextDirection.rtl and only startActionPane is set',
+      (tester) async {
+    const gestureDetectorKey = ValueKey('gesture_detector');
+    const actionPaneKey = ValueKey('action_pane');
+    final actionPane = ActionPane(
+      key: actionPaneKey,
+      motion: const BehindMotion(),
+      children: [
+        SlidableAction(onPressed: (_) {}, icon: Icons.share),
+        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+      ],
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.rtl,
+        child: Slidable(
+          startActionPane: actionPane,
+          child: Builder(builder: (context) {
+            return GestureDetector(
+              key: gestureDetectorKey,
+              onTap: () {
+                Slidable.of(context)!.openStartActionPane();
+              },
+            );
+          }),
+        ),
+      ),
+    );
+
+    expect(find.byKey(actionPaneKey), findsNothing);
+
+    await tester.tap(find.byKey(gestureDetectorKey));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(actionPaneKey), findsOneWidget);
+  });
+
+  testWidgets('should work if TextDirection.rtl and only endActionPane is set',
+      (tester) async {
+    const gestureDetectorKey = ValueKey('gesture_detector');
+    const actionPaneKey = ValueKey('action_pane');
+    final actionPane = ActionPane(
+      key: actionPaneKey,
+      motion: const BehindMotion(),
+      children: [
+        SlidableAction(onPressed: (_) {}, icon: Icons.share),
+        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+      ],
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.rtl,
+        child: Slidable(
+          endActionPane: actionPane,
+          child: Builder(builder: (context) {
+            return GestureDetector(
+              key: gestureDetectorKey,
+              onTap: () {
+                Slidable.of(context)!.openEndActionPane();
+              },
+            );
+          }),
+        ),
+      ),
+    );
+
+    expect(find.byKey(actionPaneKey), findsNothing);
+
+    await tester.tap(find.byKey(gestureDetectorKey));
+    await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(actionPaneKey), findsOneWidget);
+  });
 }

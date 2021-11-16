@@ -5,7 +5,7 @@ void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -38,19 +38,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final direction = AppState.of(context).direction;
+    final direction = AppState.of(context)!.direction;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Slidable'),
       ),
-      body: SlidableNotificationListener(
-        onNotification: (notification) {},
+      body: SlidableAutoCloseBehavior(
         child: ListView(
           scrollDirection: flipAxis(direction),
           children: [
             Directionality(
               textDirection: TextDirection.rtl,
               child: Slidable(
+                key: const ValueKey(1),
                 groupTag: '0',
                 direction: direction,
                 startActionPane: const ActionPane(
@@ -73,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Slidable(
+              key: const ValueKey(2),
               groupTag: '0',
               direction: direction,
               startActionPane: const ActionPane(
@@ -92,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.pink, text: 'hello 2'),
             ),
             Slidable(
+              key: const ValueKey(3),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: ScrollMotion(),
@@ -123,29 +125,30 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     closeOnCancel: true,
                     confirmDismiss: () async {
-                      return showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Are you sure?'),
-                            content: const Text('Are you sure to dismiss?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: const Text('Yes'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: const Text('No'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      return await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Are you sure?'),
+                                content: const Text('Are you sure to dismiss?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                    child: const Text('Yes'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
+                                    child: const Text('No'),
+                                  ),
+                                ],
+                              );
+                            },
+                          ) ??
+                          false;
                     },
                   ),
                   children: const [
@@ -163,6 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Tile(color: Colors.lime, text: 'hello 4'),
               ),
             Slidable(
+              key: const ValueKey(5),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -181,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
+              key: const ValueKey(6),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -199,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
+              key: const ValueKey(7),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -217,6 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Tile(color: Colors.grey, text: 'hello'),
             ),
             Slidable(
+              key: const ValueKey(8),
               direction: direction,
               startActionPane: const ActionPane(
                 motion: BehindMotion(),
@@ -243,9 +250,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class SlideAction extends StatelessWidget {
   const SlideAction({
-    Key key,
-    @required this.color,
-    @required this.icon,
+    Key? key,
+    required this.color,
+    required this.icon,
     this.flex = 1,
   }) : super(key: key);
 
@@ -259,8 +266,10 @@ class SlideAction extends StatelessWidget {
       flex: flex,
       backgroundColor: color,
       foregroundColor: Colors.white,
-      onPressed: (_) {},
       icon: Icon(icon),
+      onPressed: (_) {
+        print(icon);
+      },
       label: 'hello',
     );
   }
@@ -268,9 +277,9 @@ class SlideAction extends StatelessWidget {
 
 class Tile extends StatelessWidget {
   const Tile({
-    Key key,
-    @required this.color,
-    @required this.text,
+    Key? key,
+    required this.color,
+    required this.text,
   }) : super(key: key);
 
   final Color color;
@@ -278,10 +287,13 @@ class Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final direction = AppState.of(context).direction;
+    final direction = AppState.of(context)!.direction;
     return ActionTypeListener(
       child: GestureDetector(
-        onLongPress: () => Slidable.of(context).openEndActionPane(),
+        onTap: () {
+          print('$text');
+        },
+        onLongPress: () => Slidable.of(context)!.openEndActionPane(),
         child: Container(
           color: color,
           height: direction == Axis.horizontal ? 100 : double.infinity,
@@ -295,8 +307,8 @@ class Tile extends StatelessWidget {
 
 class ActionTypeListener extends StatefulWidget {
   const ActionTypeListener({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
   }) : super(key: key);
 
   final Widget child;
@@ -306,7 +318,7 @@ class ActionTypeListener extends StatefulWidget {
 }
 
 class _ActionTypeListenerState extends State<ActionTypeListener> {
-  ValueNotifier<ActionPaneType> _actionPaneTypeValueNotifier;
+  ValueNotifier<ActionPaneType>? _actionPaneTypeValueNotifier;
 
   @override
   void initState() {
@@ -333,9 +345,9 @@ class _ActionTypeListenerState extends State<ActionTypeListener> {
 
 class AppState extends InheritedWidget {
   const AppState({
-    Key key,
-    @required this.direction,
-    @required Widget child,
+    Key? key,
+    required this.direction,
+    required Widget child,
   }) : super(key: key, child: child);
 
   final Axis direction;
@@ -345,7 +357,7 @@ class AppState extends InheritedWidget {
     return direction != oldWidget.direction;
   }
 
-  static AppState of(BuildContext context) {
+  static AppState? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<AppState>();
   }
 }

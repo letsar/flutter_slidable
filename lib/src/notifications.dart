@@ -1,253 +1,203 @@
 import 'package:flutter/widgets.dart';
 
-import 'controller.dart';
+/// Used to dispatch a Slidable notification.
+class SlidableGroupNotification {
+  const SlidableGroupNotification._();
 
-/// Signature for [SlidableNotification] listeners.
-///
-/// Used by [SlidableNotificationListener.onNotification].
-typedef SlidableNotificationCallback = void Function(
-  SlidableNotification notification,
-);
-
-/// A [Slidable] notification that can bubble up the widget tree.
-///
-/// You can determine the type of a notification using the `is` operator to
-/// check the [runtimeType] of the notification.
-///
-/// To listen for notifications in a subtree, use a
-/// [SlidableNotificationListener].
-///
-/// To send a notification, call [dispatch] on the notification you wish to
-/// send. The notification will be delivered to the closest
-/// [SlidableNotificationListener] widget.
-@immutable
-class SlidableNotification {
-  /// Abstract const constructor. This constructor enables subclasses to provide
-  /// const constructors so that they can be used in const expressions.
-  const SlidableNotification({
-    required this.tag,
-  });
-
-  /// A tag representing the [Slidable] from which the notification is sent.
-  final Object? tag;
-
-  /// Start bubbling this notification at the given build context.
+  /// Creates a dispatcher used to dispatch the [notification] to the closest
+  /// [SlidableGroupBehavior] with the given type.
   ///
-  /// The notification will be delivered to the closest
-  /// [SlidableNotificationListener] widget.
-  /// If the [BuildContext] is null, the notification is not dispatched.
-  void dispatch(BuildContext context, SlidableController controller) {
-    final scope = context
+  /// [assertParentExists] is only used internally to not throws an assertion
+  /// error if there are no [SlidableGroupBehavior]s in the tree.
+  ///
+  /// It can be useful to call this method instead of [dispatch] in case you
+  /// want to send a last notification before disposing a StatefulWidget.
+  static SlidableGroupNotificationDispatcher<T>? createDispatcher<T>(
+    BuildContext context, {
+    bool assertParentExists = true,
+  }) {
+    final widget = context
         .getElementForInheritedWidgetOfExactType<
-            _SlidableNotificationListenerScope>()
-        ?.widget as _SlidableNotificationListenerScope?;
+            _InheritedSlidableNotification<T>>()
+        ?.widget as _InheritedSlidableNotification<T>?;
 
-    scope?.state.acceptNotification(controller, this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
+    assert(() {
+      if (assertParentExists && widget == null) {
+        throw FlutterError(
+          'SlidableGroupBehavior.of<$T> called with a context that '
+          'does not contain a SlidableGroupBehavior<$T>.',
+        );
+      }
       return true;
+    }());
+    if (widget != null) {
+      return SlidableGroupNotificationDispatcher<T>._(widget);
     }
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-    return other is SlidableNotification && other.tag == tag;
+
+    return null;
   }
 
-  @override
-  int get hashCode => tag.hashCode;
-
-  @override
-  String toString() => 'SlidableNotification(tag: $tag)';
-}
-
-/// A specific [SlidableNotification] which holds the current ratio value.
-@immutable
-class SlidableRatioNotification extends SlidableNotification {
-  /// Creates a [SlidableRatioNotification].
-  const SlidableRatioNotification({
-    required Object? tag,
-    required this.ratio,
-  }) : super(tag: tag);
-
-  /// The ratio value of the [SlidableController].
-  final double ratio;
-
-  @override
-  bool operator ==(Object other) {
-    return super == other &&
-        other is SlidableRatioNotification &&
-        other.ratio == ratio;
+  /// Dispatches the [notification] to the closest [SlidableGroupBehavior] with
+  /// the given type.
+  ///
+  /// [assertParentExists] is only used internally to not throws an assertion
+  /// error if there are no [SlidableGroupBehavior]s in the tree.
+  static void dispatch<T>(
+    BuildContext context,
+    T notification, {
+    bool assertParentExists = true,
+  }) {
+    final dispatcher = createDispatcher<T>(
+      context,
+      assertParentExists: assertParentExists,
+    );
+    dispatcher?.dispatch(notification);
   }
-
-  @override
-  int get hashCode => hashValues(tag, ratio);
-
-  @override
-  String toString() => 'SlidableRatioNotification(tag: $tag, ratio: $ratio)';
 }
 
-/// A widget that listens for [SlidableNotification]s bubbling up the tree.
-///
-/// To dispatch notifications, use the [SlidableNotification.dispatch] method.
-class SlidableNotificationListener extends StatefulWidget {
-  /// Creates a [SlidableNotificationListener].
-  const SlidableNotificationListener({
+/// A dispatcher used to dispatch a Slidable notification.
+class SlidableGroupNotificationDispatcher<T> {
+  SlidableGroupNotificationDispatcher._(this._inheritedSlidableNotification);
+
+  final _InheritedSlidableNotification<T> _inheritedSlidableNotification;
+
+  /// Dispatches the [notification] to the closest [SlidableGroupBehavior] with
+  /// the given type.
+  ///
+  /// [assertParentExists] is only used internally to not throws an assertion
+  /// error if there are no [SlidableGroupBehavior]s in the tree.
+  void dispatch(T notification) {
+    final notifier = _inheritedSlidableNotification.notifier;
+    final onNotification = _inheritedSlidableNotification.onNotification;
+    final effectiveNotification =
+        onNotification != null ? onNotification(notification) : notification;
+
+    if (effectiveNotification != null) {
+      notifier.value = effectiveNotification;
+    }
+  }
+}
+
+/// A widget which can dispatch notifications to a group of [Slidable] below it.
+class SlidableGroupBehavior<T> extends StatefulWidget {
+  /// Creates a SlidableGroupBehavior.
+  const SlidableGroupBehavior({
     Key? key,
     this.onNotification,
-    this.autoClose = true,
     required this.child,
-  })  : assert(
-          autoClose || onNotification != null,
-          'Either autoClose or onNotification must be set.',
-        ),
-        super(key: key);
+  }) : super(key: key);
 
-  /// The widget directly below this widget in the tree.
+  /// Callback that can modified a notification before to be dispatched to
+  /// listeners.
   ///
-  /// This is not necessarily the widget that dispatched the notification.
+  /// If the result if null, then the notitication is not dispatched.
+  final T? Function(T notification)? onNotification;
+
+  /// The widget below this widget in the tree.
   ///
-  /// {@macro flutter.widgets.child}
+  /// {@macro flutter.widgets.ProxyWidget.child}
   final Widget child;
 
-  /// Called when a notification of the appropriate arrives at this location in
-  /// the tree.
-  final SlidableNotificationCallback? onNotification;
-
-  /// Whether to automatically close any [Slidable] with a given tag when
-  /// another [Slidable] with the same tag opens.
-  final bool autoClose;
-
   @override
-  _SlidableNotificationListenerState createState() =>
-      _SlidableNotificationListenerState();
+  _SlidableGroupBehaviorState<T> createState() =>
+      _SlidableGroupBehaviorState<T>();
 }
 
-class _SlidableNotificationListenerState
-    extends State<SlidableNotificationListener> {
-  final Map<Object?, SlidableController> openControllers =
-      <Object?, SlidableController>{};
-
-  void acceptNotification(
-    SlidableController controller,
-    SlidableNotification notification,
-  ) {
-    handleNotification(controller, notification);
-    widget.onNotification?.call(notification);
-  }
-
-  void handleNotification(
-    SlidableController controller,
-    SlidableNotification notification,
-  ) {
-    if (widget.autoClose && !controller.closing) {
-      // Automatically close the last controller saved with the same tag.
-      final lastOpenController = openControllers[notification.tag];
-      if (lastOpenController != null && lastOpenController != controller) {
-        lastOpenController.close();
-      }
-      openControllers[notification.tag] = controller;
-    }
-  }
-
-  void clearController(SlidableController controller, Object? tag) {
-    final lastOpenController = openControllers[tag];
-    if (lastOpenController == controller) {
-      openControllers.remove(tag);
-    }
-  }
+class _SlidableGroupBehaviorState<T> extends State<SlidableGroupBehavior<T>> {
+  final valueNotifier = ValueNotifier<T?>(null);
 
   @override
   Widget build(BuildContext context) {
-    return _SlidableNotificationListenerScope(
-      state: this,
+    return _InheritedSlidableNotification(
+      onNotification: widget.onNotification,
+      notifier: valueNotifier,
       child: widget.child,
     );
   }
 }
 
-class _SlidableNotificationListenerScope extends InheritedWidget {
-  const _SlidableNotificationListenerScope({
+class _InheritedSlidableNotification<T> extends InheritedWidget {
+  const _InheritedSlidableNotification({
     Key? key,
-    required this.state,
+    required this.onNotification,
+    required this.notifier,
     required Widget child,
-  }) : super(key: key, child: child);
+  }) : super(
+          key: key,
+          child: child,
+        );
 
-  final _SlidableNotificationListenerState state;
+  final T? Function(T notification)? onNotification;
+  final ValueNotifier<T?> notifier;
+
+  static ValueNotifier<T?>? of<T>(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_InheritedSlidableNotification<T>>()
+        ?.notifier;
+  }
 
   @override
-  bool updateShouldNotify(
-      covariant _SlidableNotificationListenerScope oldWidget) {
-    return oldWidget.state != state;
+  bool updateShouldNotify(_InheritedSlidableNotification<T> oldWidget) {
+    return oldWidget.notifier != notifier;
   }
 }
 
-// Internal use.
-// ignore_for_file: public_member_api_docs
-class SlidableNotificationSender extends StatefulWidget {
-  const SlidableNotificationSender({
+/// A widget which listens to notifications dispatched by a
+/// [SlidableGroupBehavior] of the same type.
+///
+/// Typically this widget is a child of a [Slidable] widget.
+class SlidableGroupBehaviorListener<T> extends StatefulWidget {
+  /// Creates a [SlidableGroupBehaviorListener].
+  const SlidableGroupBehaviorListener({
     Key? key,
-    required this.tag,
-    required this.controller,
+    required this.onNotification,
     required this.child,
   }) : super(key: key);
 
-  final Object? tag;
-  final SlidableController controller;
+  /// The callback to invoke when a notification is dispatched.
+  final ValueChanged<T> onNotification;
+
+  /// The widget below this widget in the tree.
+  ///
+  /// {@macro flutter.widgets.ProxyWidget.child}
   final Widget child;
 
   @override
-  _SlidableNotificationSenderState createState() =>
-      _SlidableNotificationSenderState();
+  State<SlidableGroupBehaviorListener<T>> createState() =>
+      _SlidableGroupBehaviorListenerState<T>();
 }
 
-class _SlidableNotificationSenderState
-    extends State<SlidableNotificationSender> {
-  _SlidableNotificationListenerState? listenerState;
+class _SlidableGroupBehaviorListenerState<T>
+    extends State<SlidableGroupBehaviorListener<T>> {
+  ValueNotifier<T?>? notifier;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final state = context
-        .dependOnInheritedWidgetOfExactType<
-            _SlidableNotificationListenerScope>()
-        ?.state;
-    if (state != listenerState) {
-      if (state == null) {
-        removeListeners();
-      } else if (listenerState == null) {
-        addListeners();
+    final oldNotifier = notifier;
+    final newNotifier = _InheritedSlidableNotification.of<T>(context);
+    if (oldNotifier != newNotifier) {
+      if (oldNotifier != null) {
+        oldNotifier.removeListener(handleNotification);
       }
-      listenerState = state;
+      if (newNotifier != null) {
+        newNotifier.addListener(handleNotification);
+      }
+      notifier = newNotifier;
     }
   }
 
   @override
   void dispose() {
-    if (listenerState != null) {
-      removeListeners();
-      listenerState!.clearController(widget.controller, widget.tag);
-    }
+    notifier?.removeListener(handleNotification);
     super.dispose();
   }
 
-  void addListeners() {
-    widget.controller.animation.addListener(handleRatioChanged);
-  }
-
-  void removeListeners() {
-    widget.controller.animation.removeListener(handleRatioChanged);
-  }
-
-  void handleRatioChanged() {
-    final controller = widget.controller;
-    final notification = SlidableRatioNotification(
-      tag: widget.tag,
-      ratio: controller.ratio,
-    );
-    listenerState!.acceptNotification(controller, notification);
+  void handleNotification() {
+    final notification = notifier?.value;
+    if (notification != null) {
+      widget.onNotification(notification);
+    }
   }
 
   @override

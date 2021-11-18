@@ -1,11 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_slidable/src/auto_close_behavior.dart';
+import 'package:flutter_slidable/src/notifications_old.dart';
 
 import 'action_pane_configuration.dart';
 import 'controller.dart';
 import 'dismissal.dart';
 import 'gesture_detector.dart';
-import 'notifications.dart';
 import 'scrolling_behavior.dart';
 
 part 'action_pane.dart';
@@ -42,10 +43,12 @@ class Slidable extends StatefulWidget {
   /// Defaults to true.
   final bool closeOnScroll;
 
+  /// {@template slidable.groupTag}
   /// The tag shared by all the [Slidable]s of the same group.
   ///
-  /// This is used by [SlidableNotificationListener] to keep only one [Slidable]
+  /// This is used by [SlidableAutoCloseBehavior] to keep only one [Slidable]
   /// of the same group, open.
+  /// {@endtemplate}
   final Object? groupTag;
 
   /// A widget which is shown when the user drags the [Slidable] to the right or
@@ -121,7 +124,7 @@ class Slidable extends StatefulWidget {
 
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  SlidableController? controller;
+  late final SlidableController controller;
   late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
 
@@ -152,24 +155,24 @@ class _SlidableState extends State<Slidable>
 
   @override
   void dispose() {
-    controller!.actionPaneType.removeListener(handleActionPanelTypeChanged);
-    controller!.dispose();
+    controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
+    controller.dispose();
     super.dispose();
   }
 
   void updateController() {
-    controller!
-      ..enableStartActionPane = widget.startActionPane != null
+    controller
+      ..enableStartActionPane = startActionPane != null
       ..startActionPaneExtentRatio = startActionPane?.extentRatio ?? 0;
 
-    controller!
-      ..enableEndActionPane = widget.endActionPane != null
+    controller
+      ..enableEndActionPane = endActionPane != null
       ..endActionPaneExtentRatio = endActionPane?.extentRatio ?? 0;
   }
 
   void updateIsLeftToRight() {
     final textDirection = Directionality.of(context);
-    keepPanesOrder = widget.direction == Axis.vertical ||
+    controller.isLeftToRight = widget.direction == Axis.vertical ||
         !widget.useTextDirection ||
         textDirection == TextDirection.ltr;
   }
@@ -181,14 +184,14 @@ class _SlidableState extends State<Slidable>
   }
 
   void handleDismissing() {
-    if (controller!.resizeRequest.value != null) {
+    if (controller.resizeRequest.value != null) {
       setState(() {});
     }
   }
 
   void updateMoveAnimation() {
-    final double end = controller!.actionPaneType.value.toSign();
-    moveAnimation = controller!.animation.drive(
+    final double end = controller.direction.value.toDouble();
+    moveAnimation = controller.animation.drive(
       Tween<Offset>(
         begin: Offset.zero,
         end: widget.direction == Axis.horizontal
@@ -199,7 +202,7 @@ class _SlidableState extends State<Slidable>
   }
 
   Widget? get actionPane {
-    switch (controller!.actionPaneType.value) {
+    switch (controller.actionPaneType.value) {
       case ActionPaneType.start:
         return startActionPane;
       case ActionPaneType.end:
@@ -209,13 +212,11 @@ class _SlidableState extends State<Slidable>
     }
   }
 
-  ActionPane? get startActionPane =>
-      keepPanesOrder ? widget.startActionPane : widget.endActionPane;
-  ActionPane? get endActionPane =>
-      keepPanesOrder ? widget.endActionPane : widget.startActionPane;
+  ActionPane? get startActionPane => widget.startActionPane;
+  ActionPane? get endActionPane => widget.endActionPane;
 
   Alignment get actionPaneAlignment {
-    final sign = controller!.actionPaneType.value.toSign();
+    final sign = controller.direction.value.toDouble();
     if (widget.direction == Axis.horizontal) {
       return Alignment(-sign, 0);
     } else {
@@ -229,7 +230,11 @@ class _SlidableState extends State<Slidable>
 
     Widget content = SlideTransition(
       position: moveAnimation,
-      child: widget.child,
+      child: SlidableAutoCloseBehaviorInteractor(
+        groupTag: widget.groupTag,
+        controller: controller,
+        child: widget.child,
+      ),
     );
 
     content = Stack(
@@ -239,7 +244,7 @@ class _SlidableState extends State<Slidable>
             child: ClipRect(
               clipper: _SlidableClipper(
                 axis: widget.direction,
-                controller: controller!,
+                controller: controller,
               ),
               child: actionPane,
             ),
@@ -250,23 +255,23 @@ class _SlidableState extends State<Slidable>
 
     return SlidableGestureDetector(
       enabled: widget.enabled,
-      controller: controller!,
+      controller: controller,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
       child: SlidableNotificationSender(
         tag: widget.groupTag,
-        controller: controller!,
+        controller: controller,
         child: SlidableScrollingBehavior(
-          controller: controller!,
+          controller: controller,
           closeOnScroll: widget.closeOnScroll,
           child: SlidableDismissal(
             axis: flipAxis(widget.direction),
-            controller: controller!,
+            controller: controller,
             child: ActionPaneConfiguration(
               alignment: actionPaneAlignment,
               direction: widget.direction,
               isStartActionPane:
-                  controller!.actionPaneType.value == ActionPaneType.start,
+                  controller.actionPaneType.value == ActionPaneType.start,
               child: _SlidableControllerScope(
                 controller: controller,
                 child: content,

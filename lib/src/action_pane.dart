@@ -52,7 +52,7 @@ class ActionPane extends StatefulWidget {
     this.openThreshold,
     this.closeThreshold,
     required this.children,
-  })   : assert(extentRatio > 0 && extentRatio <= 1),
+  })  : assert(extentRatio > 0 && extentRatio <= 1),
         assert(
             openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
         assert(closeThreshold == null ||

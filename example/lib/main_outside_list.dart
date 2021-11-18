@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -36,13 +36,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final direction = AppState.of(context).direction;
+    final direction = AppState.of(context)!.direction;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Slidable'),
       ),
-      body: SlidableNotificationListener(
-        onNotification: (notification) {},
+      body: SlidableAutoCloseBehavior(
         child: Column(
           children: [
             Directionality(
@@ -133,29 +132,31 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                       closeOnCancel: true,
                       confirmDismiss: () async {
-                        return showDialog<bool>(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Are you sure?'),
-                              content: const Text('Are you sure to dismiss?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(true);
-                                  },
-                                  child: const Text('Yes'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(false);
-                                  },
-                                  child: const Text('No'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        return await showDialog<bool>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('Are you sure?'),
+                                  content:
+                                      const Text('Are you sure to dismiss?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: const Text('Yes'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      child: const Text('No'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ) ??
+                            false;
                       },
                     ),
                     children: const [
@@ -184,9 +185,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class SlideAction extends StatelessWidget {
   const SlideAction({
-    Key key,
-    @required this.color,
-    @required this.icon,
+    Key? key,
+    required this.color,
+    required this.icon,
     this.flex = 1,
   }) : super(key: key);
 
@@ -209,9 +210,9 @@ class SlideAction extends StatelessWidget {
 
 class Tile extends StatelessWidget {
   const Tile({
-    Key key,
-    @required this.color,
-    @required this.text,
+    Key? key,
+    required this.color,
+    required this.text,
   }) : super(key: key);
 
   final Color color;
@@ -219,9 +220,9 @@ class Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final direction = AppState.of(context).direction;
+    final direction = AppState.of(context)!.direction;
     return GestureDetector(
-      onLongPress: () => Slidable.of(context).openEndActionPane(),
+      onLongPress: () => Slidable.of(context)!.openEndActionPane(),
       child: Container(
         color: color,
         height: direction == Axis.horizontal ? 100 : double.infinity,
@@ -234,9 +235,9 @@ class Tile extends StatelessWidget {
 
 class AppState extends InheritedWidget {
   const AppState({
-    Key key,
-    @required this.direction,
-    @required Widget child,
+    Key? key,
+    required this.direction,
+    required Widget child,
   }) : super(key: key, child: child);
 
   final Axis direction;
@@ -246,7 +247,7 @@ class AppState extends InheritedWidget {
     return direction != oldWidget.direction;
   }
 
-  static AppState of(BuildContext context) {
+  static AppState? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<AppState>();
   }
 }

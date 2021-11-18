@@ -141,9 +141,8 @@ void main() {
         return ratio!;
       });
 
-      final mockActionPanelType = ValueNotifier(ActionPaneType.none);
-      when(() => mockSlidableController.actionPaneType)
-          .thenReturn(mockActionPanelType);
+      final mockDirection = ValueNotifier(0);
+      when(() => mockSlidableController.direction).thenReturn(mockDirection);
 
       await tester.pumpWidget(Center(
         child: SizedBox(

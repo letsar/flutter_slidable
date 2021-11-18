@@ -23,8 +23,8 @@ class CustomSlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
-    this.shape = const RoundedRectangleBorder(),
-    this.side = BorderSide.none,
+    this.shape,
+    this.side,
     required this.onPressed,
     required this.child,
   })  : assert(flex > 0),
@@ -75,12 +75,12 @@ class CustomSlidableAction extends StatelessWidget {
   /// [OutlinedBorder] of action, if is null, then [RoundedRectangleBorder]
   /// used by default
   /// {@endtemplate}
-  final OutlinedBorder shape;
+  final OutlinedBorder? shape;
 
   /// {@template slidable.actions.side}
   /// [BorderSide] of action, if is null, then [BorderSide.none] used by default
   /// {@endtemplate}
-  final BorderSide side;
+  final BorderSide? side;
 
   @override
   Widget build(BuildContext context) {
@@ -135,8 +135,8 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
-    this.shape = const RoundedRectangleBorder(),
-    this.side = BorderSide.none,
+    this.shape,
+    this.side,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -168,10 +168,10 @@ class SlidableAction extends StatelessWidget {
   final String? label;
 
   /// {@macro slidable.actions.shape}
-  final OutlinedBorder shape;
+  final OutlinedBorder? shape;
 
   /// {@macro slidable.actions.side}
-  final BorderSide side;
+  final BorderSide? side;
 
   @override
   Widget build(BuildContext context) {

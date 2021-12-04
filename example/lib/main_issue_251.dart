@@ -108,24 +108,35 @@ class RememberedArea extends StatefulWidget {
 }
 
 class _RememberedAreaState extends State<RememberedArea> {
+  double maxValue = 0;
   late final animation = Slidable.of(context)!.animation;
 
   @override
   void initState() {
     super.initState();
+    animation.addListener(handleValueChanged);
     animation.addStatusListener(handleStatusChanged);
   }
 
-  Color get color => widget.colorTween.lerp(animation.value * 2)!;
+  double get colorValue => animation.value * 2;
+  Color get color => widget.colorTween.lerp(colorValue)!;
+
+  void handleValueChanged() {
+    if (colorValue > maxValue) {
+      maxValue = colorValue;
+      widget.colorNotifier.value = color;
+    }
+  }
 
   void handleStatusChanged(AnimationStatus status) {
-    if (status == AnimationStatus.reverse) {
-      widget.colorNotifier.value = color;
+    if (status == AnimationStatus.dismissed) {
+      maxValue = 0;
     }
   }
 
   @override
   void dispose() {
+    animation.removeListener(handleValueChanged);
     animation.removeStatusListener(handleStatusChanged);
     super.dispose();
   }

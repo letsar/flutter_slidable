@@ -212,7 +212,7 @@ class SlidableController {
     final newRatio = (actionPaneConfigurator?.normalizeRatio(value)) ?? value;
     if (_acceptRatio(newRatio) && newRatio != ratio) {
       direction.value = newRatio.sign.toInt();
-      _animationController.animateTo(newRatio.abs(), duration: Duration.zero);
+      _animationController.value = newRatio.abs();
     }
   }
 

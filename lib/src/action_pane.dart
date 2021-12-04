@@ -182,7 +182,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
       return;
     }
 
-    if (gesture is OpeningGesture ||
+    if ((gesture is OpeningGesture && openThreshold <= extentRatio) ||
         gesture is StillGesture &&
             ((gesture.opening && position >= openThreshold) ||
                 gesture.closing && position > closeThreshold)) {

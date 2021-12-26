@@ -18,7 +18,10 @@ class MyApp extends StatelessWidget {
             Slidable(
               // Specify a key if the Slidable is dismissible.
               key: const ValueKey(0),
-
+              // Listen slider open status
+              onOpen: (bool status) {
+                // print(status);
+              },
               // The start action pane is the one at the left or the top side.
               startActionPane: ActionPane(
                 // A motion is a widget used to control how the pane animates.

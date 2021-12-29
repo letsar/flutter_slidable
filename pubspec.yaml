@@ -15,5 +15,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^0.1.1
+  collection:
 
 flutter:

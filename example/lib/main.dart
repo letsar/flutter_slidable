@@ -131,6 +131,30 @@ class MyApp extends StatelessWidget {
               // component is not dragged.
               child: const ListTile(title: Text('Slide me')),
             ),
+            Slidable(
+              // Specify a key if the Slidable is dismissible.
+              key: const ValueKey(1),
+              // The start action pane is the one at the left or the top side.
+              // trying custom view builder
+              startActionPane: FuzzyActionPane(viewData: FuzzyActionViewData(
+                  onPress: (_, percent) => print(percent),
+                  viewBuilder: (_,p) => Container(child: Text('${p}%'), color: Colors.amber,alignment: Alignment.center,)
+              ),),
+              // The end action pane is the one at the right or the bottom side.
+              endActionPane: FuzzyActionPane(
+                viewData: FuzzyActionViewData(
+                    onPress: (_, percent) => print(percent),
+                    backgroundColorBuilder: (_, p) => Color.lerp(Colors.red, Colors.green, p / 100.0)!,
+                    foregroundColorBuilder: (_,__) => Colors.white,
+                    iconBuilder: (_,__) => Icons.check_circle,
+                    labelBuilder: (_,p) => '${p}%'
+                ),
+              ),
+
+              // The child of the Slidable is what the user sees when the
+              // component is not dragged.
+              child: const ListTile(title: Text('Slide me')),
+            ),
           ],
         ),
       ),

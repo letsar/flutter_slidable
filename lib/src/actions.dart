@@ -5,9 +5,15 @@ import 'slidable.dart';
 /// Signature for [CustomSlidableAction.onPressed].
 typedef SlidableActionCallback = void Function(BuildContext context);
 
+enum LabelPosition {
+  top,
+  bottom
+}
+
 const int _kFlex = 1;
 const Color _kBackgroundColor = Colors.white;
 const bool _kAutoClose = true;
+const LabelPosition _labelPosition = LabelPosition.bottom;
 
 /// Represents an action of an [ActionPane].
 class CustomSlidableAction extends StatelessWidget {
@@ -121,6 +127,7 @@ class SlidableAction extends StatelessWidget {
     this.autoClose = _kAutoClose,
     required this.onPressed,
     this.icon,
+    this.labelPosition = _labelPosition,
     this.spacing = 4,
     this.label,
   })  : assert(flex > 0),
@@ -138,6 +145,9 @@ class SlidableAction extends StatelessWidget {
 
   /// {@macro slidable.actions.autoClose}
   final bool autoClose;
+
+  /// {@macro slidable.labelPosition}
+  final LabelPosition labelPosition;
 
   /// {@macro slidable.actions.onPressed}
   final SlidableActionCallback? onPressed;
@@ -157,25 +167,47 @@ class SlidableAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final children = <Widget>[];
 
-    if (icon != null) {
-      children.add(
-        Icon(icon),
-      );
-    }
-
-    if (label != null) {
-      if (children.isNotEmpty) {
+    if (labelPosition == LabelPosition.bottom) {
+      if (icon != null) {
         children.add(
-          SizedBox(height: spacing),
+          Icon(icon),
         );
       }
 
-      children.add(
-        Text(
-          label!,
-          overflow: TextOverflow.ellipsis,
-        ),
-      );
+      if (label != null) {
+        if (children.isNotEmpty) {
+          children.add(
+            SizedBox(height: spacing),
+          );
+        }
+
+        children.add(
+          Text(
+            label!,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      }
+    } else {
+      if (label != null) {
+        children.add(
+          Text(
+            label!,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      }
+      if (icon != null) {
+        if (children.isNotEmpty) {
+          children.add(
+            SizedBox(height: spacing),
+          );
+        }
+
+        children.add(
+          Icon(icon),
+        );
+      }
     }
 
     final child = children.length == 1

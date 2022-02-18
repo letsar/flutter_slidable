@@ -61,10 +61,10 @@ class CustomSlidableAction extends StatelessWidget {
   /// {@endtemplate}
   final bool autoClose;
 
-  /// {@template slidable.actions.onpressed}
-  /// called when the action is tapped or otherwise activated.
+  /// {@template slidable.actions.onPressed}
+  /// Called when the action is tapped or otherwise activated.
   ///
-  /// if this callback is null, then the action will be disabled.
+  /// If this callback is null, then the action will be disabled.
   /// {@endtemplate}
   final SlidableActionCallback? onPressed;
 

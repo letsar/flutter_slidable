@@ -258,9 +258,9 @@ class _SlidableState extends State<Slidable>
       controller: controller,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
-      child: SlidableNotificationSender(
-        tag: widget.groupTag,
+      child: SlidableAutoCloseNotificationSender(
         controller: controller,
+        groupTag: widget.groupTag,
         child: SlidableScrollingBehavior(
           controller: controller,
           closeOnScroll: widget.closeOnScroll,

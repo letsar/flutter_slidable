@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/auto_close_behavior.dart';
-import 'package:flutter_slidable/src/notifications_old.dart';
 
 import 'action_pane_configuration.dart';
 import 'controller.dart';

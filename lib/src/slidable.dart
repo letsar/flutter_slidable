@@ -27,6 +27,8 @@ class Slidable extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
     required this.child,
+    this.backgroundColor,
+    this.borderRadius,
   }) : super(key: key);
 
   /// Whether this slidable is interactive.
@@ -35,6 +37,14 @@ class Slidable extends StatefulWidget {
   ///
   /// Defaults to true.
   final bool enabled;
+
+  /// Defaults to [Colors.Transparent].
+  /// {@endtemplate}
+  final Color? backgroundColor;
+
+  /// Defaults to [BorderRadius.zero].
+  /// {@endtemplate}
+  final BorderRadius? borderRadius;
 
   /// Specifies to close this [Slidable] after the closest [Scrollable]'s
   /// position changed.
@@ -236,20 +246,26 @@ class _SlidableState extends State<Slidable>
       ),
     );
 
-    content = Stack(
-      children: <Widget>[
-        if (actionPane != null)
-          Positioned.fill(
-            child: ClipRect(
-              clipper: _SlidableClipper(
-                axis: widget.direction,
-                controller: controller,
+    content = ClipRRect(
+      borderRadius: widget.borderRadius ?? BorderRadius.zero,
+      child: Container(
+        color: widget.backgroundColor,
+        child: Stack(
+          children: <Widget>[
+            if (actionPane != null)
+              Positioned.fill(
+                child: ClipRect(
+                  clipper: _SlidableClipper(
+                    axis: widget.direction,
+                    controller: controller,
+                  ),
+                  child: actionPane,
+                ),
               ),
-              child: actionPane,
-            ),
-          ),
-        content,
-      ],
+            content,
+          ],
+        ),
+      ),
     );
 
     return SlidableGestureDetector(

@@ -22,6 +22,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.flex = _kFlex,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
+    this.borderRadius,
     this.autoClose = _kAutoClose,
     required this.onPressed,
     required this.child,
@@ -59,6 +60,13 @@ class CustomSlidableAction extends StatelessWidget {
   /// {@endtemplate}
   final bool autoClose;
 
+  /// {@template slidable.actions.borderRadius}
+  /// The borderRadius of this action.
+  ///
+  /// Defaults to [BorderRadius.zero].
+  /// {@endtemplate}
+  final BorderRadius? borderRadius;
+
   /// {@template slidable.actions.onPressed}
   /// Called when the action is tapped or otherwise activated.
   ///
@@ -86,7 +94,11 @@ class CustomSlidableAction extends StatelessWidget {
             backgroundColor: backgroundColor,
             primary: effectiveForegroundColor,
             onSurface: effectiveForegroundColor,
-            shape: const RoundedRectangleBorder(),
+            shape: borderRadius != null
+                ? RoundedRectangleBorder(
+                    borderRadius: borderRadius!,
+                  )
+                : const RoundedRectangleBorder(),
             side: BorderSide.none,
           ),
           child: child,
@@ -113,17 +125,18 @@ class SlidableAction extends StatelessWidget {
   /// You must set either an [icon] or a [label].
   ///
   /// The [flex] argument must also be greater than 0.
-  const SlidableAction({
-    Key? key,
-    this.flex = _kFlex,
-    this.backgroundColor = _kBackgroundColor,
-    this.foregroundColor,
-    this.autoClose = _kAutoClose,
-    required this.onPressed,
-    this.icon,
-    this.spacing = 4,
-    this.label,
-  })  : assert(flex > 0),
+  const SlidableAction(
+      {Key? key,
+      this.flex = _kFlex,
+      this.backgroundColor = _kBackgroundColor,
+      this.foregroundColor,
+      this.borderRadius,
+      this.autoClose = _kAutoClose,
+      required this.onPressed,
+      this.icon,
+      this.spacing = 4,
+      this.label})
+      : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
 
@@ -149,6 +162,9 @@ class SlidableAction extends StatelessWidget {
   ///
   /// Defaults to 4.
   final double spacing;
+
+  /// {@macro slidable.actions.borderRadius}
+  final BorderRadius? borderRadius;
 
   /// A label to display below the [icon].
   final String? label;
@@ -197,6 +213,7 @@ class SlidableAction extends StatelessWidget {
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       flex: flex,
+      borderRadius: borderRadius,
       child: child,
     );
   }

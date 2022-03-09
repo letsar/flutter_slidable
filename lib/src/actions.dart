@@ -22,7 +22,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.flex = _kFlex,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
-    this.borderRadius,
+    this.shape = const RoundedRectangleBorder(),
     this.autoClose = _kAutoClose,
     required this.onPressed,
     required this.child,
@@ -60,12 +60,12 @@ class CustomSlidableAction extends StatelessWidget {
   /// {@endtemplate}
   final bool autoClose;
 
-  /// {@template slidable.actions.borderRadius}
-  /// The borderRadius of this action.
+  /// {@template slidable.actions.shape}
+  /// The shape of this action.
   ///
-  /// Defaults to [BorderRadius.zero].
+  /// Defaults to [RoundedRectangleBorder].
   /// {@endtemplate}
-  final BorderRadius? borderRadius;
+  final OutlinedBorder? shape;
 
   /// {@template slidable.actions.onPressed}
   /// Called when the action is tapped or otherwise activated.
@@ -94,11 +94,7 @@ class CustomSlidableAction extends StatelessWidget {
             backgroundColor: backgroundColor,
             primary: effectiveForegroundColor,
             onSurface: effectiveForegroundColor,
-            shape: borderRadius != null
-                ? RoundedRectangleBorder(
-                    borderRadius: borderRadius!,
-                  )
-                : const RoundedRectangleBorder(),
+            shape: shape,
             side: BorderSide.none,
           ),
           child: child,
@@ -130,7 +126,7 @@ class SlidableAction extends StatelessWidget {
       this.flex = _kFlex,
       this.backgroundColor = _kBackgroundColor,
       this.foregroundColor,
-      this.borderRadius,
+      this.shape,
       this.autoClose = _kAutoClose,
       required this.onPressed,
       this.icon,
@@ -163,8 +159,8 @@ class SlidableAction extends StatelessWidget {
   /// Defaults to 4.
   final double spacing;
 
-  /// {@macro slidable.actions.borderRadius}
-  final BorderRadius? borderRadius;
+  /// {@macro slidable.actions.shape}
+  final OutlinedBorder? shape;
 
   /// A label to display below the [icon].
   final String? label;
@@ -213,7 +209,7 @@ class SlidableAction extends StatelessWidget {
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       flex: flex,
-      borderRadius: borderRadius,
+      shape: shape,
       child: child,
     );
   }

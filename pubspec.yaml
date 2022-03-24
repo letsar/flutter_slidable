@@ -4,8 +4,8 @@ version: 1.2.0
 homepage: https://github.com/letsar/flutter_slidable
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
-  flutter: ">=1.22.0"
+  sdk: '>=2.16.1 <3.0.0'
+  flutter: ">=2.10.3"
 
 dependencies:
   flutter:
@@ -14,7 +14,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^0.1.1
+  mocktail: ^0.3.0
   collection:
 
 flutter:

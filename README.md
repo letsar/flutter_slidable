@@ -8,6 +8,8 @@
 
 A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
 
+Note: Don't add Widget with onPressed and onTap to label or icon of SlidableAction.
+
 ## Sponsors
 
 Our top sponsors are shown below! [[Become a Sponsor](https://github.com/sponsors/letsar)]

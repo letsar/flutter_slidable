@@ -8,6 +8,8 @@
 
 A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
 
+Note: Don't add Widget with onPressed and onTap to label or icon of SlidableAction.
+
 ## Sponsors
 
 Our top sponsors are shown below! [[Become a Sponsor](https://github.com/sponsors/letsar)]
@@ -78,15 +80,15 @@ Slidable(
         onPressed: doNothing,
         backgroundColor: Color(0xFFFE4A49),
         foregroundColor: Colors.white,
-        icon: Icons.delete,
-        label: 'Delete',
+        icon: Icon(Icons.delete),
+        label: Text('Delete'),
       ),
       SlidableAction(
         onPressed: doNothing,
         backgroundColor: Color(0xFF21B7CA),
         foregroundColor: Colors.white,
-        icon: Icons.share,
-        label: 'Share',
+        icon: Icon(Icons.share),
+        label: Text('Share'),
       ),
     ],
   ),
@@ -101,15 +103,15 @@ Slidable(
         onPressed: doNothing,
         backgroundColor: Color(0xFF7BC043),
         foregroundColor: Colors.white,
-        icon: Icons.archive,
-        label: 'Archive',
+        icon: Icon(Icons.archive),
+        label: Text('Archive'),
       ),
       SlidableAction(
         onPressed: doNothing,
         backgroundColor: Color(0xFF0392CF),
         foregroundColor: Colors.white,
-        icon: Icons.save,
-        label: 'Save',
+        icon: Icon(Icons.save),
+        label: Text('Save'),
       ),
     ],
   ),

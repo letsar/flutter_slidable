@@ -14,7 +14,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^0.1.1
+  mocktail: ^0.3.0
   collection:
 
 flutter:

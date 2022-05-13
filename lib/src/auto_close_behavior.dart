@@ -388,7 +388,7 @@ class _SlidableAutoCloseBarrierNotificationSenderState
       // while the barrier was still enabled for this group.
       // We need to release the barrier.
 
-      SchedulerBinding.instance!.addPostFrameCallback((Duration _) {
+      SchedulerBinding.instance.addPostFrameCallback((Duration _) {
         // We call it in the next frame to avoid to rebuild a widget that is
         // already rebuilding.
         dispatchSlidableAutoCloseBarrierNotification(enabled: false);

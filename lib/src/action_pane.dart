@@ -49,6 +49,7 @@ class ActionPane extends StatefulWidget {
     this.extentRatio = _defaultExtentRatio,
     required this.motion,
     this.dismissible,
+    this.dragDismissible = true,
     this.openThreshold,
     this.closeThreshold,
     required this.children,
@@ -70,6 +71,11 @@ class ActionPane extends StatefulWidget {
 
   /// A widget which controls how the [Slidable] dismisses.
   final Widget? dismissible;
+
+  /// Indicates whether the [Slidable] can be dismissed by dragging.
+  ///
+  /// Defaults to true.
+  final bool dragDismissible;
 
   /// The fraction of the total extent from where the [Slidable] will
   /// automatically open when the drag end.
@@ -155,7 +161,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
 
   @override
   double normalizeRatio(double ratio) {
-    if (widget.dismissible != null) {
+    if (widget.dismissible != null && widget.dragDismissible) {
       return ratio;
     }
 
@@ -171,7 +177,9 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     final gesture = controller!.endGesture.value;
     final position = controller!.animation.value;
 
-    if (widget.dismissible != null && position > widget.extentRatio) {
+    if (widget.dismissible != null &&
+        widget.dragDismissible &&
+        position > widget.extentRatio) {
       if (controller!.isDismissibleReady) {
         controller!.dismissGesture.value = DismissGesture(gesture);
       } else {
@@ -182,7 +190,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
       return;
     }
 
-    if (gesture is OpeningGesture ||
+    if ((gesture is OpeningGesture && openThreshold <= extentRatio) ||
         gesture is StillGesture &&
             ((gesture.opening && position >= openThreshold) ||
                 gesture.closing && position > closeThreshold)) {

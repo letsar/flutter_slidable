@@ -291,7 +291,7 @@ class Tile extends StatelessWidget {
     return ActionTypeListener(
       child: GestureDetector(
         onTap: () {
-          print('$text');
+          print(text);
         },
         onLongPress: () => Slidable.of(context)!.openEndActionPane(),
         child: Container(

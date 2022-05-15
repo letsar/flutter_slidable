@@ -1,3 +1,10 @@
+## 1.2.0
+### Added
+* A way to automatically close other Slidables within the same group by tapping on them.
+* Add a dragDismissible parameter on ActionPane.
+### Fixed
+* The RTL issue (#244).
+
 ## 1.1.0
 ### Changed
 * Created a totally different notification system in order to be more flexible.

@@ -150,6 +150,56 @@ void main() {
     });
 
     testWidgets(
+        'startActionPane cannot be drag dismissed if dragDismissible is false',
+        (tester) async {
+      bool dismissed = false;
+      void handleDismissed() {
+        dismissed = true;
+      }
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: SizedBox(
+              height: 200,
+              width: 100,
+              child: Slidable(
+                key: const ValueKey('key'),
+                startActionPane: ActionPane(
+                  dragDismissible: false,
+                  dismissible: DismissiblePane(
+                    onDismissed: handleDismissed,
+                    dismissThreshold: 0.8,
+                  ),
+                  motion: const BehindMotion(),
+                  children: [
+                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                  ],
+                ),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(dismissed, isFalse);
+
+      await tester.timedDrag(
+        find.byTypeOf<Slidable>(),
+        const Offset(80, 0),
+        const Duration(milliseconds: 400),
+      );
+
+      // Wait for the resize to finish.
+      await tester.pumpAndSettle();
+
+      expect(dismissed, isFalse);
+    });
+
+    testWidgets(
         'when the drag is not past the dismissThreshold, the Slidable stays open',
         (tester) async {
       bool dismissed = false;

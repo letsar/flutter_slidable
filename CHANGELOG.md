@@ -1,3 +1,7 @@
+## 1.2.1
+### Fixed
+* Build warning
+
 ## 1.2.0
 ### Added
 * A way to automatically close other Slidables within the same group by tapping on them.

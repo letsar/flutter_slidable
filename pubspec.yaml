@@ -1,6 +1,6 @@
 name: flutter_slidable
 description: A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
-version: 1.2.0
+version: 1.2.1
 homepage: https://github.com/letsar/flutter_slidable
 
 environment:

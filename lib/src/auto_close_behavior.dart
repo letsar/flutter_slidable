@@ -388,7 +388,12 @@ class _SlidableAutoCloseBarrierNotificationSenderState
       // while the barrier was still enabled for this group.
       // We need to release the barrier.
 
-      SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+      // In Flutter 3, [SchedulerBinding.instance] is not nullable, but since
+      // we want to support Flutter 2, this is a simple way to do it without
+      // having a build warning.
+      // ignore: unnecessary_nullable_for_final_variable_declarations
+      final SchedulerBinding? schedulerBinding = SchedulerBinding.instance;
+      schedulerBinding?.addPostFrameCallback((Duration _) {
         // We call it in the next frame to avoid to rebuild a widget that is
         // already rebuilding.
         dispatchSlidableAutoCloseBarrierNotification(enabled: false);

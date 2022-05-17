@@ -241,6 +241,36 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               child: const Tile(color: Colors.grey, text: 'hello'),
             ),
+            Slidable(
+              direction: direction,
+              startActionPane: ActionPane(
+                motion: const BehindMotion(),
+                children: [
+                  SlideAction(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(19),
+                    ),
+                    color: Colors.green.withOpacity(0.8),
+                    icon: Icons.share,
+                  ),
+                  SlideAction(
+                    color: Colors.amber.withOpacity(0.8),
+                    icon: Icons.delete,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(19),
+                    ),
+                  ),
+                ],
+              ),
+              endActionPane: const ActionPane(
+                motion: BehindMotion(),
+                children: [
+                  SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                  SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                ],
+              ),
+              child: const Tile(color: Colors.red, text: 'hello'),
+            ),
           ],
         ),
       ),
@@ -250,20 +280,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class SlideAction extends StatelessWidget {
   const SlideAction({
-    Key? key,
     required this.color,
     required this.icon,
+    Key? key,
     this.flex = 1,
   }) : super(key: key);
 
   final Color color;
   final IconData icon;
   final int flex;
-
+  final OutlinedBorder shape;
+  final BorderSide side;
   @override
   Widget build(BuildContext context) {
     return SlidableAction(
       flex: flex,
+      shape: shape,
+      side: side,
       backgroundColor: color,
       foregroundColor: Colors.white,
       onPressed: (_) {
@@ -291,7 +324,7 @@ class Tile extends StatelessWidget {
     return ActionTypeListener(
       child: GestureDetector(
         onTap: () {
-          print('$text');
+          print(text);
         },
         onLongPress: () => Slidable.of(context)!.openEndActionPane(),
         child: Container(

@@ -5,9 +5,11 @@ import 'slidable.dart';
 /// Signature for [CustomSlidableAction.onPressed].
 typedef SlidableActionCallback = void Function(BuildContext context);
 
-const int _kFlex = 1;
-const Color _kBackgroundColor = Colors.white;
-const bool _kAutoClose = true;
+const _kFlex = 1;
+const _kBackgroundColor = Colors.white;
+const _kAutoClose = true;
+const _kborderSide = BorderSide.none;
+const _kshape = RoundedRectangleBorder();
 
 /// Represents an action of an [ActionPane].
 class CustomSlidableAction extends StatelessWidget {
@@ -23,6 +25,8 @@ class CustomSlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
+    this.side,
+    this.shape,
     required this.onPressed,
     required this.child,
   })  : assert(flex > 0),
@@ -69,6 +73,14 @@ class CustomSlidableAction extends StatelessWidget {
   /// Typically the action's icon or label.
   final Widget child;
 
+  /// Defaults to [BorderSide.none].
+  /// {@endtemplate}
+  final BorderSide? side;
+
+  /// Defaults to [RoundedRectangleBorder].
+  /// {@endtemplate}
+  final OutlinedBorder? shape;
+
   @override
   Widget build(BuildContext context) {
     final effectiveForegroundColor = foregroundColor ??
@@ -86,8 +98,8 @@ class CustomSlidableAction extends StatelessWidget {
             backgroundColor: backgroundColor,
             primary: effectiveForegroundColor,
             onSurface: effectiveForegroundColor,
-            shape: const RoundedRectangleBorder(),
-            side: BorderSide.none,
+            shape: shape,
+            side: side,
           ),
           child: child,
         ),
@@ -123,6 +135,8 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
+    this.side = _kborderSide,
+    this.shape = _kshape,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -132,6 +146,12 @@ class SlidableAction extends StatelessWidget {
 
   /// {@macro slidable.actions.backgroundColor}
   final Color backgroundColor;
+
+  /// {@macro slidable.actions.side}
+  final BorderSide side;
+
+  /// {@macro slidable.actions.shape}
+  final OutlinedBorder shape;
 
   /// {@macro slidable.actions.foregroundColor}
   final Color? foregroundColor;
@@ -197,6 +217,8 @@ class SlidableAction extends StatelessWidget {
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       flex: flex,
+      side: side,
+      shape: shape,
       child: child,
     );
   }

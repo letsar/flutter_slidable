@@ -1,3 +1,7 @@
+## 1.3.0
+### Added
+* Padding and BorderRadius to SlidableAction.
+
 ## 1.2.1
 ### Fixed
 * Build warning

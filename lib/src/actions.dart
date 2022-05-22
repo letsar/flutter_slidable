@@ -23,6 +23,8 @@ class CustomSlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
+    this.borderRadius = BorderRadius.zero,
+    this.padding,
     required this.onPressed,
     required this.child,
   })  : assert(flex > 0),
@@ -66,6 +68,18 @@ class CustomSlidableAction extends StatelessWidget {
   /// {@endtemplate}
   final SlidableActionCallback? onPressed;
 
+  /// {@template slidable.actions.borderRadius}
+  /// The borderRadius of this action
+  ///
+  /// Defaults to [BorderRadius.zero].
+  /// {@endtemplate}
+  final BorderRadius borderRadius;
+
+  /// {@template slidable.actions.padding}
+  /// The padding of the OutlinedButton
+  /// {@endtemplate}
+  final EdgeInsets? padding;
+
   /// Typically the action's icon or label.
   final Widget child;
 
@@ -83,10 +97,13 @@ class CustomSlidableAction extends StatelessWidget {
         child: OutlinedButton(
           onPressed: () => _handleTap(context),
           style: OutlinedButton.styleFrom(
+            padding: padding,
             backgroundColor: backgroundColor,
             primary: effectiveForegroundColor,
             onSurface: effectiveForegroundColor,
-            shape: const RoundedRectangleBorder(),
+            shape: RoundedRectangleBorder(
+              borderRadius: borderRadius,
+            ),
             side: BorderSide.none,
           ),
           child: child,
@@ -123,6 +140,8 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
+    this.borderRadius = BorderRadius.zero,
+    this.padding,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -152,6 +171,12 @@ class SlidableAction extends StatelessWidget {
 
   /// A label to display below the [icon].
   final String? label;
+
+  /// Padding of the OutlinedButton
+  final BorderRadius borderRadius;
+
+  /// Padding of the OutlinedButton
+  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +217,8 @@ class SlidableAction extends StatelessWidget {
           );
 
     return CustomSlidableAction(
+      borderRadius: borderRadius,
+      padding: padding,
       onPressed: onPressed,
       autoClose: autoClose,
       backgroundColor: backgroundColor,

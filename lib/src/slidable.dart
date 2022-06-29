@@ -99,7 +99,9 @@ class Slidable extends StatefulWidget {
   /// The widget below this widget in the tree.
   ///
   /// {@macro flutter.widgets.ProxyWidget.child}
-  final Widget child;
+  final Widget Function(SlidableController controller) child;
+
+  // final Function Widget(BuildContext context) child;
 
   @override
   _SlidableState createState() => _SlidableState();
@@ -136,6 +138,7 @@ class _SlidableState extends State<Slidable>
     super.initState();
     controller = SlidableController(this)
       ..actionPaneType.addListener(handleActionPanelTypeChanged);
+
   }
 
   @override
@@ -233,7 +236,7 @@ class _SlidableState extends State<Slidable>
       child: SlidableAutoCloseBehaviorInteractor(
         groupTag: widget.groupTag,
         controller: controller,
-        child: widget.child,
+        child: widget.child.call(controller),
       ),
     );
 

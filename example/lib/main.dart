@@ -10,14 +10,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
     return MaterialApp(
       title: 'Slidable Example',
+      // ListView.builder(itemBuilder: )
       home: Scaffold(
         body: ListView(
           children: [
             Slidable(
               // Specify a key if the Slidable is dismissible.
               key: const ValueKey(0),
+              enabled: false,
 
               // The start action pane is the one at the left or the top side.
               startActionPane: ActionPane(
@@ -72,12 +76,15 @@ class MyApp extends StatelessWidget {
 
               // The child of the Slidable is what the user sees when the
               // component is not dragged.
-              child: const ListTile(title: Text('Slide me')),
+              child:(controller)=> GestureDetector(
+                onTap: (){
+                  controller.openEndActionPane();
+                },
+                  child: const ListTile(title: Text('Slide me'))),
             ),
             Slidable(
               // Specify a key if the Slidable is dismissible.
               key: const ValueKey(1),
-
               // The start action pane is the one at the left or the top side.
               startActionPane: const ActionPane(
                 // A motion is a widget used to control how the pane animates.
@@ -108,8 +115,7 @@ class MyApp extends StatelessWidget {
                 motion: const ScrollMotion(),
                 dismissible: DismissiblePane(onDismissed: () {}),
                 children: const [
-                  SlidableAction(
-                    // An action can be bigger than the others.
+                  SlidableAction(// An action can be bigger than the others.
                     flex: 2,
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF7BC043),
@@ -129,7 +135,7 @@ class MyApp extends StatelessWidget {
 
               // The child of the Slidable is what the user sees when the
               // component is not dragged.
-              child: const ListTile(title: Text('Slide me')),
+              child: (controller)=>const ListTile(title: Text('Slide me')),
             ),
           ],
         ),

@@ -1,3 +1,7 @@
+## 1.3.1
+### Fixed
+* Rare LateInitializationError with DrawerMotion (https://github.com/letsar/flutter_slidable/issues/289).
+
 ## 1.3.0
 ### Added
 * Padding and BorderRadius to SlidableAction.

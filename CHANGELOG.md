@@ -1,6 +1,7 @@
 ## 1.3.1
 ### Fixed
 * Rare LateInitializationError with DrawerMotion (https://github.com/letsar/flutter_slidable/issues/289).
+* Issue with shadow content (https://github.com/letsar/flutter_slidable/issues/279).
 
 ## 1.3.0
 ### Added

@@ -144,7 +144,8 @@ class _SizeTransition extends AnimatedWidget {
       alignment = const AlignmentDirectional(0, -1);
     }
     return ClipRect(
-      clipBehavior: value == 1 ? Clip.none : Clip.hardEdge,
+//       clipBehavior: value == 1 ? Clip.none : Clip.hardEdge,
+            clipBehavior: Clip.hardEdge,
       child: Align(
         alignment: alignment,
         heightFactor: axis == Axis.vertical ? value : null,

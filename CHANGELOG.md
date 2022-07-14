@@ -1,3 +1,7 @@
+## 1.3.2
+### Fixed
+* ClipBehavior.none issue (https://github.com/letsar/flutter_slidable/issues/361).
+
 ## 1.3.1
 ### Fixed
 * Rare LateInitializationError with DrawerMotion (https://github.com/letsar/flutter_slidable/issues/289).

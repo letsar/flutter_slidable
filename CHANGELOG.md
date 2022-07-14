@@ -1,3 +1,7 @@
+## 2.0.0
+### Changed
+* Minimum version of Flutter (3.0.0 now) and Dart (2.17.0 now).
+
 ## 1.3.2
 ### Fixed
 * ClipBehavior.none issue (https://github.com/letsar/flutter_slidable/issues/361).

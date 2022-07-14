@@ -144,21 +144,14 @@ class _SizeTransition extends AnimatedWidget {
       alignment = const AlignmentDirectional(0, -1);
     }
 
-    final align = Align(
-      alignment: alignment,
-      heightFactor: axis == Axis.vertical ? value : null,
-      widthFactor: axis == Axis.horizontal ? value : null,
-      child: child,
-    );
-
-    if (value == 1) {
-      // We don't want to clip our child in normal conditions.
-      return align;
-    }
-
-    // We can't use ClipBehavior.none on Flutter versions < 3.
     return ClipRect(
-      child: align,
+      clipBehavior: value == 1 ? Clip.none : Clip.hardEdge,
+      child: Align(
+        alignment: alignment,
+        heightFactor: axis == Axis.vertical ? value : null,
+        widthFactor: axis == Axis.horizontal ? value : null,
+        child: child,
+      ),
     );
   }
 }

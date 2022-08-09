@@ -1,5 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 // INTERNAL USE
 // ignore_for_file: public_member_api_docs
@@ -42,7 +42,7 @@ class FlexEntranceTransition extends MultiChildRenderObjectWidget {
 }
 
 class _FlexEntranceTransitionParentData extends FlexParentData {
-  late Tween<double> mainAxisPosition;
+  Tween<double>? mainAxisPosition;
 }
 
 class _RenderFlexEntranceTransition extends RenderBox
@@ -123,17 +123,20 @@ class _RenderFlexEntranceTransition extends RenderBox
   }
 
   void updateChildOffsets(RenderObject child) {
-    final parentData = child.parentData as _FlexEntranceTransitionParentData?;
-    final mainAxisPosition = parentData!.mainAxisPosition.evaluate(
-      _mainAxisPosition,
-    );
-    switch (_direction) {
-      case Axis.horizontal:
-        parentData.offset = Offset(mainAxisPosition, 0);
-        break;
-      case Axis.vertical:
-        parentData.offset = Offset(0, mainAxisPosition);
-        break;
+    final parentData = child.parentData;
+    if (parentData is _FlexEntranceTransitionParentData) {
+      final mainAxisPosition = parentData.mainAxisPosition?.evaluate(
+            _mainAxisPosition,
+          ) ??
+          0;
+      switch (_direction) {
+        case Axis.horizontal:
+          parentData.offset = Offset(mainAxisPosition, 0);
+          break;
+        case Axis.vertical:
+          parentData.offset = Offset(0, mainAxisPosition);
+          break;
+      }
     }
   }
 

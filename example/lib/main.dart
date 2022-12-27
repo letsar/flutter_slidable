@@ -79,9 +79,9 @@ class MyApp extends StatelessWidget {
               key: const ValueKey(1),
 
               // The start action pane is the one at the left or the top side.
-              startActionPane: const ActionPane(
+              startActionPane: ActionPane(
                 // A motion is a widget used to control how the pane animates.
-                motion: ScrollMotion(),
+                motion: const ScrollMotion(),
 
                 // All actions are defined in the children parameter.
                 children: [
@@ -107,7 +107,7 @@ class MyApp extends StatelessWidget {
               endActionPane: ActionPane(
                 motion: const ScrollMotion(),
                 dismissible: DismissiblePane(onDismissed: () {}),
-                children: const [
+                children: [
                   SlidableAction(
                     // An action can be bigger than the others.
                     flex: 2,

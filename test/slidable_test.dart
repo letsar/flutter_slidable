@@ -21,16 +21,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             child: Builder(builder: (context) {
@@ -68,16 +84,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             child: Builder(builder: (context) {
@@ -116,16 +148,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             child: Builder(builder: (context) {
@@ -164,16 +212,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.share),
+                    )),
+                SlidableAction(
+                    onPressed: (_) {},
+                    icon: const SizedBox(
+                      child: Icon(Icons.delete),
+                    )),
               ],
             ),
             child: Builder(builder: (context) {
@@ -213,8 +277,16 @@ void main() {
             key: endActionPaneKey,
             motion: const ScrollMotion(),
             children: [
-              SlidableAction(onPressed: (_) {}, icon: Icons.share),
-              SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+              SlidableAction(
+                  onPressed: (_) {},
+                  icon: const SizedBox(
+                    child: Icon(Icons.share),
+                  )),
+              SlidableAction(
+                  onPressed: (_) {},
+                  icon: const SizedBox(
+                    child: Icon(Icons.delete),
+                  )),
             ],
           ),
           child: Builder(
@@ -253,8 +325,16 @@ void main() {
             key: startActionPaneKey,
             motion: const ScrollMotion(),
             children: [
-              SlidableAction(onPressed: (_) {}, icon: Icons.share),
-              SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+              SlidableAction(
+                  onPressed: (_) {},
+                  icon: const SizedBox(
+                    child: Icon(Icons.share),
+                  )),
+              SlidableAction(
+                  onPressed: (_) {},
+                  icon: const SizedBox(
+                    child: Icon(Icons.delete),
+                  )),
             ],
           ),
           child: Builder(
@@ -288,8 +368,16 @@ void main() {
       key: actionPaneKey,
       motion: const BehindMotion(),
       children: [
-        SlidableAction(onPressed: (_) {}, icon: Icons.share),
-        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+        SlidableAction(
+            onPressed: (_) {},
+            icon: const SizedBox(
+              child: Icon(Icons.share),
+            )),
+        SlidableAction(
+            onPressed: (_) {},
+            icon: const SizedBox(
+              child: Icon(Icons.delete),
+            )),
       ],
     );
 
@@ -326,8 +414,16 @@ void main() {
       key: actionPaneKey,
       motion: const BehindMotion(),
       children: [
-        SlidableAction(onPressed: (_) {}, icon: Icons.share),
-        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+        SlidableAction(
+            onPressed: (_) {},
+            icon: const SizedBox(
+              child: Icon(Icons.share),
+            )),
+        SlidableAction(
+            onPressed: (_) {},
+            icon: const SizedBox(
+              child: Icon(Icons.delete),
+            )),
       ],
     );
 

@@ -10,12 +10,16 @@ void main() {
 const actions = [
   SlideAction(
     color: Color(0xFFFE4A49),
-    icon: Icons.delete,
+    icon: SizedBox(
+      child: Icon(Icons.delete),
+    ),
     label: 'Delete',
   ),
   SlideAction(
     color: Color(0xFF21B7CA),
-    icon: Icons.share,
+    icon: SizedBox(
+      child: Icon(Icons.share),
+    ),
     label: 'Share',
   ),
 ];
@@ -207,7 +211,7 @@ class SlideAction extends StatelessWidget {
   }) : super(key: key);
 
   final Color color;
-  final IconData icon;
+  final Widget icon;
   final int flex;
   final String label;
 

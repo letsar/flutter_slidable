@@ -15,10 +15,8 @@
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VSCode related
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -73,3 +71,6 @@ coverage/
 !**/ios/**/default.mode2v3
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
+
+# Lock file
+*.lock

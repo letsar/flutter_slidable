@@ -16,27 +16,6 @@ typedef ConfirmDismissCallback = Future<bool> Function();
 
 /// A widget wich controls how a [Slidable] dismisses.
 class DismissiblePane extends StatefulWidget {
-  /// Creates a [DismissiblePane].
-  ///
-  /// The [onDismissed], [dismissThreshold], [dismissalDuration],
-  /// [resizeDuration], [closeOnCancel], and [motion] arguments must not be
-  /// null.
-  ///
-  /// The [dismissThreshold] must be between 0 and 1 (both exclusives).
-  ///
-  /// You must set the key of the enclosing [Slidable] to use this widget.
-  const DismissiblePane({
-    Key? key,
-    required this.onDismissed,
-    this.dismissThreshold = _kDismissThreshold,
-    this.dismissalDuration = _kDismissalDuration,
-    this.resizeDuration = _kResizeDuration,
-    this.confirmDismiss,
-    this.closeOnCancel = false,
-    this.motion = const InversedDrawerMotion(),
-  })  : assert(dismissThreshold > 0 && dismissThreshold < 1),
-        super(key: key);
-
   /// The threshold from which a dismiss will be triggered if the user stops
   /// to drag the [Slidable].
   ///
@@ -76,8 +55,28 @@ class DismissiblePane extends StatefulWidget {
   /// The widget which animates while the [Slidable] is currently dismissing.
   final Widget motion;
 
+  /// Creates a [DismissiblePane].
+  ///
+  /// The [onDismissed], [dismissThreshold], [dismissalDuration],
+  /// [resizeDuration], [closeOnCancel], and [motion] arguments must not be
+  /// null.
+  ///
+  /// The [dismissThreshold] must be between 0 and 1 (both exclusives).
+  ///
+  /// You must set the key of the enclosing [Slidable] to use this widget.
+  const DismissiblePane({
+    super.key,
+    required this.onDismissed,
+    this.dismissThreshold = _kDismissThreshold,
+    this.dismissalDuration = _kDismissalDuration,
+    this.resizeDuration = _kResizeDuration,
+    this.confirmDismiss,
+    this.closeOnCancel = false,
+    this.motion = const InversedDrawerMotion(),
+  }) : assert(dismissThreshold > 0 && dismissThreshold < 1);
+
   @override
-  _DismissiblePaneState createState() => _DismissiblePaneState();
+  State<DismissiblePane> createState() => _DismissiblePaneState();
 }
 
 class _DismissiblePaneState extends State<DismissiblePane> {
@@ -111,18 +110,23 @@ class _DismissiblePaneState extends State<DismissiblePane> {
       return true;
     }());
     controller = Slidable.of(context);
-    controller!.dismissGesture.addListener(handleDismissGestureChanged);
+    controller?.dismissGesture.addListener(handleDismissGestureChanged);
   }
 
   @override
   void dispose() {
-    controller!.dismissGesture.removeListener(handleDismissGestureChanged);
+    controller?.dismissGesture.removeListener(handleDismissGestureChanged);
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return widget.motion;
+  }
+
   Future<void> handleDismissGestureChanged() async {
-    final endGesture = controller!.dismissGesture.value!.endGesture;
-    final position = controller!.animation.value;
+    final endGesture = controller?.dismissGesture.value!.endGesture;
+    final position = controller?.animation.value ?? 0.0;
 
     if (endGesture is OpeningGesture ||
         endGesture is StillGesture && position >= widget.dismissThreshold) {
@@ -131,21 +135,16 @@ class _DismissiblePaneState extends State<DismissiblePane> {
         canDismiss = await widget.confirmDismiss!();
       }
       if (canDismiss) {
-        controller!.dismiss(
+        controller?.dismiss(
           ResizeRequest(widget.resizeDuration, widget.onDismissed),
           duration: widget.dismissalDuration,
         );
       } else if (widget.closeOnCancel) {
-        controller!.close();
+        controller?.close();
       }
       return;
     }
 
-    controller!.openCurrentActionPane();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.motion;
+    controller?.openCurrentActionPane();
   }
 }

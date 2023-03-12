@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/auto_close_behavior.dart';
-import 'package:flutter_slidable/src/notifications_old.dart';
 
 import 'action_pane_configuration.dart';
 import 'controller.dart';
@@ -13,22 +12,22 @@ part 'action_pane.dart';
 
 /// A widget which can be dragged to reveal contextual actions.
 class Slidable extends StatefulWidget {
-  /// Creates a [Slidable].
+  /// The closest instance of the [SlidableController] which controls this
+  /// [Slidable] that encloses the given context.
   ///
-  /// The [enabled], [closeOnScroll], [direction], [dragStartBehavior],
-  /// [useTextDirection] and [child] arguments must not be null.
-  const Slidable({
-    Key? key,
-    this.groupTag,
-    this.enabled = true,
-    this.closeOnScroll = true,
-    this.startActionPane,
-    this.endActionPane,
-    this.direction = Axis.horizontal,
-    this.dragStartBehavior = DragStartBehavior.down,
-    this.useTextDirection = true,
-    required this.child,
-  }) : super(key: key);
+  /// {@tool snippet}
+  /// Typical usage is as follows:
+  ///
+  /// ```dart
+  /// SlidableController controller = Slidable.of(context);
+  /// ```
+  /// {@end-tool}
+  static SlidableController? of(BuildContext context) {
+    final scope = context
+        .getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()
+        ?.widget as _SlidableControllerScope?;
+    return scope?.controller;
+  }
 
   /// Whether this slidable is interactive.
   ///
@@ -101,25 +100,25 @@ class Slidable extends StatefulWidget {
   /// {@macro flutter.widgets.ProxyWidget.child}
   final Widget child;
 
-  @override
-  _SlidableState createState() => _SlidableState();
+  /// Creates a [Slidable].
+  ///
+  /// The [enabled], [closeOnScroll], [direction], [dragStartBehavior],
+  /// [useTextDirection] and [child] arguments must not be null.
+  const Slidable({
+    super.key,
+    this.groupTag,
+    this.enabled = true,
+    this.closeOnScroll = true,
+    this.startActionPane,
+    this.endActionPane,
+    this.direction = Axis.horizontal,
+    this.dragStartBehavior = DragStartBehavior.down,
+    this.useTextDirection = true,
+    required this.child,
+  });
 
-  /// The closest instance of the [SlidableController] which controls this
-  /// [Slidable] that encloses the given context.
-  ///
-  /// {@tool snippet}
-  /// Typical usage is as follows:
-  ///
-  /// ```dart
-  /// SlidableController controller = Slidable.of(context);
-  /// ```
-  /// {@end-tool}
-  static SlidableController? of(BuildContext context) {
-    final scope = context
-        .getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()
-        ?.widget as _SlidableControllerScope?;
-    return scope?.controller;
-  }
+  @override
+  State<Slidable> createState() => _SlidableState();
 }
 
 class _SlidableState extends State<Slidable>
@@ -130,6 +129,28 @@ class _SlidableState extends State<Slidable>
 
   @override
   bool get wantKeepAlive => !widget.closeOnScroll;
+
+  Widget? get actionPane {
+    switch (controller.actionPaneType.value) {
+      case ActionPaneType.start:
+        return startActionPane;
+      case ActionPaneType.end:
+        return endActionPane;
+      default:
+        return null;
+    }
+  }
+
+  ActionPane? get startActionPane => widget.startActionPane;
+  ActionPane? get endActionPane => widget.endActionPane;
+  Alignment get actionPaneAlignment {
+    final sign = controller.direction.value.toDouble();
+    if (widget.direction == Axis.horizontal) {
+      return Alignment(-sign, 0);
+    } else {
+      return Alignment(0, -sign);
+    }
+  }
 
   @override
   void initState() {
@@ -158,6 +179,65 @@ class _SlidableState extends State<Slidable>
     controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
     controller.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // See AutomaticKeepAliveClientMixin.
+
+    Widget content = SlideTransition(
+      position: moveAnimation,
+      child: SlidableAutoCloseBehaviorInteractor(
+        groupTag: widget.groupTag,
+        controller: controller,
+        child: widget.child,
+      ),
+    );
+
+    content = Stack(
+      children: <Widget>[
+        if (actionPane != null)
+          Positioned.fill(
+            child: ClipRect(
+              clipper: _SlidableClipper(
+                axis: widget.direction,
+                controller: controller,
+              ),
+              child: actionPane,
+            ),
+          ),
+        content,
+      ],
+    );
+
+    return SlidableGestureDetector(
+      enabled: widget.enabled,
+      controller: controller,
+      direction: widget.direction,
+      dragStartBehavior: widget.dragStartBehavior,
+      child: SlidableAutoCloseNotificationSender(
+        groupTag: widget.groupTag,
+        controller: controller,
+        child: SlidableScrollingBehavior(
+          controller: controller,
+          closeOnScroll: widget.closeOnScroll,
+          child: SlidableDismissal(
+            axis: flipAxis(widget.direction),
+            controller: controller,
+            child: ActionPaneConfiguration(
+              alignment: actionPaneAlignment,
+              direction: widget.direction,
+              isStartActionPane:
+                  controller.actionPaneType.value == ActionPaneType.start,
+              child: _SlidableControllerScope(
+                controller: controller,
+                child: content,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void updateController() {
@@ -200,98 +280,15 @@ class _SlidableState extends State<Slidable>
       ),
     );
   }
-
-  Widget? get actionPane {
-    switch (controller.actionPaneType.value) {
-      case ActionPaneType.start:
-        return startActionPane;
-      case ActionPaneType.end:
-        return endActionPane;
-      default:
-        return null;
-    }
-  }
-
-  ActionPane? get startActionPane => widget.startActionPane;
-  ActionPane? get endActionPane => widget.endActionPane;
-
-  Alignment get actionPaneAlignment {
-    final sign = controller.direction.value.toDouble();
-    if (widget.direction == Axis.horizontal) {
-      return Alignment(-sign, 0);
-    } else {
-      return Alignment(0, -sign);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context); // See AutomaticKeepAliveClientMixin.
-
-    Widget content = SlideTransition(
-      position: moveAnimation,
-      child: SlidableAutoCloseBehaviorInteractor(
-        groupTag: widget.groupTag,
-        controller: controller,
-        child: widget.child,
-      ),
-    );
-
-    content = Stack(
-      children: <Widget>[
-        if (actionPane != null)
-          Positioned.fill(
-            child: ClipRect(
-              clipper: _SlidableClipper(
-                axis: widget.direction,
-                controller: controller,
-              ),
-              child: actionPane,
-            ),
-          ),
-        content,
-      ],
-    );
-
-    return SlidableGestureDetector(
-      enabled: widget.enabled,
-      controller: controller,
-      direction: widget.direction,
-      dragStartBehavior: widget.dragStartBehavior,
-      child: SlidableNotificationSender(
-        tag: widget.groupTag,
-        controller: controller,
-        child: SlidableScrollingBehavior(
-          controller: controller,
-          closeOnScroll: widget.closeOnScroll,
-          child: SlidableDismissal(
-            axis: flipAxis(widget.direction),
-            controller: controller,
-            child: ActionPaneConfiguration(
-              alignment: actionPaneAlignment,
-              direction: widget.direction,
-              isStartActionPane:
-                  controller.actionPaneType.value == ActionPaneType.start,
-              child: _SlidableControllerScope(
-                controller: controller,
-                child: content,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _SlidableControllerScope extends InheritedWidget {
-  const _SlidableControllerScope({
-    Key? key,
-    required this.controller,
-    required Widget child,
-  }) : super(key: key, child: child);
-
   final SlidableController? controller;
+
+  const _SlidableControllerScope({
+    required this.controller,
+    required super.child,
+  });
 
   @override
   bool updateShouldNotify(_SlidableControllerScope old) {
@@ -300,13 +297,13 @@ class _SlidableControllerScope extends InheritedWidget {
 }
 
 class _SlidableClipper extends CustomClipper<Rect> {
+  final Axis axis;
+  final SlidableController controller;
+
   _SlidableClipper({
     required this.axis,
     required this.controller,
   }) : super(reclip: controller.animation);
-
-  final Axis axis;
-  final SlidableController controller;
 
   @override
   Rect getClip(Size size) {

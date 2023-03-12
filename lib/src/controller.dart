@@ -15,18 +15,6 @@ enum ActionPaneType {
   start,
 }
 
-/// Represents how the ratio should changes.
-abstract class RatioConfigurator {
-  /// Makes sure the given [ratio] is between the bounds.
-  double normalizeRatio(double ratio);
-
-  /// The total extent ratio of this configurator.
-  double get extentRatio;
-
-  /// A method to call when the end gesture changed.
-  void handleEndGestureChanged();
-}
-
 /// The direction of a gesture in the context of [Slidable].
 enum GestureDirection {
   /// The direction in which the user want to show the action pane.
@@ -36,56 +24,65 @@ enum GestureDirection {
   closing,
 }
 
+/// Represents how the ratio should changes.
+abstract class RatioConfigurator {
+  /// The total extent ratio of this configurator.
+  double get extentRatio;
+
+  /// Makes sure the given [ratio] is between the bounds.
+  double normalizeRatio(double ratio);
+
+  /// A method to call when the end gesture changed.
+  void handleEndGestureChanged();
+}
+
 /// A request made to resize a [Slidable] after a dismiss.
 @immutable
 class ResizeRequest {
-  /// Creates a [ResizeRequest].
-  const ResizeRequest(this.duration, this.onDismissed);
-
   /// The duration of the resize.
   final Duration duration;
 
   /// The callback to execute when the resize finishes.
   final VoidCallback onDismissed;
+
+  /// Creates a [ResizeRequest].
+  const ResizeRequest(this.duration, this.onDismissed);
 }
 
 /// Represents an intention to dismiss a [Slidable].
 @immutable
 class DismissGesture {
-  /// Creates a [DismissGesture].
-  const DismissGesture(this.endGesture);
-
   /// The [EndGesture] provoking this one.
   final EndGesture? endGesture;
+
+  /// Creates a [DismissGesture].
+  const DismissGesture(this.endGesture);
 }
 
 /// Represents the end of a gesture on [Slidable].
 @immutable
 class EndGesture {
-  /// Creates an [EndGesture].
-  const EndGesture(this.velocity);
-
   /// The velocity of the gesture.
   final double velocity;
+
+  /// Creates an [EndGesture].
+  const EndGesture(this.velocity);
 }
 
 /// Represents a gesture used explicitly to open a [Slidable].
 class OpeningGesture extends EndGesture {
   /// Creates an [OpeningGesture].
-  const OpeningGesture(double velocity) : super(velocity);
+  const OpeningGesture(super.velocity);
 }
 
 /// Represents a gesture used explicitly to close a [Slidable].
 class ClosingGesture extends EndGesture {
   /// Creates a [ClosingGesture].
-  const ClosingGesture(double velocity) : super(velocity);
+  const ClosingGesture(super.velocity);
 }
 
 /// Represents an end gesture without velocity.
 class StillGesture extends EndGesture {
-  /// Creates a [StillGesture].
-  const StillGesture(this.direction) : super(0);
-
   /// The direction in which the user dragged the [Slidable].
   final GestureDirection direction;
 
@@ -94,83 +91,15 @@ class StillGesture extends EndGesture {
 
   /// Whether the user was in the process to close the [Slidable].
   bool get closing => direction == GestureDirection.closing;
+
+  /// Creates a [StillGesture].
+  const StillGesture(this.direction) : super(0);
 }
 
 /// Represents a way to control a slidable from outside.
 class SlidableController {
-  /// Creates a [SlidableController].
-  SlidableController(TickerProvider vsync)
-      : _animationController = AnimationController(vsync: vsync),
-        endGesture = ValueNotifier(null),
-        _dismissGesture = _ValueNotifier(null),
-        resizeRequest = ValueNotifier(null),
-        actionPaneType = ValueNotifier(ActionPaneType.none),
-        direction = ValueNotifier(0) {
-    direction.addListener(_onDirectionChanged);
-  }
-
-  final AnimationController _animationController;
-  final _ValueNotifier<DismissGesture?> _dismissGesture;
-
-  /// Whether the start action pane is enabled.
-  bool enableStartActionPane = true;
-
-  /// Whether the end action pane is enabled.
-  bool enableEndActionPane = true;
-
-  /// Whether the start action pane is at the left (if horizontal).
-  /// Defaults to true.
-  bool isLeftToRight = true;
-
-  /// Whether the positive action pane is enabled.
-  bool get enablePositiveActionPane =>
-      isLeftToRight ? enableStartActionPane : enableEndActionPane;
-
-  /// Whether the negative action pane is enabled.
-  bool get enableNegativeActionPane =>
-      isLeftToRight ? enableEndActionPane : enableStartActionPane;
-
-  /// The extent ratio of the start action pane.
-  double get startActionPaneExtentRatio => _startActionPaneExtentRatio;
-  double _startActionPaneExtentRatio = 0;
-  set startActionPaneExtentRatio(double value) {
-    if (_startActionPaneExtentRatio != value && value >= 0 && value <= 1) {
-      _startActionPaneExtentRatio = value;
-    }
-  }
-
-  /// The extent ratio of the end action pane.
-  double get endActionPaneExtentRatio => _endActionPaneExtentRatio;
-  double _endActionPaneExtentRatio = 0;
-  set endActionPaneExtentRatio(double value) {
-    if (_endActionPaneExtentRatio != value && value >= 0 && value <= 1) {
-      _endActionPaneExtentRatio = value;
-    }
-  }
-
-  /// The current action pane configurator.
-  RatioConfigurator? get actionPaneConfigurator => _actionPaneConfigurator;
-  RatioConfigurator? _actionPaneConfigurator;
-  set actionPaneConfigurator(RatioConfigurator? value) {
-    if (_actionPaneConfigurator != value) {
-      _actionPaneConfigurator = value;
-      if (_replayEndGesture && value != null) {
-        _replayEndGesture = false;
-        value.handleEndGestureChanged();
-      }
-    }
-  }
-
-  bool _replayEndGesture = false;
-
-  /// The value of the ratio over time.
-  Animation<double> get animation => _animationController.view;
-
   /// Track the end gestures.
   final ValueNotifier<EndGesture?> endGesture;
-
-  /// Track the dismiss gestures.
-  ValueNotifier<DismissGesture?> get dismissGesture => _dismissGesture;
 
   /// Track the resize requests.
   final ValueNotifier<ResizeRequest?> resizeRequest;
@@ -185,18 +114,89 @@ class SlidableController {
   ///  1 means that the slidable is moving to the right.
   final ValueNotifier<int> direction;
 
+  final AnimationController _animationController;
+  final _ValueNotifier<DismissGesture?> _dismissGesture;
+
+  /// Whether the start action pane is enabled.
+  bool enableStartActionPane = true;
+
+  /// Whether the end action pane is enabled.
+  bool enableEndActionPane = true;
+
+  /// Whether the start action pane is at the left (if horizontal).
+  /// Defaults to true.
+  bool isLeftToRight = true;
+
+  bool _replayEndGesture = false;
+
+  /// Whether the positive action pane is enabled.
+  bool get enablePositiveActionPane =>
+      isLeftToRight ? enableStartActionPane : enableEndActionPane;
+
+  /// Whether the negative action pane is enabled.
+  bool get enableNegativeActionPane =>
+      isLeftToRight ? enableEndActionPane : enableStartActionPane;
+
+  double _startActionPaneExtentRatio = 0;
+
+  /// The extent ratio of the start action pane.
+  double get startActionPaneExtentRatio => _startActionPaneExtentRatio;
+
+  set startActionPaneExtentRatio(double value) {
+    if (_startActionPaneExtentRatio != value && value >= 0 && value <= 1) {
+      _startActionPaneExtentRatio = value;
+    }
+  }
+
+  double _endActionPaneExtentRatio = 0;
+
+  /// The extent ratio of the end action pane.
+  double get endActionPaneExtentRatio => _endActionPaneExtentRatio;
+
+  set endActionPaneExtentRatio(double value) {
+    if (_endActionPaneExtentRatio != value && value >= 0 && value <= 1) {
+      _endActionPaneExtentRatio = value;
+    }
+  }
+
+  RatioConfigurator? _actionPaneConfigurator;
+
+  /// The current action pane configurator.
+  RatioConfigurator? get actionPaneConfigurator => _actionPaneConfigurator;
+
+  set actionPaneConfigurator(RatioConfigurator? value) {
+    if (_actionPaneConfigurator != value) {
+      _actionPaneConfigurator = value;
+      if (_replayEndGesture && value != null) {
+        _replayEndGesture = false;
+        value.handleEndGestureChanged();
+      }
+    }
+  }
+
+  /// The value of the ratio over time.
+  Animation<double> get animation => _animationController.view;
+
+  /// Track the dismiss gestures.
+  ValueNotifier<DismissGesture?> get dismissGesture => _dismissGesture;
+
   /// Indicates whether the dismissible registered to gestures.
   bool get isDismissibleReady => _dismissGesture._hasListeners;
 
-  /// Whether this [close()] method has been called and not finished.
-  bool get closing => _closing;
   bool _closing = false;
 
-  bool _acceptRatio(double ratio) {
-    return !_closing &&
-        (ratio == 0 ||
-            ((ratio > 0 && enablePositiveActionPane) ||
-                (ratio < 0 && enableNegativeActionPane)));
+  /// Whether this [close()] method has been called and not finished.
+  bool get closing => _closing;
+
+  /// Creates a [SlidableController].
+  SlidableController(TickerProvider vsync)
+      : _animationController = AnimationController(vsync: vsync),
+        endGesture = ValueNotifier(null),
+        _dismissGesture = _ValueNotifier(null),
+        resizeRequest = ValueNotifier(null),
+        actionPaneType = ValueNotifier(ActionPaneType.none),
+        direction = ValueNotifier(0) {
+    direction.addListener(_onDirectionChanged);
   }
 
   /// The current ratio of the full size of the [Slidable] that is already
@@ -214,12 +214,6 @@ class SlidableController {
       direction.value = newRatio.sign.toInt();
       _animationController.value = newRatio.abs();
     }
-  }
-
-  void _onDirectionChanged() {
-    final mulitiplier = isLeftToRight ? 1 : -1;
-    final index = (direction.value * mulitiplier) + 1;
-    actionPaneType.value = ActionPaneType.values[index];
   }
 
   /// Dispatches a new [EndGesture] determined by the given [velocity] and
@@ -346,10 +340,23 @@ class SlidableController {
     direction.removeListener(_onDirectionChanged);
     direction.dispose();
   }
+
+  bool _acceptRatio(double ratio) {
+    return !_closing &&
+        (ratio == 0 ||
+            ((ratio > 0 && enablePositiveActionPane) ||
+                (ratio < 0 && enableNegativeActionPane)));
+  }
+
+  void _onDirectionChanged() {
+    final mulitiplier = isLeftToRight ? 1 : -1;
+    final index = (direction.value * mulitiplier) + 1;
+    actionPaneType.value = ActionPaneType.values[index];
+  }
 }
 
 class _ValueNotifier<T> extends ValueNotifier<T> {
-  _ValueNotifier(T value) : super(value);
-
   bool get _hasListeners => hasListeners;
+
+  _ValueNotifier(super.value);
 }

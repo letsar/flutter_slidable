@@ -11,13 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  meta: ^1.8.0
 
 dev_dependencies:
   # Linter
   flutter_lints: ^2.0.1
-
-  # Testing
-  collection: ^1.17.0
-  mocktail: ^0.3.0
-  flutter_test:
-    sdk: flutter

@@ -9,9 +9,4 @@ export 'src/controller.dart'
 export 'src/dismissible_pane.dart';
 export 'src/dismissible_pane_motions.dart';
 export 'src/notifications.dart';
-export 'src/notifications_old.dart'
-    show
-        SlidableNotification,
-        SlidableRatioNotification,
-        SlidableNotificationListener;
 export 'src/slidable.dart';

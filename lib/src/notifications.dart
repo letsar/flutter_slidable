@@ -2,8 +2,6 @@ import 'package:flutter/widgets.dart';
 
 /// Used to dispatch a Slidable notification.
 class SlidableGroupNotification {
-  const SlidableGroupNotification._();
-
   /// Creates a dispatcher used to dispatch the [notification] to the closest
   /// [SlidableGroupBehavior] with the given type.
   ///
@@ -53,13 +51,15 @@ class SlidableGroupNotification {
     );
     dispatcher?.dispatch(notification);
   }
+
+  const SlidableGroupNotification._();
 }
 
 /// A dispatcher used to dispatch a Slidable notification.
 class SlidableGroupNotificationDispatcher<T> {
-  SlidableGroupNotificationDispatcher._(this._inheritedSlidableNotification);
-
   final _InheritedSlidableNotification<T> _inheritedSlidableNotification;
+
+  SlidableGroupNotificationDispatcher._(this._inheritedSlidableNotification);
 
   /// Dispatches the [notification] to the closest [SlidableGroupBehavior] with
   /// the given type.
@@ -80,17 +80,10 @@ class SlidableGroupNotificationDispatcher<T> {
 
 /// A widget which can dispatch notifications to a group of [Slidable] below it.
 class SlidableGroupBehavior<T> extends StatefulWidget {
-  /// Creates a SlidableGroupBehavior.
-  const SlidableGroupBehavior({
-    Key? key,
-    this.onNotification,
-    required this.child,
-  }) : super(key: key);
-
   /// Callback that can modified a notification before to be dispatched to
   /// listeners.
   ///
-  /// If the result if null, then the notitication is not dispatched.
+  /// If the result if null, then the notification is not dispatched.
   final T? Function(T notification)? onNotification;
 
   /// The widget below this widget in the tree.
@@ -98,8 +91,15 @@ class SlidableGroupBehavior<T> extends StatefulWidget {
   /// {@macro flutter.widgets.ProxyWidget.child}
   final Widget child;
 
+  /// Creates a SlidableGroupBehavior.
+  const SlidableGroupBehavior({
+    super.key,
+    this.onNotification,
+    required this.child,
+  });
+
   @override
-  _SlidableGroupBehaviorState<T> createState() =>
+  State<SlidableGroupBehavior<T>> createState() =>
       _SlidableGroupBehaviorState<T>();
 }
 
@@ -117,24 +117,21 @@ class _SlidableGroupBehaviorState<T> extends State<SlidableGroupBehavior<T>> {
 }
 
 class _InheritedSlidableNotification<T> extends InheritedWidget {
-  const _InheritedSlidableNotification({
-    Key? key,
-    required this.onNotification,
-    required this.notifier,
-    required Widget child,
-  }) : super(
-          key: key,
-          child: child,
-        );
-
-  final T? Function(T notification)? onNotification;
-  final ValueNotifier<T?> notifier;
-
   static ValueNotifier<T?>? of<T>(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<_InheritedSlidableNotification<T>>()
         ?.notifier;
   }
+
+  final T? Function(T notification)? onNotification;
+  final ValueNotifier<T?> notifier;
+
+  const _InheritedSlidableNotification({
+    super.key,
+    required this.onNotification,
+    required this.notifier,
+    required super.child,
+  });
 
   @override
   bool updateShouldNotify(_InheritedSlidableNotification<T> oldWidget) {
@@ -147,13 +144,6 @@ class _InheritedSlidableNotification<T> extends InheritedWidget {
 ///
 /// Typically this widget is a child of a [Slidable] widget.
 class SlidableGroupBehaviorListener<T> extends StatefulWidget {
-  /// Creates a [SlidableGroupBehaviorListener].
-  const SlidableGroupBehaviorListener({
-    Key? key,
-    required this.onNotification,
-    required this.child,
-  }) : super(key: key);
-
   /// The callback to invoke when a notification is dispatched.
   final ValueChanged<T> onNotification;
 
@@ -161,6 +151,13 @@ class SlidableGroupBehaviorListener<T> extends StatefulWidget {
   ///
   /// {@macro flutter.widgets.ProxyWidget.child}
   final Widget child;
+
+  /// Creates a [SlidableGroupBehaviorListener].
+  const SlidableGroupBehaviorListener({
+    super.key,
+    required this.onNotification,
+    required this.child,
+  });
 
   @override
   State<SlidableGroupBehaviorListener<T>> createState() =>
@@ -193,15 +190,15 @@ class _SlidableGroupBehaviorListenerState<T>
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+
   void handleNotification() {
     final notification = notifier?.value;
     if (notification != null) {
       widget.onNotification(notification);
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child;
   }
 }

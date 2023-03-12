@@ -2,34 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'slidable.dart';
 
-/// Signature for [CustomSlidableAction.onPressed].
-typedef SlidableActionCallback = void Function(BuildContext context);
-
 const int _kFlex = 1;
 const Color _kBackgroundColor = Colors.white;
 const bool _kAutoClose = true;
 
+/// Signature for [CustomSlidableAction.onPressed].
+typedef SlidableActionCallback = void Function(BuildContext context);
+
 /// Represents an action of an [ActionPane].
 class CustomSlidableAction extends StatelessWidget {
-  /// Creates a [CustomSlidableAction].
-  ///
-  /// The [flex], [backgroundColor], [autoClose] and [child] arguments must not
-  /// be null.
-  ///
-  /// The [flex] argument must also be greater than 0.
-  const CustomSlidableAction({
-    Key? key,
-    this.flex = _kFlex,
-    this.backgroundColor = _kBackgroundColor,
-    this.foregroundColor,
-    this.autoClose = _kAutoClose,
-    this.borderRadius = BorderRadius.zero,
-    this.padding,
-    required this.onPressed,
-    required this.child,
-  })  : assert(flex > 0),
-        super(key: key);
-
   /// {@template slidable.actions.flex}
   /// The flex factor to use for this child.
   ///
@@ -83,6 +64,24 @@ class CustomSlidableAction extends StatelessWidget {
   /// Typically the action's icon or label.
   final Widget child;
 
+  /// Creates a [CustomSlidableAction].
+  ///
+  /// The [flex], [backgroundColor], [autoClose] and [child] arguments must not
+  /// be null.
+  ///
+  /// The [flex] argument must also be greater than 0.
+  const CustomSlidableAction({
+    super.key,
+    this.flex = _kFlex,
+    this.backgroundColor = _kBackgroundColor,
+    this.foregroundColor,
+    this.autoClose = _kAutoClose,
+    this.borderRadius = BorderRadius.zero,
+    this.padding,
+    required this.onPressed,
+    required this.child,
+  }) : assert(flex > 0);
+
   @override
   Widget build(BuildContext context) {
     final effectiveForegroundColor = foregroundColor ??
@@ -97,10 +96,10 @@ class CustomSlidableAction extends StatelessWidget {
         child: OutlinedButton(
           onPressed: () => _handleTap(context),
           style: OutlinedButton.styleFrom(
+            foregroundColor: effectiveForegroundColor,
             padding: padding,
+            disabledForegroundColor: effectiveForegroundColor.withOpacity(0.38),
             backgroundColor: backgroundColor,
-            primary: effectiveForegroundColor,
-            onSurface: effectiveForegroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: borderRadius,
             ),
@@ -122,30 +121,6 @@ class CustomSlidableAction extends StatelessWidget {
 
 /// An action for [Slidable] which can show an icon, a label, or both.
 class SlidableAction extends StatelessWidget {
-  /// Creates a [SlidableAction].
-  ///
-  /// The [flex], [backgroundColor], [autoClose] and [spacing] arguments
-  /// must not be null.
-  ///
-  /// You must set either an [icon] or a [label].
-  ///
-  /// The [flex] argument must also be greater than 0.
-  const SlidableAction({
-    Key? key,
-    this.flex = _kFlex,
-    this.backgroundColor = _kBackgroundColor,
-    this.foregroundColor,
-    this.autoClose = _kAutoClose,
-    required this.onPressed,
-    this.icon,
-    this.spacing = 4,
-    this.label,
-    this.borderRadius = BorderRadius.zero,
-    this.padding,
-  })  : assert(flex > 0),
-        assert(icon != null || label != null),
-        super(key: key);
-
   /// {@macro slidable.actions.flex}
   final int flex;
 
@@ -177,6 +152,29 @@ class SlidableAction extends StatelessWidget {
 
   /// Padding of the OutlinedButton
   final EdgeInsets? padding;
+
+  /// Creates a [SlidableAction].
+  ///
+  /// The [flex], [backgroundColor], [autoClose] and [spacing] arguments
+  /// must not be null.
+  ///
+  /// You must set either an [icon] or a [label].
+  ///
+  /// The [flex] argument must also be greater than 0.
+  const SlidableAction({
+    super.key,
+    this.flex = _kFlex,
+    this.backgroundColor = _kBackgroundColor,
+    this.foregroundColor,
+    this.autoClose = _kAutoClose,
+    required this.onPressed,
+    this.icon,
+    this.spacing = 4,
+    this.label,
+    this.borderRadius = BorderRadius.zero,
+    this.padding,
+  })  : assert(flex > 0),
+        assert(icon != null || label != null);
 
   @override
   Widget build(BuildContext context) {

@@ -1,26 +1,25 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
 import 'controller.dart';
 
-// INTERNAL USE
-// ignore_for_file: public_member_api_docs
-
+@internal
 class SlidableDismissal extends StatefulWidget {
-  const SlidableDismissal({
-    Key? key,
-    required this.axis,
-    required this.controller,
-    required this.child,
-  }) : super(key: key);
-
   final Axis axis;
   final Widget child;
   final SlidableController controller;
 
+  const SlidableDismissal({
+    super.key,
+    required this.axis,
+    required this.controller,
+    required this.child,
+  });
+
   @override
-  _SlidableDismissalState createState() => _SlidableDismissalState();
+  State<SlidableDismissal> createState() => _SlidableDismissalState();
 }
 
 class _SlidableDismissalState extends State<SlidableDismissal>
@@ -55,20 +54,6 @@ class _SlidableDismissalState extends State<SlidableDismissal>
     super.dispose();
   }
 
-  void handleResizeRequestChanged() {
-    final resizeRequest = widget.controller.resizeRequest.value;
-
-    if (widget.controller.animation.status == AnimationStatus.completed) {
-      animationController.duration = resizeRequest!.duration;
-      animationController.forward(from: 0).then((_) {
-        resizeRequest.onDismissed.call();
-      });
-      setState(() {
-        resized = true;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (resized) {
@@ -98,26 +83,32 @@ class _SlidableDismissalState extends State<SlidableDismissal>
       child: widget.child,
     );
   }
+
+  void handleResizeRequestChanged() {
+    final resizeRequest = widget.controller.resizeRequest.value;
+
+    if (widget.controller.animation.status == AnimationStatus.completed) {
+      animationController.duration = resizeRequest!.duration;
+      animationController.forward(from: 0).then((_) {
+        resizeRequest.onDismissed.call();
+      });
+      setState(() {
+        resized = true;
+      });
+    }
+  }
 }
 
 /// We use a custom SizeTransition to not clip when the sizeFactor is 1.
 class _SizeTransition extends AnimatedWidget {
-  /// Creates a size transition.
-  ///
-  /// The [axis], [sizeFactor], and [axisAlignment] arguments must not be null.
-  /// The [axis] argument defaults to [Axis.vertical]. The [axisAlignment]
-  /// defaults to 0.0, which centers the child along the main axis during the
-  /// transition.
-  const _SizeTransition({
-    Key? key,
-    this.axis = Axis.vertical,
-    required Animation<double> sizeFactor,
-    this.child,
-  }) : super(key: key, listenable: sizeFactor);
-
   /// [Axis.horizontal] if [sizeFactor] modifies the width, otherwise
   /// [Axis.vertical].
   final Axis axis;
+
+  /// The widget below this widget in the tree.
+  ///
+  /// {@macro flutter.widgets.ProxyWidget.child}
+  final Widget? child;
 
   /// The animation that controls the (clipped) size of the child.
   ///
@@ -129,10 +120,17 @@ class _SizeTransition extends AnimatedWidget {
   /// in the appropriate axis.
   Animation<double> get sizeFactor => listenable as Animation<double>;
 
-  /// The widget below this widget in the tree.
+  /// Creates a size transition.
   ///
-  /// {@macro flutter.widgets.ProxyWidget.child}
-  final Widget? child;
+  /// The [axis], [sizeFactor], and [axisAlignment] arguments must not be null.
+  /// The [axis] argument defaults to [Axis.vertical]. The [axisAlignment]
+  /// defaults to 0.0, which centers the child along the main axis during the
+  /// transition.
+  const _SizeTransition({
+    this.axis = Axis.vertical,
+    required Animation<double> sizeFactor,
+    this.child,
+  }) : super(listenable: sizeFactor);
 
   @override
   Widget build(BuildContext context) {

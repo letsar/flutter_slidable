@@ -1,18 +1,9 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
-// INTERNAL USE
-// ignore_for_file: public_member_api_docs
-
+@internal
 class FlexEntranceTransition extends MultiChildRenderObjectWidget {
-  FlexEntranceTransition({
-    Key? key,
-    required this.mainAxisPosition,
-    required this.direction,
-    required this.startToEnd,
-    required List<Widget> children,
-  }) : super(key: key, children: children);
-
   /// The direction to use as the main axis.
   final Axis direction;
 
@@ -22,9 +13,18 @@ class FlexEntranceTransition extends MultiChildRenderObjectWidget {
   /// The animation that controls the main axis position of the children.
   final Animation<double> mainAxisPosition;
 
+  @internal
+  FlexEntranceTransition({
+    super.key,
+    required this.mainAxisPosition,
+    required this.direction,
+    required this.startToEnd,
+    required super.children,
+  });
+
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _RenderFlexEntranceTransition(
+    return RenderFlexEntranceTransition(
       mainAxisPosition: mainAxisPosition,
       direction: direction,
       startToEnd: startToEnd,
@@ -33,7 +33,9 @@ class FlexEntranceTransition extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, _RenderFlexEntranceTransition renderObject) {
+    BuildContext context,
+    RenderFlexEntranceTransition renderObject,
+  ) {
     renderObject
       ..mainAxisPosition = mainAxisPosition
       ..direction = direction
@@ -45,26 +47,15 @@ class _FlexEntranceTransitionParentData extends FlexParentData {
   Tween<double>? mainAxisPosition;
 }
 
-class _RenderFlexEntranceTransition extends RenderBox
+@internal
+class RenderFlexEntranceTransition extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox,
             _FlexEntranceTransitionParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox,
             _FlexEntranceTransitionParentData> {
-  _RenderFlexEntranceTransition({
-    List<RenderBox>? children,
-    Axis direction = Axis.horizontal,
-    required Animation<double> mainAxisPosition,
-    required bool startToEnd,
-  })  : _direction = direction,
-        _mainAxisPosition = mainAxisPosition,
-        _startToEnd = startToEnd {
-    addAll(children);
-  }
-
-  /// The direction to use as the main axis.
-  Axis get direction => _direction;
   Axis _direction;
+  Axis get direction => _direction;
   set direction(Axis value) {
     if (_direction != value) {
       _direction = value;
@@ -72,8 +63,8 @@ class _RenderFlexEntranceTransition extends RenderBox
     }
   }
 
-  bool get startToEnd => _startToEnd;
   bool _startToEnd;
+  bool get startToEnd => _startToEnd;
   set startToEnd(bool value) {
     if (_startToEnd != value) {
       _startToEnd = value;
@@ -81,8 +72,8 @@ class _RenderFlexEntranceTransition extends RenderBox
     }
   }
 
-  Animation<double> get mainAxisPosition => _mainAxisPosition;
   Animation<double> _mainAxisPosition;
+  Animation<double> get mainAxisPosition => _mainAxisPosition;
   set mainAxisPosition(Animation<double> value) {
     if (_mainAxisPosition != value) {
       if (attached) {
@@ -92,6 +83,17 @@ class _RenderFlexEntranceTransition extends RenderBox
       _mainAxisPosition = value;
       markNeedsOffsets();
     }
+  }
+
+  RenderFlexEntranceTransition({
+    List<RenderBox>? children,
+    Axis direction = Axis.horizontal,
+    required Animation<double> mainAxisPosition,
+    required bool startToEnd,
+  })  : _direction = direction,
+        _mainAxisPosition = mainAxisPosition,
+        _startToEnd = startToEnd {
+    addAll(children);
   }
 
   @override
@@ -111,59 +113,6 @@ class _RenderFlexEntranceTransition extends RenderBox
   void detach() {
     _mainAxisPosition.removeListener(markNeedsOffsets);
     super.detach();
-  }
-
-  void markNeedsOffsets() {
-    updateOffsets();
-    markNeedsPaint();
-  }
-
-  void updateOffsets() {
-    visitChildren(updateChildOffsets);
-  }
-
-  void updateChildOffsets(RenderObject child) {
-    final parentData = child.parentData;
-    if (parentData is _FlexEntranceTransitionParentData) {
-      final mainAxisPosition = parentData.mainAxisPosition?.evaluate(
-            _mainAxisPosition,
-          ) ??
-          0;
-      switch (_direction) {
-        case Axis.horizontal:
-          parentData.offset = Offset(mainAxisPosition, 0);
-          break;
-        case Axis.vertical:
-          parentData.offset = Offset(0, mainAxisPosition);
-          break;
-      }
-    }
-  }
-
-  int getTotalFlex() {
-    int totalFlex = 0;
-    visitChildren((child) {
-      final parentData = child.parentData as _FlexEntranceTransitionParentData?;
-      assert(() {
-        if (parentData!.flex != null) {
-          return true;
-        } else {
-          throw FlutterError.fromParts(
-            [
-              ErrorSummary(
-                'DrawerMotion only supports children with non-zero flex',
-              ),
-              ErrorDescription(
-                'Only children wrapped into Flexible widgets with non-zero '
-                'flex are supported',
-              ),
-            ],
-          );
-        }
-      }());
-      totalFlex += parentData!.flex!;
-    });
-    return totalFlex;
   }
 
   @override
@@ -244,5 +193,58 @@ class _RenderFlexEntranceTransition extends RenderBox
           ? childParentData.previousSibling
           : childParentData.nextSibling;
     }
+  }
+
+  void markNeedsOffsets() {
+    updateOffsets();
+    markNeedsPaint();
+  }
+
+  void updateOffsets() {
+    visitChildren(updateChildOffsets);
+  }
+
+  void updateChildOffsets(RenderObject child) {
+    final parentData = child.parentData;
+    if (parentData is _FlexEntranceTransitionParentData) {
+      final mainAxisPosition = parentData.mainAxisPosition?.evaluate(
+            _mainAxisPosition,
+          ) ??
+          0;
+      switch (_direction) {
+        case Axis.horizontal:
+          parentData.offset = Offset(mainAxisPosition, 0);
+          break;
+        case Axis.vertical:
+          parentData.offset = Offset(0, mainAxisPosition);
+          break;
+      }
+    }
+  }
+
+  int getTotalFlex() {
+    int totalFlex = 0;
+    visitChildren((child) {
+      final parentData = child.parentData as _FlexEntranceTransitionParentData?;
+      assert(() {
+        if (parentData!.flex != null) {
+          return true;
+        } else {
+          throw FlutterError.fromParts(
+            [
+              ErrorSummary(
+                'DrawerMotion only supports children with non-zero flex',
+              ),
+              ErrorDescription(
+                'Only children wrapped into Flexible widgets with non-zero '
+                'flex are supported',
+              ),
+            ],
+          );
+        }
+      }());
+      totalFlex += parentData!.flex!;
+    });
+    return totalFlex;
   }
 }

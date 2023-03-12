@@ -7,9 +7,7 @@ import 'slidable.dart';
 /// as the [Slidable] dismisses.
 class InversedDrawerMotion extends StatelessWidget {
   /// Creates a [InversedDrawerMotion].
-  const InversedDrawerMotion({
-    Key? key,
-  }) : super(key: key);
+  const InversedDrawerMotion({super.key});
 
   @override
   Widget build(BuildContext context) {

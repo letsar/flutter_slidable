@@ -1,19 +1,10 @@
 part of 'slidable.dart';
 
-const _defaultExtentRatio = 0.5;
+const double _defaultExtentRatio = 0.5;
 
 /// Data of the ambient [ActionPane] accessible from its children.
 @immutable
 class ActionPaneData {
-  /// Creates an [ActionPaneData].
-  const ActionPaneData({
-    required this.extentRatio,
-    required this.alignment,
-    required this.direction,
-    required this.fromStart,
-    required this.children,
-  });
-
   /// The total extent of this [ActionPane] relatively to the enclosing
   /// [Slidable] widget.
   ///
@@ -31,34 +22,24 @@ class ActionPaneData {
 
   /// The actions for this pane.
   final List<Widget> children;
+
+  /// Creates an [ActionPaneData].
+  const ActionPaneData({
+    required this.extentRatio,
+    required this.alignment,
+    required this.direction,
+    required this.fromStart,
+    required this.children,
+  });
 }
 
 /// An action pane.
 class ActionPane extends StatefulWidget {
-  /// Creates an [ActionPane].
-  ///
-  /// The [extentRatio] argument must not be null and must be between 0
-  /// (exclusive) and 1 (inclusive).
-  /// The [openThreshold] argument must be null or between 0 and 1
-  /// (both exclusives).
-  /// The [closeThreshold] argument must be null or between 0 and 1
-  /// (both exclusives).
-  /// The [children] argument must not be null.
-  const ActionPane({
-    Key? key,
-    this.extentRatio = _defaultExtentRatio,
-    required this.motion,
-    this.dismissible,
-    this.dragDismissible = true,
-    this.openThreshold,
-    this.closeThreshold,
-    required this.children,
-  })  : assert(extentRatio > 0 && extentRatio <= 1),
-        assert(
-            openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
-        assert(closeThreshold == null ||
-            (closeThreshold > 0 && closeThreshold < 1)),
-        super(key: key);
+  /// The action pane's data from the closest instance of this class that
+  /// encloses the given context.
+  static ActionPaneData? of(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<_ActionPaneScope>()
+      ?.actionPaneData;
 
   /// The total extent of this [ActionPane] relatively to the enclosing
   /// [Slidable] widget.
@@ -96,16 +77,32 @@ class ActionPane extends StatefulWidget {
   /// The actions for this pane.
   final List<Widget> children;
 
-  @override
-  _ActionPaneState createState() => _ActionPaneState();
+  /// Creates an [ActionPane].
+  ///
+  /// The [extentRatio] argument must not be null and must be between 0
+  /// (exclusive) and 1 (inclusive).
+  /// The [openThreshold] argument must be null or between 0 and 1
+  /// (both exclusives).
+  /// The [closeThreshold] argument must be null or between 0 and 1
+  /// (both exclusives).
+  /// The [children] argument must not be null.
+  const ActionPane({
+    super.key,
+    this.extentRatio = _defaultExtentRatio,
+    required this.motion,
+    this.dismissible,
+    this.dragDismissible = true,
+    this.openThreshold,
+    this.closeThreshold,
+    required this.children,
+  })  : assert(extentRatio > 0 && extentRatio <= 1),
+        assert(
+            openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
+        assert(closeThreshold == null ||
+            (closeThreshold > 0 && closeThreshold < 1));
 
-  /// The action pane's data from the closest instance of this class that
-  /// encloses the given context.
-  static ActionPaneData? of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_ActionPaneScope>()
-        ?.actionPaneData;
-  }
+  @override
+  State<ActionPane> createState() => _ActionPaneState();
 }
 
 class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
@@ -121,40 +118,35 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
   void initState() {
     super.initState();
     controller = Slidable.of(context);
-    controller!.endGesture.addListener(handleEndGestureChanged);
+    controller?.endGesture.addListener(handleEndGestureChanged);
 
     if (widget.dismissible != null) {
-      controller!.animation.addListener(handleRatioChanged);
+      controller!.animation.addListener(_handleRatioChanged);
     }
-    updateThresholds();
+    _updateThresholds();
     controller!.actionPaneConfigurator = this;
-  }
-
-  void updateThresholds() {
-    openThreshold = widget.openThreshold ?? widget.extentRatio / 2;
-    closeThreshold = widget.closeThreshold ?? widget.extentRatio / 2;
   }
 
   @override
   void didUpdateWidget(covariant ActionPane oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.dismissible != null) {
-      controller!.animation.removeListener(handleRatioChanged);
+      controller!.animation.removeListener(_handleRatioChanged);
     }
     if (widget.dismissible == null) {
       // In the case where the child was different than the motion, we get
       // it back.
       showMotion = true;
     } else {
-      controller!.animation.addListener(handleRatioChanged);
+      controller!.animation.addListener(_handleRatioChanged);
     }
-    updateThresholds();
+    _updateThresholds();
   }
 
   @override
   void dispose() {
     controller!.endGesture.removeListener(handleEndGestureChanged);
-    controller!.animation.removeListener(handleRatioChanged);
+    controller!.animation.removeListener(_handleRatioChanged);
     controller!.actionPaneConfigurator = null;
     super.dispose();
   }
@@ -202,16 +194,6 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
     controller!.close();
   }
 
-  void handleRatioChanged() {
-    final show = controller!.ratio.abs() <= widget.extentRatio &&
-        !controller!.isDismissibleReady;
-    if (show != showMotion) {
-      setState(() {
-        showMotion = show;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final config = ActionPaneConfiguration.of(context)!;
@@ -241,16 +223,31 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
       child: child!,
     );
   }
+
+  void _updateThresholds() {
+    openThreshold = widget.openThreshold ?? widget.extentRatio / 2;
+    closeThreshold = widget.closeThreshold ?? widget.extentRatio / 2;
+  }
+
+  void _handleRatioChanged() {
+    final show = controller!.ratio.abs() <= widget.extentRatio &&
+        !controller!.isDismissibleReady;
+    if (show != showMotion) {
+      setState(() {
+        showMotion = show;
+      });
+    }
+  }
 }
 
 class _ActionPaneScope extends InheritedWidget {
-  const _ActionPaneScope({
-    Key? key,
-    this.actionPaneData,
-    required Widget child,
-  }) : super(key: key, child: child);
-
   final ActionPaneData? actionPaneData;
+
+  const _ActionPaneScope({
+    super.key,
+    this.actionPaneData,
+    required super.child,
+  });
 
   @override
   bool updateShouldNotify(covariant _ActionPaneScope oldWidget) {

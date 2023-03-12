@@ -10,9 +10,7 @@ class BehindMotion extends StatelessWidget {
   /// Creates a [BehindMotion].
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/behind_motion.mp4}
-  const BehindMotion({
-    Key? key,
-  }) : super(key: key);
+  const BehindMotion({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +28,7 @@ class StretchMotion extends StatelessWidget {
   /// Creates a [StretchMotion].
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/stretch_motion.mp4}
-  const StretchMotion({
-    Key? key,
-  }) : super(key: key);
+  const StretchMotion({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +58,7 @@ class ScrollMotion extends StatelessWidget {
   /// Creates a [ScrollMotion].
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/scroll_motion.mp4}
-  const ScrollMotion({
-    Key? key,
-  }) : super(key: key);
+  const ScrollMotion({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +84,7 @@ class DrawerMotion extends StatelessWidget {
   /// Creates a [DrawerMotion].
   ///
   /// {@animation 664 200 https://raw.githubusercontent.com/letsar/flutter_slidable/assets/drawer_motion.mp4}
-  const DrawerMotion({
-    Key? key,
-  }) : super(key: key);
+  const DrawerMotion({super.key});
 
   @override
   Widget build(BuildContext context) {

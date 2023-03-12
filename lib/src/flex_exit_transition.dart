@@ -1,19 +1,9 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
-// INTERNAL USE
-// ignore_for_file: public_member_api_docs
-
+@internal
 class FlexExitTransition extends MultiChildRenderObjectWidget {
-  FlexExitTransition({
-    Key? key,
-    required this.mainAxisExtent,
-    required this.direction,
-    required this.startToEnd,
-    required this.initialExtentRatio,
-    required List<Widget> children,
-  }) : super(key: key, children: children);
-
   /// The direction to use as the main axis.
   final Axis direction;
 
@@ -27,9 +17,19 @@ class FlexExitTransition extends MultiChildRenderObjectWidget {
   /// The animation that controls the main axis position of the children.
   final Animation<double> mainAxisExtent;
 
+  @internal
+  FlexExitTransition({
+    super.key,
+    required this.mainAxisExtent,
+    required this.direction,
+    required this.startToEnd,
+    required this.initialExtentRatio,
+    required super.children,
+  });
+
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _RenderFlexExitTransition(
+    return RenderFlexExitTransition(
       mainAxisExtent: mainAxisExtent,
       direction: direction,
       initialExtentRatio: initialExtentRatio,
@@ -39,7 +39,9 @@ class FlexExitTransition extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, _RenderFlexExitTransition renderObject) {
+    BuildContext context,
+    RenderFlexExitTransition renderObject,
+  ) {
     renderObject
       ..mainAxisExtent = mainAxisExtent
       ..direction = direction
@@ -50,12 +52,54 @@ class FlexExitTransition extends MultiChildRenderObjectWidget {
 
 class _FlexExitTransitionParentData extends FlexParentData {}
 
-class _RenderFlexExitTransition extends RenderBox
+@internal
+class RenderFlexExitTransition extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _FlexExitTransitionParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox,
             _FlexExitTransitionParentData> {
-  _RenderFlexExitTransition({
+  Axis _direction;
+  Axis get direction => _direction;
+  set direction(Axis value) {
+    if (_direction != value) {
+      _direction = value;
+      markNeedsLayout();
+    }
+  }
+
+  bool _startToEnd;
+  bool get startToEnd => _startToEnd;
+  set startToEnd(bool value) {
+    if (_startToEnd != value) {
+      _startToEnd = value;
+      markNeedsLayout();
+    }
+  }
+
+  double? _initialExtentRatio;
+  double get initialExtentRatio => _initialExtentRatio!;
+  set initialExtentRatio(double value) {
+    if (_initialExtentRatio != value) {
+      _initialExtentRatio = value;
+      markNeedsLayout();
+    }
+  }
+
+  Animation<double> _mainAxisExtent;
+  Animation<double> get mainAxisExtent => _mainAxisExtent;
+  set mainAxisExtent(Animation<double> value) {
+    if (_mainAxisExtent != value) {
+      if (attached) {
+        _mainAxisExtent.removeListener(markNeedsOffsets);
+        value.addListener(markNeedsOffsets);
+      }
+      _mainAxisExtent = value;
+      markNeedsOffsets();
+    }
+  }
+
+  @internal
+  RenderFlexExitTransition({
     List<RenderBox>? children,
     Axis direction = Axis.horizontal,
     required Animation<double> mainAxisExtent,
@@ -66,47 +110,6 @@ class _RenderFlexExitTransition extends RenderBox
         _initialExtentRatio = initialExtentRatio,
         _startToEnd = startToEnd {
     addAll(children);
-  }
-
-  /// The direction to use as the main axis.
-  Axis get direction => _direction;
-  Axis _direction;
-  set direction(Axis value) {
-    if (_direction != value) {
-      _direction = value;
-      markNeedsLayout();
-    }
-  }
-
-  bool get startToEnd => _startToEnd;
-  bool _startToEnd;
-  set startToEnd(bool value) {
-    if (_startToEnd != value) {
-      _startToEnd = value;
-      markNeedsLayout();
-    }
-  }
-
-  double get initialExtentRatio => _initialExtentRatio!;
-  double? _initialExtentRatio;
-  set initialExtentRatio(double value) {
-    if (_initialExtentRatio != value) {
-      _initialExtentRatio = value;
-      markNeedsLayout();
-    }
-  }
-
-  Animation<double> get mainAxisExtent => _mainAxisExtent;
-  Animation<double> _mainAxisExtent;
-  set mainAxisExtent(Animation<double> value) {
-    if (_mainAxisExtent != value) {
-      if (attached) {
-        _mainAxisExtent.removeListener(markNeedsOffsets);
-        value.addListener(markNeedsOffsets);
-      }
-      _mainAxisExtent = value;
-      markNeedsOffsets();
-    }
   }
 
   @override
@@ -126,36 +129,6 @@ class _RenderFlexExitTransition extends RenderBox
   void detach() {
     _mainAxisExtent.removeListener(markNeedsOffsets);
     super.detach();
-  }
-
-  void markNeedsOffsets() {
-    markNeedsLayout();
-  }
-
-  int getTotalFlex() {
-    int totalFlex = 0;
-    visitChildren((child) {
-      final parentData = child.parentData as _FlexExitTransitionParentData?;
-      assert(() {
-        if (parentData!.flex != null) {
-          return true;
-        } else {
-          throw FlutterError.fromParts(
-            [
-              ErrorSummary(
-                'FlexTransition only supports children with non-zero flex',
-              ),
-              ErrorDescription(
-                'Only children wrapped into Flexible widgets with non-zero '
-                'flex are supported',
-              ),
-            ],
-          );
-        }
-      }());
-      totalFlex += parentData!.flex!;
-    });
-    return totalFlex;
   }
 
   @override
@@ -255,5 +228,35 @@ class _RenderFlexExitTransition extends RenderBox
           ? childParentData.previousSibling
           : childParentData.nextSibling;
     }
+  }
+
+  void markNeedsOffsets() {
+    markNeedsLayout();
+  }
+
+  int getTotalFlex() {
+    int totalFlex = 0;
+    visitChildren((child) {
+      final parentData = child.parentData as _FlexExitTransitionParentData?;
+      assert(() {
+        if (parentData!.flex != null) {
+          return true;
+        } else {
+          throw FlutterError.fromParts(
+            [
+              ErrorSummary(
+                'FlexTransition only supports children with non-zero flex',
+              ),
+              ErrorDescription(
+                'Only children wrapped into Flexible widgets with non-zero '
+                'flex are supported',
+              ),
+            ],
+          );
+        }
+      }());
+      totalFlex += parentData!.flex!;
+    });
+    return totalFlex;
   }
 }

@@ -1,21 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
 import 'controller.dart';
 
-// INTERNAL USE
-// ignore_for_file: public_member_api_docs
-
+@internal
 class SlidableGestureDetector extends StatefulWidget {
-  const SlidableGestureDetector({
-    Key? key,
-    this.enabled = true,
-    required this.controller,
-    required this.direction,
-    required this.child,
-    this.dragStartBehavior = DragStartBehavior.start,
-  }) : super(key: key);
-
   final SlidableController controller;
   final Widget child;
   final Axis direction;
@@ -38,8 +28,18 @@ class SlidableGestureDetector extends StatefulWidget {
   ///  * [DragGestureRecognizer.dragStartBehavior], which gives an example for the different behaviors.
   final DragStartBehavior dragStartBehavior;
 
+  @internal
+  const SlidableGestureDetector({
+    super.key,
+    this.enabled = true,
+    required this.controller,
+    required this.direction,
+    required this.child,
+    this.dragStartBehavior = DragStartBehavior.start,
+  });
+
   @override
-  _SlidableGestureDetectorState createState() =>
+  State<SlidableGestureDetector> createState() =>
       _SlidableGestureDetectorState();
 }
 
@@ -50,6 +50,11 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
 
   bool get directionIsXAxis {
     return widget.direction == Axis.horizontal;
+  }
+
+  double get overallDragAxisExtent {
+    final Size? size = context.size;
+    return directionIsXAxis ? size!.width : size!.height;
   }
 
   @override
@@ -67,11 +72,6 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
       dragStartBehavior: widget.dragStartBehavior,
       child: widget.child,
     );
-  }
-
-  double get overallDragAxisExtent {
-    final Size? size = context.size;
-    return directionIsXAxis ? size!.width : size!.height;
   }
 
   void handleDragStart(DragStartDetails details) {

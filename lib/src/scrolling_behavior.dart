@@ -1,18 +1,10 @@
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
 import 'controller.dart';
 
-// INTERNAL USE
-// ignore_for_file: public_member_api_docs
-
+@internal
 class SlidableScrollingBehavior extends StatefulWidget {
-  const SlidableScrollingBehavior({
-    Key? key,
-    required this.controller,
-    this.closeOnScroll = true,
-    required this.child,
-  }) : super(key: key);
-
   final SlidableController controller;
 
   /// Specifies to close the closest [Slidable] after the closest [Scrollable]'s
@@ -26,8 +18,15 @@ class SlidableScrollingBehavior extends StatefulWidget {
   /// {@macro flutter.widgets.child}
   final Widget child;
 
+  const SlidableScrollingBehavior({
+    super.key,
+    required this.controller,
+    this.closeOnScroll = true,
+    required this.child,
+  });
+
   @override
-  _SlidableScrollingBehaviorState createState() =>
+  State<SlidableScrollingBehavior> createState() =>
       _SlidableScrollingBehaviorState();
 }
 
@@ -56,9 +55,14 @@ class _SlidableScrollingBehaviorState extends State<SlidableScrollingBehavior> {
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+
   void addScrollingNotifierListener() {
     if (widget.closeOnScroll) {
-      scrollPosition = Scrollable.of(context)?.position;
+      scrollPosition = Scrollable.of(context).position;
       if (scrollPosition != null) {
         scrollPosition!.isScrollingNotifier.addListener(handleScrollingChanged);
       }
@@ -75,10 +79,5 @@ class _SlidableScrollingBehaviorState extends State<SlidableScrollingBehavior> {
         scrollPosition!.isScrollingNotifier.value) {
       widget.controller.close();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child;
   }
 }

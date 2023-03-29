@@ -101,6 +101,8 @@ class CustomSlidableAction extends StatelessWidget {
       flex: flex,
       child: Container(
         margin: margin,
+        height: double.infinity,
+        width: double.infinity,
         child: OutlinedButton(
           onPressed: () => _handleTap(context),
           style: OutlinedButton.styleFrom(

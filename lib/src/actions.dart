@@ -142,6 +142,7 @@ class SlidableAction extends StatelessWidget {
     this.label,
     this.borderRadius = BorderRadius.zero,
     this.padding,
+    this.labelStyle,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -178,6 +179,9 @@ class SlidableAction extends StatelessWidget {
   /// Padding of the OutlinedButton
   final EdgeInsets? padding;
 
+  /// The style to use for the [label].
+  final TextStyle? labelStyle;
+
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[];
@@ -199,6 +203,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
+          style: labelStyle,
         ),
       );
     }

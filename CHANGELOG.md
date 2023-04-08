@@ -1,3 +1,8 @@
+## 3.0.0
+
+### Changed
+* Minimum version of Flutter (3.7.0 now)
+
 ## 2.0.0
 ### Changed
 * Minimum version of Flutter (3.0.0 now) and Dart (2.17.0 now).

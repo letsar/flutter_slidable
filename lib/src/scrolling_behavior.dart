@@ -58,7 +58,7 @@ class _SlidableScrollingBehaviorState extends State<SlidableScrollingBehavior> {
 
   void addScrollingNotifierListener() {
     if (widget.closeOnScroll) {
-      scrollPosition = Scrollable.of(context)?.position;
+      scrollPosition = Scrollable.maybeOf(context)?.position;
       if (scrollPosition != null) {
         scrollPosition!.isScrollingNotifier.addListener(handleScrollingChanged);
       }

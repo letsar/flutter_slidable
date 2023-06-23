@@ -103,8 +103,11 @@ class CustomSlidableAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveForegroundColor =
-        foregroundColor ?? (ThemeData.estimateBrightnessForColor(backgroundColor) == Brightness.light ? Colors.black : Colors.white);
+    final effectiveForegroundColor = foregroundColor ??
+        (ThemeData.estimateBrightnessForColor(backgroundColor) ==
+                Brightness.light
+            ? Colors.black
+            : Colors.white);
 
     return Expanded(
       flex: flex,
@@ -123,10 +126,6 @@ class CustomSlidableAction extends StatelessWidget {
               borderRadius: borderRadius,
             ),
             side: BorderSide.none,
-            primary: effectiveForegroundColor,
-            onSurface: effectiveForegroundColor,
-            shape: shape,
-            side: side,
           ),
           child: child,
         ),
@@ -212,10 +211,12 @@ class SlidableAction extends StatelessWidget {
 
   /// Margin of the OutlinedButton
   final EdgeInsets? margin;
+
   /// The style to use for the [label].
   final TextStyle? labelStyle;
 
   @override
+  Widget build(BuildContext context) {
     final children = <Widget>[];
 
     if (icon != null) {

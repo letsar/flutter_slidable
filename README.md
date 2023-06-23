@@ -1,8 +1,23 @@
 <!-- [![Build][github_action_badge]][github_action] -->
 
-[![Pub][pub_badge]][pub] [![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
+**NOTE:** This is a forked repository that includes some of the fixes and improvements from the pull request created on the origin repository. Since there's no activity on the development on the origin repository, I decided to continue on this fork in the meantime. You are free to use this repository for your projects, if you want to use new fixes.
 
-[<img src="https://raw.githubusercontent.com/letsar/flutter_slidable/assets/flutter_favorite.png" width="100" />][flutter_favorite] **Slidable is a [Flutter Favorite][flutter_favorite] package!**
+To include this fork repo in your project, replace flutter_slidable with:
+
+```yaml
+  flutter_slidable:
+    git:
+      url: https://github.com/milindgoel15/flutter_slidable.git
+      ref: master # choose dev if you want to use dev build
+```
+
+---
+
+[![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
+
+[<img src="https://raw.githubusercontent.com/letsar/flutter_slidable/assets/flutter_favorite.png" width="100" />][flutter_favorite] 
+
+**Slidable is a [Flutter Favorite][flutter_favorite] package!**
 
 # flutter_slidable
 

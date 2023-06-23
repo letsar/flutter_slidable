@@ -91,11 +91,8 @@ class CustomSlidableAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveForegroundColor = foregroundColor ??
-        (ThemeData.estimateBrightnessForColor(backgroundColor) ==
-                Brightness.light
-            ? Colors.black
-            : Colors.white);
+    final effectiveForegroundColor =
+        foregroundColor ?? (ThemeData.estimateBrightnessForColor(backgroundColor) == Brightness.light ? Colors.black : Colors.white);
 
     return Expanded(
       flex: flex,
@@ -108,8 +105,8 @@ class CustomSlidableAction extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             padding: padding,
             backgroundColor: backgroundColor,
-            primary: effectiveForegroundColor,
-            onSurface: effectiveForegroundColor,
+            foregroundColor: effectiveForegroundColor,
+            disabledForegroundColor: effectiveForegroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: borderRadius,
             ),
@@ -152,6 +149,7 @@ class SlidableAction extends StatelessWidget {
     this.borderRadius = BorderRadius.zero,
     this.padding,
     this.margin,
+    this.labelStyle,
   })  : assert(flex > 0),
         assert(icon != null || label != null),
         super(key: key);
@@ -172,7 +170,7 @@ class SlidableAction extends StatelessWidget {
   final SlidableActionCallback? onPressed;
 
   /// An icon to display above the [label].
-  final IconData? icon;
+  final Widget? icon;
 
   /// The space between [icon] and [label] if both set.
   ///
@@ -190,14 +188,15 @@ class SlidableAction extends StatelessWidget {
 
   /// Margin of the OutlinedButton
   final EdgeInsets? margin;
+  /// The style to use for the [label].
+  final TextStyle? labelStyle;
 
   @override
-  Widget build(BuildContext context) {
     final children = <Widget>[];
 
     if (icon != null) {
       children.add(
-        Icon(icon),
+        icon!,
       );
     }
 
@@ -212,6 +211,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
+          style: labelStyle,
         ),
       );
     }

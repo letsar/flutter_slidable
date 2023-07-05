@@ -124,7 +124,7 @@ class _DismissiblePaneState extends State<DismissiblePane> {
     final endGesture = controller!.dismissGesture.value!.endGesture;
     final position = controller!.animation.value;
 
-    if (endGesture is OpeningGesture ||
+    if (endGesture is OpeningGesture && position >= widget.dismissThreshold ||
         endGesture is StillGesture && position >= widget.dismissThreshold) {
       bool canDismiss = true;
       if (widget.confirmDismiss != null) {

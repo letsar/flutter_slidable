@@ -99,8 +99,8 @@ class CustomSlidableAction extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             padding: padding,
             backgroundColor: backgroundColor,
-            primary: effectiveForegroundColor,
-            onSurface: effectiveForegroundColor,
+            disabledForegroundColor: effectiveForegroundColor.withOpacity(0.38),
+            foregroundColor: effectiveForegroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: borderRadius,
             ),

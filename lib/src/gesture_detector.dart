@@ -77,7 +77,9 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   void handleDragStart(DragStartDetails details) {
     startPosition = details.localPosition;
     lastPosition = startPosition;
-    dragExtent = dragExtent.sign *
+    dragExtent = (widget.controller.ratio != 0 && dragExtent != 0
+            ? dragExtent.sign
+            : widget.controller.ratio.sign) *
         overallDragAxisExtent *
         widget.controller.ratio *
         widget.controller.direction.value;

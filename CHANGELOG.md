@@ -1,3 +1,8 @@
+## 3.0.1
+
+## Changed
+* Remove deprecation use of `primary` and `surface` parameters from OutlinedButton.styleFrom method. (See https://github.com/letsar/flutter_slidable/pull/443)
+
 ## 3.0.0
 
 ### Changed

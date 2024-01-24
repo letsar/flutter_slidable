@@ -138,12 +138,16 @@ class SlidableAction extends StatelessWidget {
     this.autoClose = _kAutoClose,
     required this.onPressed,
     this.icon,
+    this.leadingWidget,
     this.spacing = 4,
     this.label,
     this.borderRadius = BorderRadius.zero,
     this.padding,
-  })  : assert(flex > 0),
-        assert(icon != null || label != null),
+  })  : assert(flex > 0, 'Flex must be greater than 0.'),
+        assert(icon == null || leadingWidget == null,
+            'You can provide either an icon or a widget, not both.'),
+        assert(icon != null || leadingWidget != null || label != null,
+            'You must provide at least an icon, a widget, or a label.'),
         super(key: key);
 
   /// {@macro slidable.actions.flex}
@@ -164,6 +168,10 @@ class SlidableAction extends StatelessWidget {
   /// An icon to display above the [label].
   final IconData? icon;
 
+  /// A leading widget to display above the [label].
+  /// This can be any widget, including an icon or an image.
+  final Widget? leadingWidget;
+
   /// The space between [icon] and [label] if both set.
   ///
   /// Defaults to 4.
@@ -180,40 +188,33 @@ class SlidableAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final children = <Widget>[];
+    final List<Widget> children = [];
 
+    // Add icon if it's provided
     if (icon != null) {
-      children.add(
-        Icon(icon),
-      );
+      children.add(Icon(icon));
+    }
+
+    // Add leadingWidget if it's provided
+    if (leadingWidget != null) {
+      children.add(leadingWidget!);
     }
 
     if (label != null) {
       if (children.isNotEmpty) {
-        children.add(
-          SizedBox(height: spacing),
-        );
+        children.add(SizedBox(height: spacing));
       }
-
-      children.add(
-        Text(
-          label!,
-          overflow: TextOverflow.ellipsis,
-        ),
-      );
+      children.add(Text(
+        label!,
+        overflow: TextOverflow.ellipsis,
+      ));
     }
 
-    final child = children.length == 1
+    final Widget child = children.length == 1
         ? children.first
         : Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              ...children.map(
-                (child) => Flexible(
-                  child: child,
-                ),
-              )
-            ],
+            children: children.map((child) => Flexible(child: child)).toList(),
           );
 
     return CustomSlidableAction(

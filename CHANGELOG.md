@@ -1,3 +1,8 @@
+## 3.1.0
+
+### Added
+* A way to provide a controller to the Slidable.
+  
 ## 3.0.1
 
 ## Changed

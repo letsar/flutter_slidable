@@ -56,17 +56,32 @@ class _MyHomePageState extends State<MyHomePage> {
                     closeThreshold: 0.4,
                     motion: BehindMotion(),
                     children: [
-                      SlideAction(color: Colors.green, icon: Icons.share),
-                      SlideAction(color: Colors.amber, icon: Icons.delete),
+                      SlideAction(
+                          color: Colors.green,
+                          icon: SizedBox(
+                            child: Icon(Icons.share),
+                          )),
+                      SlideAction(
+                          color: Colors.amber,
+                          icon: SizedBox(
+                            child: Icon(Icons.delete),
+                          )),
                     ],
                   ),
                   endActionPane: const ActionPane(
                     motion: BehindMotion(),
                     children: [
                       SlideAction(
-                          color: Colors.red, icon: Icons.delete_forever),
+                          color: Colors.red,
+                          icon: SizedBox(
+                            child: Icon(Icons.delete),
+                          )),
                       SlideAction(
-                          color: Colors.blue, icon: Icons.alarm, flex: 2),
+                          color: Colors.blue,
+                          icon: SizedBox(
+                            child: Icon(Icons.alarm),
+                          ),
+                          flex: 2),
                     ],
                   ),
                   child: const Tile(color: Colors.grey, text: 'hello'),
@@ -81,15 +96,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 startActionPane: const ActionPane(
                   motion: StretchMotion(),
                   children: [
-                    SlideAction(color: Colors.green, icon: Icons.share),
-                    SlideAction(color: Colors.amber, icon: Icons.delete),
+                    SlideAction(
+                        color: Colors.green,
+                        icon: SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlideAction(
+                        color: Colors.amber,
+                        icon: SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 endActionPane: const ActionPane(
                   motion: StretchMotion(),
                   children: [
-                    SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                    SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 3),
+                    SlideAction(
+                        color: Colors.red,
+                        icon: SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
+                    SlideAction(
+                        color: Colors.blue,
+                        icon: SizedBox(
+                          child: Icon(Icons.alarm),
+                        ),
+                        flex: 3),
                   ],
                 ),
                 child: const Tile(color: Colors.pink, text: 'hello 2'),
@@ -102,15 +134,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 startActionPane: const ActionPane(
                   motion: ScrollMotion(),
                   children: [
-                    SlideAction(color: Colors.green, icon: Icons.share),
-                    SlideAction(color: Colors.amber, icon: Icons.delete),
+                    SlideAction(
+                        color: Colors.green,
+                        icon: SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlideAction(
+                        color: Colors.amber,
+                        icon: SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 endActionPane: const ActionPane(
                   motion: ScrollMotion(),
                   children: [
-                    SlideAction(color: Colors.red, icon: Icons.delete_forever),
-                    SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
+                    SlideAction(
+                        color: Colors.red,
+                        icon: SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
+                    SlideAction(
+                        color: Colors.blue,
+                        icon: SizedBox(
+                          child: Icon(Icons.alarm),
+                        ),
+                        flex: 2),
                   ],
                 ),
                 child: const Tile(color: Colors.yellow, text: 'hello 3'),
@@ -160,17 +209,32 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     ),
                     children: const [
-                      SlideAction(color: Colors.green, icon: Icons.share),
-                      SlideAction(color: Colors.amber, icon: Icons.delete),
+                      SlideAction(
+                          color: Colors.green,
+                          icon: SizedBox(
+                            child: Icon(Icons.share),
+                          )),
+                      SlideAction(
+                          color: Colors.amber,
+                          icon: SizedBox(
+                            child: Icon(Icons.delete),
+                          )),
                     ],
                   ),
                   endActionPane: const ActionPane(
                     motion: DrawerMotion(),
                     children: [
                       SlideAction(
-                          color: Colors.red, icon: Icons.delete_forever),
+                          color: Colors.red,
+                          icon: SizedBox(
+                            child: Icon(Icons.delete),
+                          )),
                       SlideAction(
-                          color: Colors.blue, icon: Icons.alarm, flex: 2),
+                          color: Colors.blue,
+                          icon: SizedBox(
+                            child: Icon(Icons.alarm),
+                          ),
+                          flex: 2),
                     ],
                   ),
                   child: const Tile(color: Colors.lime, text: 'hello 4'),
@@ -192,7 +256,7 @@ class SlideAction extends StatelessWidget {
   }) : super(key: key);
 
   final Color color;
-  final IconData icon;
+  final Widget icon;
   final int flex;
 
   @override

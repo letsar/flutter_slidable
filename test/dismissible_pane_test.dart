@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/action_pane_motions.dart';
 import 'package:flutter_slidable/src/actions.dart';
@@ -34,8 +33,16 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -77,8 +84,16 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -124,8 +139,16 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -174,8 +197,16 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -226,8 +257,16 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -282,8 +321,16 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -340,8 +387,16 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.share),
+                        )),
+                    SlidableAction(
+                        onPressed: (_) {},
+                        icon: const SizedBox(
+                          child: Icon(Icons.delete),
+                        )),
                   ],
                 ),
                 child: Builder(

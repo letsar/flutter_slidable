@@ -47,6 +47,8 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
   double dragExtent = 0;
   late Offset startPosition;
   late Offset lastPosition;
+  DateTime? startTime;
+  DateTime? endTime;
 
   bool get directionIsXAxis {
     return widget.direction == Axis.horizontal;
@@ -54,17 +56,12 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
 
   @override
   Widget build(BuildContext context) {
-    final canDragHorizontally = directionIsXAxis && widget.enabled;
-    final canDragVertically = !directionIsXAxis && widget.enabled;
-    return GestureDetector(
-      onHorizontalDragStart: canDragHorizontally ? handleDragStart : null,
-      onHorizontalDragUpdate: canDragHorizontally ? handleDragUpdate : null,
-      onHorizontalDragEnd: canDragHorizontally ? handleDragEnd : null,
-      onVerticalDragStart: canDragVertically ? handleDragStart : null,
-      onVerticalDragUpdate: canDragVertically ? handleDragUpdate : null,
-      onVerticalDragEnd: canDragVertically ? handleDragEnd : null,
+    final canDrag = widget.enabled;
+    return Listener(
+      onPointerDown: canDrag ? handlePointerDown : null,
+      onPointerMove: canDrag ? handlePointerMove : null,
+      onPointerUp: canDrag ? handlePointerUp : null,
       behavior: HitTestBehavior.opaque,
-      dragStartBehavior: widget.dragStartBehavior,
       child: widget.child,
     );
   }
@@ -74,8 +71,9 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
     return directionIsXAxis ? size!.width : size!.height;
   }
 
-  void handleDragStart(DragStartDetails details) {
-    startPosition = details.localPosition;
+  void handlePointerDown(PointerDownEvent event) {
+    startTime = DateTime.now();
+    startPosition = event.localPosition;
     lastPosition = startPosition;
     dragExtent = dragExtent.sign *
         overallDragAxisExtent *
@@ -83,22 +81,35 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
         widget.controller.direction.value;
   }
 
-  void handleDragUpdate(DragUpdateDetails details) {
-    final delta = details.primaryDelta!;
+  void handlePointerMove(PointerMoveEvent event) {
+    final delta = directionIsXAxis ? event.delta.dx : event.delta.dy;
     dragExtent += delta;
-    lastPosition = details.localPosition;
+    lastPosition = event.localPosition;
     widget.controller.ratio = dragExtent / overallDragAxisExtent;
   }
 
-  void handleDragEnd(DragEndDetails details) {
+  void handlePointerUp(PointerUpEvent event) {
+    endTime = DateTime.now();
     final delta = lastPosition - startPosition;
     final primaryDelta = directionIsXAxis ? delta.dx : delta.dy;
     final gestureDirection =
         primaryDelta >= 0 ? GestureDirection.opening : GestureDirection.closing;
 
+    final velocity = calculateVelocity();
     widget.controller.dispatchEndGesture(
-      details.primaryVelocity,
+      velocity,
       gestureDirection,
     );
+  }
+
+  double calculateVelocity() {
+    if (startTime == null || endTime == null) {
+      return 0.0;
+    }
+    final duration = endTime!.difference(startTime!).inMilliseconds / 1000;
+    final distance = directionIsXAxis
+        ? lastPosition.dx - startPosition.dx
+        : lastPosition.dy - startPosition.dy;
+    return distance / duration; // 単位はピクセル/秒
   }
 }

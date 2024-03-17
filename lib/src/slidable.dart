@@ -6,7 +6,7 @@ import 'package:flutter_slidable/src/notifications_old.dart';
 import 'action_pane_configuration.dart';
 import 'controller.dart';
 import 'dismissal.dart';
-import 'gesture_detector.dart';
+import 'gesture_listener.dart';
 import 'scrolling_behavior.dart';
 
 part 'action_pane.dart';
@@ -269,7 +269,7 @@ class _SlidableState extends State<Slidable>
       ],
     );
 
-    return SlidableGestureDetector(
+    return SlidableGestureListener(
       enabled: widget.enabled,
       controller: controller,
       direction: widget.direction,

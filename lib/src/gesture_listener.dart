@@ -53,6 +53,8 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
   late DateTime lastTime;
   double? lastVelocity;
 
+  bool? isWidgetDirectionDrag;
+
   bool get directionIsXAxis {
     return widget.direction == Axis.horizontal;
   }
@@ -84,9 +86,22 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
         widget.controller.direction.value;
 
     lastTime = DateTime.now();
+
+    isWidgetDirectionDrag = null;
+    lastVelocity = null;
   }
 
   void handlePointerMove(PointerMoveEvent event) {
+    if (isWidgetDirectionDrag == null) {
+      final dx = (event.localPosition.dx - startPosition.dx).abs();
+      final dy = (event.localPosition.dy - startPosition.dy).abs();
+      isWidgetDirectionDrag =
+          (widget.direction == Axis.horizontal) ? dx > dy : dy > dx;
+    }
+    if (!isWidgetDirectionDrag!) {
+      return;
+    }
+
     final delta = directionIsXAxis ? event.delta.dx : event.delta.dy;
     dragExtent += delta;
     lastPosition = event.localPosition;
@@ -100,6 +115,9 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
   }
 
   void handlePointerUp(PointerUpEvent event) {
+    if (isWidgetDirectionDrag == null || !isWidgetDirectionDrag!) {
+      return;
+    }
     endTime = DateTime.now();
     final delta = lastPosition - startPosition;
     final primaryDelta = directionIsXAxis ? delta.dx : delta.dy;
@@ -110,7 +128,6 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
       currentVelocity(),
       gestureDirection,
     );
-    lastVelocity = null;
   }
 
   double? currentVelocity() {
@@ -122,7 +139,6 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
       return null;
     }
 
-    print('lastVelocity: $lastVelocity');
     return lastVelocity;
   }
 }

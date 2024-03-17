@@ -50,6 +50,9 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
   DateTime? startTime;
   DateTime? endTime;
 
+  late DateTime lastTime;
+  double? lastVelocity;
+
   bool get directionIsXAxis {
     return widget.direction == Axis.horizontal;
   }
@@ -79,6 +82,8 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
         overallDragAxisExtent *
         widget.controller.ratio *
         widget.controller.direction.value;
+
+    lastTime = DateTime.now();
   }
 
   void handlePointerMove(PointerMoveEvent event) {
@@ -86,6 +91,12 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
     dragExtent += delta;
     lastPosition = event.localPosition;
     widget.controller.ratio = dragExtent / overallDragAxisExtent;
+
+    final now = DateTime.now();
+    final deltaTime =
+        now.difference(lastTime).inMilliseconds / 1000.0; // 秒単位で変化量を計算
+    lastVelocity = delta / deltaTime;
+    lastTime = now;
   }
 
   void handlePointerUp(PointerUpEvent event) {
@@ -95,21 +106,23 @@ class _SlidableGestureListenerState extends State<SlidableGestureListener> {
     final gestureDirection =
         primaryDelta >= 0 ? GestureDirection.opening : GestureDirection.closing;
 
-    final velocity = calculateVelocity();
     widget.controller.dispatchEndGesture(
-      velocity,
+      currentVelocity(),
       gestureDirection,
     );
+    lastVelocity = null;
   }
 
-  double calculateVelocity() {
-    if (startTime == null || endTime == null) {
-      return 0.0;
+  double? currentVelocity() {
+    if (lastVelocity == null) {
+      return null;
     }
-    final duration = endTime!.difference(startTime!).inMilliseconds / 1000;
-    final distance = directionIsXAxis
-        ? lastPosition.dx - startPosition.dx
-        : lastPosition.dy - startPosition.dy;
-    return distance / duration; // 単位はピクセル/秒
+    if (lastVelocity!.abs() < 20) {
+      lastVelocity = null;
+      return null;
+    }
+
+    print('lastVelocity: $lastVelocity');
+    return lastVelocity;
   }
 }

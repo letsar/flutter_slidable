@@ -119,15 +119,12 @@ class Slidable extends StatefulWidget {
   /// ```
   /// {@end-tool}
   static SlidableController? of(BuildContext context) {
-    final scope = context
-        .getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()
-        ?.widget as _SlidableControllerScope?;
+    final scope = context.getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()?.widget as _SlidableControllerScope?;
     return scope?.controller;
   }
 }
 
-class _SlidableState extends State<Slidable>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+class _SlidableState extends State<Slidable> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final SlidableController controller;
   late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
@@ -138,8 +135,7 @@ class _SlidableState extends State<Slidable>
   @override
   void initState() {
     super.initState();
-    controller = (widget.controller ?? SlidableController(this))
-      ..actionPaneType.addListener(handleActionPanelTypeChanged);
+    controller = (widget.controller ?? SlidableController(this))..actionPaneType.addListener(handleActionPanelTypeChanged);
   }
 
   @override
@@ -157,8 +153,7 @@ class _SlidableState extends State<Slidable>
     if (oldWidget.controller != widget.controller) {
       controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
 
-      controller = (widget.controller ?? SlidableController(this))
-        ..actionPaneType.addListener(handleActionPanelTypeChanged);
+      controller = (widget.controller ?? SlidableController(this))..actionPaneType.addListener(handleActionPanelTypeChanged);
     }
 
     updateIsLeftToRight();
@@ -187,9 +182,7 @@ class _SlidableState extends State<Slidable>
 
   void updateIsLeftToRight() {
     final textDirection = Directionality.of(context);
-    controller.isLeftToRight = widget.direction == Axis.vertical ||
-        !widget.useTextDirection ||
-        textDirection == TextDirection.ltr;
+    controller.isLeftToRight = widget.direction == Axis.vertical || !widget.useTextDirection || textDirection == TextDirection.ltr;
   }
 
   void handleActionPanelTypeChanged() {
@@ -209,9 +202,7 @@ class _SlidableState extends State<Slidable>
     moveAnimation = controller.animation.drive(
       Tween<Offset>(
         begin: Offset.zero,
-        end: widget.direction == Axis.horizontal
-            ? Offset(end, 0)
-            : Offset(0, end),
+        end: widget.direction == Axis.horizontal ? Offset(end, 0) : Offset(0, end),
       ),
     );
   }
@@ -286,8 +277,7 @@ class _SlidableState extends State<Slidable>
             child: ActionPaneConfiguration(
               alignment: actionPaneAlignment,
               direction: widget.direction,
-              isStartActionPane:
-                  controller.actionPaneType.value == ActionPaneType.start,
+              isStartActionPane: controller.actionPaneType.value == ActionPaneType.start,
               child: _SlidableControllerScope(
                 controller: controller,
                 child: content,

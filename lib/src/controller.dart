@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 const _defaultMovementDuration = Duration(milliseconds: 200);
 const _defaultCurve = Curves.ease;
+const _defaultExtentRatio = 0.5;
 
 /// The different kinds of action panes.
 enum ActionPaneType {
@@ -123,12 +124,10 @@ class SlidableController {
   bool isLeftToRight = true;
 
   /// Whether the positive action pane is enabled.
-  bool get enablePositiveActionPane =>
-      isLeftToRight ? enableStartActionPane : enableEndActionPane;
+  bool get enablePositiveActionPane => isLeftToRight ? enableStartActionPane : enableEndActionPane;
 
   /// Whether the negative action pane is enabled.
-  bool get enableNegativeActionPane =>
-      isLeftToRight ? enableEndActionPane : enableStartActionPane;
+  bool get enableNegativeActionPane => isLeftToRight ? enableEndActionPane : enableStartActionPane;
 
   /// The extent ratio of the start action pane.
   double get startActionPaneExtentRatio => _startActionPaneExtentRatio;
@@ -193,10 +192,7 @@ class SlidableController {
   bool _closing = false;
 
   bool _acceptRatio(double ratio) {
-    return !_closing &&
-        (ratio == 0 ||
-            ((ratio > 0 && enablePositiveActionPane) ||
-                (ratio < 0 && enableNegativeActionPane)));
+    return !_closing && (ratio == 0 || ((ratio > 0 && enablePositiveActionPane) || (ratio < 0 && enableNegativeActionPane)));
   }
 
   /// The current ratio of the full size of the [Slidable] that is already
@@ -209,7 +205,7 @@ class SlidableController {
   /// [ActionPaneType.start].
   double get ratio => _animationController.value * direction.value;
   set ratio(double value) {
-    final newRatio = (actionPaneConfigurator?.normalizeRatio(value)) ?? value;
+    final newRatio = actionPaneConfigurator?.normalizeRatio(value) ?? value;
     if (_acceptRatio(newRatio) && newRatio != ratio) {
       direction.value = newRatio.sign.toInt();
       _animationController.value = newRatio.abs();
@@ -259,9 +255,10 @@ class SlidableController {
   Future<void> openCurrentActionPane({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
+    double extent = _defaultExtentRatio,
   }) async {
     return openTo(
-      actionPaneConfigurator!.extentRatio,
+      extent,
       duration: duration,
       curve: curve,
     );

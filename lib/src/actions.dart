@@ -85,11 +85,8 @@ class CustomSlidableAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveForegroundColor = foregroundColor ??
-        (ThemeData.estimateBrightnessForColor(backgroundColor) ==
-                Brightness.light
-            ? Colors.black
-            : Colors.white);
+    final effectiveForegroundColor =
+        foregroundColor ?? (ThemeData.estimateBrightnessForColor(backgroundColor) == Brightness.light ? Colors.black : Colors.white);
 
     return Expanded(
       flex: flex,
@@ -106,7 +103,13 @@ class CustomSlidableAction extends StatelessWidget {
             ),
             side: BorderSide.none,
           ),
-          child: child,
+          child: Container(
+            alignment: Alignment.topRight,
+            margin: const EdgeInsets.only(
+              right: 5,
+            ),
+            child: child,
+          ),
         ),
       ),
     );
@@ -180,41 +183,16 @@ class SlidableAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final children = <Widget>[];
-
-    if (icon != null) {
-      children.add(
+    final children = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
         Icon(icon),
-      );
-    }
-
-    if (label != null) {
-      if (children.isNotEmpty) {
-        children.add(
-          SizedBox(height: spacing),
-        );
-      }
-
-      children.add(
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
         ),
-      );
-    }
-
-    final child = children.length == 1
-        ? children.first
-        : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ...children.map(
-                (child) => Flexible(
-                  child: child,
-                ),
-              )
-            ],
-          );
+      ],
+    );
 
     return CustomSlidableAction(
       borderRadius: borderRadius,
@@ -224,7 +202,7 @@ class SlidableAction extends StatelessWidget {
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       flex: flex,
-      child: child,
+      child: children,
     );
   }
 }

@@ -47,6 +47,7 @@ class ActionPane extends StatefulWidget {
   const ActionPane({
     Key? key,
     this.extentRatio = _defaultExtentRatio,
+    this.ratio,
     required this.motion,
     this.dismissible,
     this.dragDismissible = true,
@@ -64,6 +65,9 @@ class ActionPane extends StatefulWidget {
   ///
   /// Must be between 0 (excluded) and 1.
   final double extentRatio;
+
+  ///Ratio for fixed widget
+  final double? ratio;
 
   /// A widget which animates when the [Slidable] moves.
   final Widget motion;
@@ -95,6 +99,7 @@ class ActionPane extends StatefulWidget {
   /// The actions for this pane.
   final List<Widget> children;
 
+  /// Callback function
   final Function()? onClose;
 
   @override
@@ -178,7 +183,7 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
 
     // Custom thresholds for different swipe actions
     const double halfSwipeThreshold = 0.5;
-    const double quarterSwipeThreshold = 0.25;
+    final double quarterSwipeThreshold = widget.ratio ?? 0.25;
 
     if (position < quarterSwipeThreshold / 2) {
       controller!.close();

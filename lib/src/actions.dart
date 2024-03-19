@@ -105,9 +105,6 @@ class CustomSlidableAction extends StatelessWidget {
           ),
           child: Container(
             alignment: Alignment.topRight,
-            margin: const EdgeInsets.only(
-              right: 5,
-            ),
             child: child,
           ),
         ),

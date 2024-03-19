@@ -7,9 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Slidable', () {
-    testWidgets(
-        'child should be able to open the horitzontal start action pane',
-        (tester) async {
+    testWidgets('child should be able to open the horitzontal start action pane', (tester) async {
       const gestureDetectorKey = ValueKey('gesture_detector');
       const startActionPaneKey = ValueKey('start');
       const endActionPaneKey = ValueKey('end');
@@ -21,16 +19,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             child: Builder(builder: (context) {
@@ -55,8 +69,7 @@ void main() {
       expect(find.byKey(endActionPaneKey), findsNothing);
     });
 
-    testWidgets('child should be able to open the horizontal end action pane',
-        (tester) async {
+    testWidgets('child should be able to open the horizontal end action pane', (tester) async {
       const gestureDetectorKey = ValueKey('gesture_detector');
       const startActionPaneKey = ValueKey('start');
       const endActionPaneKey = ValueKey('end');
@@ -68,16 +81,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             child: Builder(builder: (context) {
@@ -102,8 +131,7 @@ void main() {
       expect(find.byKey(endActionPaneKey), findsOneWidget);
     });
 
-    testWidgets('child should be able to open the vertical start action pane',
-        (tester) async {
+    testWidgets('child should be able to open the vertical start action pane', (tester) async {
       const gestureDetectorKey = ValueKey('gesture_detector');
       const startActionPaneKey = ValueKey('start');
       const endActionPaneKey = ValueKey('end');
@@ -116,16 +144,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             child: Builder(builder: (context) {
@@ -150,8 +194,7 @@ void main() {
       expect(find.byKey(endActionPaneKey), findsNothing);
     });
 
-    testWidgets('child should be able to open the vertical end action pane',
-        (tester) async {
+    testWidgets('child should be able to open the vertical end action pane', (tester) async {
       const gestureDetectorKey = ValueKey('gesture_detector');
       const startActionPaneKey = ValueKey('start');
       const endActionPaneKey = ValueKey('end');
@@ -164,16 +207,32 @@ void main() {
               key: startActionPaneKey,
               motion: const BehindMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             endActionPane: ActionPane(
               key: endActionPaneKey,
               motion: const ScrollMotion(),
               children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.share),
+                  label: const Text(''),
+                ),
+                SlidableAction(
+                  onPressed: (_) {},
+                  icon: const Icon(Icons.delete),
+                  label: const Text(''),
+                ),
               ],
             ),
             child: Builder(builder: (context) {
@@ -213,8 +272,16 @@ void main() {
             key: endActionPaneKey,
             motion: const ScrollMotion(),
             children: [
-              SlidableAction(onPressed: (_) {}, icon: Icons.share),
-              SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+              SlidableAction(
+                onPressed: (_) {},
+                icon: const Icon(Icons.share),
+                label: const Text(''),
+              ),
+              SlidableAction(
+                onPressed: (_) {},
+                icon: const Icon(Icons.delete),
+                label: const Text(''),
+              ),
             ],
           ),
           child: Builder(
@@ -253,8 +320,16 @@ void main() {
             key: startActionPaneKey,
             motion: const ScrollMotion(),
             children: [
-              SlidableAction(onPressed: (_) {}, icon: Icons.share),
-              SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+              SlidableAction(
+                onPressed: (_) {},
+                icon: const Icon(Icons.share),
+                label: const Text(''),
+              ),
+              SlidableAction(
+                onPressed: (_) {},
+                icon: const Icon(Icons.delete),
+                label: const Text(''),
+              ),
             ],
           ),
           child: Builder(
@@ -279,17 +354,23 @@ void main() {
     expect(tester.getTopLeft(find.byKey(childKey)), const Offset(0, 0));
   });
 
-  testWidgets(
-      'should work if TextDirection.rtl and only startActionPane is set',
-      (tester) async {
+  testWidgets('should work if TextDirection.rtl and only startActionPane is set', (tester) async {
     const gestureDetectorKey = ValueKey('gesture_detector');
     const actionPaneKey = ValueKey('action_pane');
     final actionPane = ActionPane(
       key: actionPaneKey,
       motion: const BehindMotion(),
       children: [
-        SlidableAction(onPressed: (_) {}, icon: Icons.share),
-        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+        SlidableAction(
+          onPressed: (_) {},
+          icon: const Icon(Icons.share),
+          label: const Text(''),
+        ),
+        SlidableAction(
+          onPressed: (_) {},
+          icon: const Icon(Icons.delete),
+          label: const Text(''),
+        ),
       ],
     );
 
@@ -318,16 +399,23 @@ void main() {
     expect(find.byKey(actionPaneKey), findsOneWidget);
   });
 
-  testWidgets('should work if TextDirection.rtl and only endActionPane is set',
-      (tester) async {
+  testWidgets('should work if TextDirection.rtl and only endActionPane is set', (tester) async {
     const gestureDetectorKey = ValueKey('gesture_detector');
     const actionPaneKey = ValueKey('action_pane');
     final actionPane = ActionPane(
       key: actionPaneKey,
       motion: const BehindMotion(),
       children: [
-        SlidableAction(onPressed: (_) {}, icon: Icons.share),
-        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+        SlidableAction(
+          onPressed: (_) {},
+          icon: const Icon(Icons.share),
+          label: const Text(''),
+        ),
+        SlidableAction(
+          onPressed: (_) {},
+          icon: const Icon(Icons.delete),
+          label: const Text(''),
+        ),
       ],
     );
 

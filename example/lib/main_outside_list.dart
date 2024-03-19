@@ -63,10 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   endActionPane: const ActionPane(
                     motion: BehindMotion(),
                     children: [
-                      SlideAction(
-                          color: Colors.red, icon: Icons.delete_forever),
-                      SlideAction(
-                          color: Colors.blue, icon: Icons.alarm, flex: 2),
+                      SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                      SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                     ],
                   ),
                   child: const Tile(color: Colors.grey, text: 'hello'),
@@ -137,8 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               builder: (context) {
                                 return AlertDialog(
                                   title: const Text('Are you sure?'),
-                                  content:
-                                      const Text('Are you sure to dismiss?'),
+                                  content: const Text('Are you sure to dismiss?'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
@@ -167,10 +164,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   endActionPane: const ActionPane(
                     motion: DrawerMotion(),
                     children: [
-                      SlideAction(
-                          color: Colors.red, icon: Icons.delete_forever),
-                      SlideAction(
-                          color: Colors.blue, icon: Icons.alarm, flex: 2),
+                      SlideAction(color: Colors.red, icon: Icons.delete_forever),
+                      SlideAction(color: Colors.blue, icon: Icons.alarm, flex: 2),
                     ],
                   ),
                   child: const Tile(color: Colors.lime, text: 'hello 4'),
@@ -202,8 +197,8 @@ class SlideAction extends StatelessWidget {
       backgroundColor: color,
       foregroundColor: Colors.white,
       onPressed: (_) {},
-      icon: icon,
-      label: 'hello',
+      icon: Icon(icon),
+      label: const Text('hello'),
     );
   }
 }

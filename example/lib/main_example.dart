@@ -43,8 +43,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
   AnimationController? controller;
 
   @override
@@ -144,8 +143,7 @@ class SlidableControllerSender extends StatefulWidget {
   final Widget? child;
 
   @override
-  _SlidableControllerSenderState createState() =>
-      _SlidableControllerSenderState();
+  _SlidableControllerSenderState createState() => _SlidableControllerSenderState();
 }
 
 class _SlidableControllerSenderState extends State<SlidableControllerSender> {
@@ -218,8 +216,8 @@ class SlideAction extends StatelessWidget {
       backgroundColor: color,
       foregroundColor: Colors.white,
       onPressed: (_) {},
-      icon: icon,
-      label: label,
+      icon: Icon(icon),
+      label: Text(label),
     );
   }
 }

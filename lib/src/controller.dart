@@ -333,7 +333,7 @@ class SlidableController {
   }) async {
     await _animationController.animateTo(
       1,
-      duration: _defaultMovementDuration,
+      duration: duration,
       curve: curve,
     );
     resizeRequest.value = request;

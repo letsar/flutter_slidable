@@ -302,6 +302,11 @@ class SlidableController {
   }
 
   /// Opens the [Slidable] to the given [ratio].
+  ///
+  /// The [ratio] sign will determine which direction the slidable should open.
+  /// ```dart
+  ///   controller.openTo(-1); //opens slidable all the way to the left side
+  /// ```  
   Future<void> openTo(
     double ratio, {
     Duration duration = _defaultMovementDuration,

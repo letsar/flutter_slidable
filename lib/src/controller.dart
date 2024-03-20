@@ -260,8 +260,24 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
+    double extentRatio = 0.5; // equal to _defaultExtentRatio
+    if (actionPaneConfigurator == null) {
+      switch (actionPaneType.value) {
+        case ActionPaneType.start:
+          extentRatio = _startActionPaneExtentRatio;
+          break;
+        case ActionPaneType.end:
+          extentRatio = _endActionPaneExtentRatio;
+          break;
+        case ActionPaneType.none:
+          break;
+      }
+    } else {
+      extentRatio = actionPaneConfigurator!.extentRatio;
+    }
+
     return openTo(
-      actionPaneConfigurator!.extentRatio,
+      extentRatio,
       duration: duration,
       curve: curve,
     );

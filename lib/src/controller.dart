@@ -122,6 +122,9 @@ class SlidableController {
   /// Defaults to true.
   bool isLeftToRight = true;
 
+  ///Show that if Slidable closed
+  bool isClosed = true;
+
   /// Whether the positive action pane is enabled.
   bool get enablePositiveActionPane =>
       isLeftToRight ? enableStartActionPane : enableEndActionPane;
@@ -209,7 +212,7 @@ class SlidableController {
   /// [ActionPaneType.start].
   double get ratio => _animationController.value * direction.value;
   set ratio(double value) {
-    final newRatio = (actionPaneConfigurator?.normalizeRatio(value)) ?? value;
+    final newRatio = actionPaneConfigurator?.normalizeRatio(value) ?? value;
     if (_acceptRatio(newRatio) && newRatio != ratio) {
       direction.value = newRatio.sign.toInt();
       _animationController.value = newRatio.abs();
@@ -253,6 +256,7 @@ class SlidableController {
     );
     direction.value = 0;
     _closing = false;
+    isClosed = true;
   }
 
   /// Opens the current [ActionPane].
@@ -260,6 +264,7 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
+    isClosed = false;
     return openTo(
       actionPaneConfigurator!.extentRatio,
       duration: duration,
@@ -276,7 +281,7 @@ class SlidableController {
       direction.value = isLeftToRight ? 1 : -1;
       ratio = 0;
     }
-
+    isClosed = false;
     return openTo(
       startActionPaneExtentRatio,
       duration: duration,
@@ -293,7 +298,7 @@ class SlidableController {
       direction.value = isLeftToRight ? -1 : 1;
       ratio = 0;
     }
-
+    isClosed = false;
     return openTo(
       -endActionPaneExtentRatio,
       duration: duration,

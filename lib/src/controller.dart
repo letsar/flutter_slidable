@@ -122,7 +122,7 @@ class SlidableController {
   /// Defaults to true.
   bool isLeftToRight = true;
 
-  ///Show that if Slidable closed
+  ///Show that if slidable closed
   bool isClosed = true;
 
   /// Whether the positive action pane is enabled.

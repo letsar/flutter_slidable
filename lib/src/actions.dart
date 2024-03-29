@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'slidable.dart';
 
 /// Signature for [CustomSlidableAction.onPressed].
@@ -137,6 +138,7 @@ class SlidableAction extends StatelessWidget {
     this.autoClose = _kAutoClose,
     required this.onPressed,
     this.icon,
+    this.iconWidget,
     this.spacing = 4,
     this.label,
     this.style,
@@ -163,7 +165,7 @@ class SlidableAction extends StatelessWidget {
 
   /// An icon to display above the [label].
   final IconData? icon;
-  final TextStyle? style;
+  final Widget? iconWidget;
 
   /// The space between [icon] and [label] if both set.
   ///
@@ -172,6 +174,7 @@ class SlidableAction extends StatelessWidget {
 
   /// A label to display below the [icon].
   final String? label;
+  final TextStyle? style;
 
   /// Padding of the OutlinedButton
   final BorderRadius borderRadius;
@@ -186,6 +189,11 @@ class SlidableAction extends StatelessWidget {
     if (icon != null) {
       children.add(
         Icon(icon),
+      );
+    }
+    if (iconWidget != null) {
+      children.add(
+        iconWidget,
       );
     }
 

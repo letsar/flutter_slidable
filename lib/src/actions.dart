@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:clync_app/core/app_export.dart';
 import 'slidable.dart';
 
 /// Signature for [CustomSlidableAction.onPressed].
@@ -163,6 +162,7 @@ class SlidableAction extends StatelessWidget {
 
   /// An icon to display above the [label].
   final IconData? icon;
+  final TextStyle? style;
 
   /// The space between [icon] and [label] if both set.
   ///
@@ -198,7 +198,7 @@ class SlidableAction extends StatelessWidget {
       children.add(
         Text(
           label!,
-          style: AppStyle.style12w500(),
+          style: style,
           overflow: TextOverflow.ellipsis,
         ),
       );

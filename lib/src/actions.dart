@@ -139,6 +139,7 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
+    this.style,
     this.borderRadius = BorderRadius.zero,
     this.padding,
   })  : assert(flex > 0),

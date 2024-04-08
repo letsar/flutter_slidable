@@ -1,3 +1,18 @@
+## 3.1.0
+
+### Added
+* A way to provide a controller to the Slidable.
+  
+## 3.0.1
+
+## Changed
+* Remove deprecation use of `primary` and `surface` parameters from OutlinedButton.styleFrom method. (See https://github.com/letsar/flutter_slidable/pull/443)
+
+## 3.0.0
+
+### Changed
+* Minimum version of Flutter (3.7.0 now)
+
 ## 2.0.0
 ### Changed
 * Minimum version of Flutter (3.0.0 now) and Dart (2.17.0 now).

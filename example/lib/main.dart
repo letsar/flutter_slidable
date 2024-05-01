@@ -96,10 +96,11 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                   // A SlidableAction can have an icon and/or a label.
                   SlidableAction(
                     onPressed: doNothing,
-                    backgroundColor: Color(0xFFFE4A49),
-                    foregroundColor: Colors.white,
-                    icon: Icons.delete,
+                    // backgroundColor: Color(0xFFFE4A49),
+                    // foregroundColor: Colors.white,
+                    // icon: Icons.delete,
                     label: 'Delete',
+                    labelStyle: TextStyle(color: Colors.red),
                   ),
                   SlidableAction(
                     onPressed: doNothing,

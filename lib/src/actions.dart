@@ -8,6 +8,11 @@ typedef SlidableActionCallback = void Function(BuildContext context);
 const int _kFlex = 1;
 const Color _kBackgroundColor = Colors.white;
 const bool _kAutoClose = true;
+const TextStyle _kDefaultTextStyle = TextStyle(
+  color: Colors.black,
+  fontSize: 16,
+  fontWeight: FontWeight.w500,
+);
 
 /// Represents an action of an [ActionPane].
 class CustomSlidableAction extends StatelessWidget {
@@ -199,6 +204,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
+          style: _kDefaultTextStyle,
         ),
       );
     }

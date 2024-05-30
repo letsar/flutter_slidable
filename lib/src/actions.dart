@@ -9,8 +9,8 @@ const int _kFlex = 1;
 const Color _kBackgroundColor = Colors.white;
 const bool _kAutoClose = true;
 const TextStyle _kDefaultTextStyle = TextStyle(
-  color: Colors.black,
-  fontSize: 16,
+  color: Colors.white,
+  fontSize: 13,
   fontWeight: FontWeight.w500,
 );
 
@@ -28,6 +28,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
+    this.textStyle = _kDefaultTextStyle,
     this.borderRadius = BorderRadius.zero,
     this.padding,
     required this.onPressed,
@@ -73,6 +74,13 @@ class CustomSlidableAction extends StatelessWidget {
   /// {@endtemplate}
   final SlidableActionCallback? onPressed;
 
+  /// {@template slidable.textStyle}
+  /// The text style of the OutlinedButton
+  /// 
+  /// Defaults to [TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500)]
+  /// {@endtemplate}
+  final TextStyle? textStyle;
+
   /// {@template slidable.actions.borderRadius}
   /// The borderRadius of this action
   ///
@@ -101,7 +109,7 @@ class CustomSlidableAction extends StatelessWidget {
       child: SizedBox.expand(
         child: OutlinedButton(
           onPressed: () => _handleTap(context),
-          style: OutlinedButton.styleFrom(
+          style: OutlinedButton.styleFrom
             padding: padding,
             backgroundColor: backgroundColor,
             disabledForegroundColor: effectiveForegroundColor.withOpacity(0.38),
@@ -235,6 +243,7 @@ class SlidableAction extends StatelessWidget {
       autoClose: autoClose,
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
+      
       flex: flex,
       child: child,
     );

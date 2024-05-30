@@ -141,6 +141,7 @@ class SlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
+    this.textStyle = _kDefaultTextStyle,
     required this.onPressed,
     this.icon,
     this.spacing = 4,
@@ -174,6 +175,11 @@ class SlidableAction extends StatelessWidget {
   /// Defaults to 4.
   final double spacing;
 
+  /// The default text style for the label.
+  ///
+  /// Defaults to [ThemeData.textTheme.bodyText1].
+  final TextStyle? textStyle;
+
   /// A label to display below the [icon].
   final String? label;
 
@@ -204,7 +210,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
-          style: _kDefaultTextStyle,
+          style: textStyle,
         ),
       );
     }

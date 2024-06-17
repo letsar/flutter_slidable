@@ -148,6 +148,34 @@ Animate the actions as if they were streched while the `Slidable` is moving:
 
 ![Stretch Motion][stretch_motion]
 
+### Controller
+
+You can use ```SlidableController``` to open or close the actions programmatically:
+
+```dart
+final controller = SlidableController();
+
+// ...
+
+Slidable(
+  controller: controller,
+  // ...
+);
+
+// ...
+
+// Open the actions
+void _handleOpen() {
+  controller.openEndActionPane();
+  // OR
+  //controller.openStartActionPane();
+}
+
+void _handleOpen() {
+  controller.close();
+}
+```
+
 ## FAQ
 
 You can read the FAQ here: https://github.com/letsar/flutter_slidable/wiki/FAQ

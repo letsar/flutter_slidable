@@ -3,10 +3,17 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 void main() => runApp(const MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
+  late final controller = SlidableController(this);
 
   @override
   Widget build(BuildContext context) {
@@ -48,21 +55,21 @@ class MyApp extends StatelessWidget {
               ),
 
               // The end action pane is the one at the right or the bottom side.
-              endActionPane: const ActionPane(
-                motion: ScrollMotion(),
+              endActionPane:  ActionPane(
+                motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
                     // An action can be bigger than the others.
                     flex: 2,
-                    onPressed: doNothing,
-                    backgroundColor: Color(0xFF7BC043),
+                    onPressed: (_) => controller.openEndActionPane(),
+                    backgroundColor: const Color(0xFF7BC043),
                     foregroundColor: Colors.white,
                     icon: Icon(Icons.archive),
                     label: 'Archive',
                   ),
                   SlidableAction(
-                    onPressed: doNothing,
-                    backgroundColor: Color(0xFF0392CF),
+                    onPressed: (_) => controller.close(),
+                    backgroundColor: const Color(0xFF0392CF),
                     foregroundColor: Colors.white,
                     icon: Icon(Icons.save),
                     label: 'Save',
@@ -75,6 +82,7 @@ class MyApp extends StatelessWidget {
               child: const ListTile(title: Text('Slide me')),
             ),
             Slidable(
+              controller: controller,
               // Specify a key if the Slidable is dismissible.
               key: const ValueKey(1),
 

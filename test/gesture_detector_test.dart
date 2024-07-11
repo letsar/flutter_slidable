@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/controller.dart';
 import 'package:flutter_slidable/src/gesture_detector.dart';

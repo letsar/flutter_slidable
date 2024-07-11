@@ -82,10 +82,10 @@ class SlidableGroupNotificationDispatcher<T> {
 class SlidableGroupBehavior<T> extends StatefulWidget {
   /// Creates a SlidableGroupBehavior.
   const SlidableGroupBehavior({
-    Key? key,
+    super.key,
     this.onNotification,
     required this.child,
-  }) : super(key: key);
+  });
 
   /// Callback that can modified a notification before to be dispatched to
   /// listeners.
@@ -118,14 +118,10 @@ class _SlidableGroupBehaviorState<T> extends State<SlidableGroupBehavior<T>> {
 
 class _InheritedSlidableNotification<T> extends InheritedWidget {
   const _InheritedSlidableNotification({
-    Key? key,
     required this.onNotification,
     required this.notifier,
-    required Widget child,
-  }) : super(
-          key: key,
-          child: child,
-        );
+    required super.child,
+  });
 
   final T? Function(T notification)? onNotification;
   final ValueNotifier<T?> notifier;
@@ -149,10 +145,10 @@ class _InheritedSlidableNotification<T> extends InheritedWidget {
 class SlidableGroupBehaviorListener<T> extends StatefulWidget {
   /// Creates a [SlidableGroupBehaviorListener].
   const SlidableGroupBehaviorListener({
-    Key? key,
+    super.key,
     required this.onNotification,
     required this.child,
-  }) : super(key: key);
+  });
 
   /// The callback to invoke when a notification is dispatched.
   final ValueChanged<T> onNotification;

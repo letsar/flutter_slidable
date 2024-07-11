@@ -18,7 +18,7 @@ class Slidable extends StatefulWidget {
   /// The [enabled], [closeOnScroll], [direction], [dragStartBehavior],
   /// [useTextDirection] and [child] arguments must not be null.
   const Slidable({
-    Key? key,
+    super.key,
     this.controller,
     this.groupTag,
     this.enabled = true,
@@ -29,7 +29,7 @@ class Slidable extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
     required this.child,
-  }) : super(key: key);
+  });
 
   /// The Slidable widget controller.
   final SlidableController? controller;
@@ -302,10 +302,9 @@ class _SlidableState extends State<Slidable>
 
 class _SlidableControllerScope extends InheritedWidget {
   const _SlidableControllerScope({
-    Key? key,
     required this.controller,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   final SlidableController? controller;
 

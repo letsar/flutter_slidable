@@ -9,11 +9,11 @@ import 'controller.dart';
 
 class SlidableDismissal extends StatefulWidget {
   const SlidableDismissal({
-    Key? key,
+    super.key,
     required this.axis,
     required this.controller,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Axis axis;
   final Widget child;
@@ -109,11 +109,10 @@ class _SizeTransition extends AnimatedWidget {
   /// defaults to 0.0, which centers the child along the main axis during the
   /// transition.
   const _SizeTransition({
-    Key? key,
     this.axis = Axis.vertical,
     required Animation<double> sizeFactor,
     this.child,
-  }) : super(key: key, listenable: sizeFactor);
+  }) : super(listenable: sizeFactor);
 
   /// [Axis.horizontal] if [sizeFactor] modifies the width, otherwise
   /// [Axis.vertical].

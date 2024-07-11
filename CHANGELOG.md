@@ -1,3 +1,9 @@
+## 3.1.1
+
+### Fixed
+* An issue when having only one action pane set [#311](https://github.com/letsar/flutter_slidable/issues/311)
+* An issue with delete threshold [#230](https://github.com/letsar/flutter_slidable/issues/230) 
+
 ## 3.1.0
 
 ### Added

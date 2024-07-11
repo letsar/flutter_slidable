@@ -45,7 +45,7 @@ class ActionPane extends StatefulWidget {
   /// (both exclusives).
   /// The [children] argument must not be null.
   const ActionPane({
-    Key? key,
+    super.key,
     this.extentRatio = _defaultExtentRatio,
     required this.motion,
     this.dismissible,
@@ -57,8 +57,7 @@ class ActionPane extends StatefulWidget {
         assert(
             openThreshold == null || (openThreshold > 0 && openThreshold < 1)),
         assert(closeThreshold == null ||
-            (closeThreshold > 0 && closeThreshold < 1)),
-        super(key: key);
+            (closeThreshold > 0 && closeThreshold < 1));
 
   /// The total extent of this [ActionPane] relatively to the enclosing
   /// [Slidable] widget.
@@ -245,10 +244,9 @@ class _ActionPaneState extends State<ActionPane> implements RatioConfigurator {
 
 class _ActionPaneScope extends InheritedWidget {
   const _ActionPaneScope({
-    Key? key,
     this.actionPaneData,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   final ActionPaneData? actionPaneData;
 

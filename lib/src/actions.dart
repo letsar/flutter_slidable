@@ -18,7 +18,7 @@ class CustomSlidableAction extends StatelessWidget {
   ///
   /// The [flex] argument must also be greater than 0.
   const CustomSlidableAction({
-    Key? key,
+    super.key,
     this.flex = _kFlex,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
@@ -27,8 +27,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.padding,
     required this.onPressed,
     required this.child,
-  })  : assert(flex > 0),
-        super(key: key);
+  }) : assert(flex > 0);
 
   /// {@template slidable.actions.flex}
   /// The flex factor to use for this child.
@@ -131,7 +130,7 @@ class SlidableAction extends StatelessWidget {
   ///
   /// The [flex] argument must also be greater than 0.
   const SlidableAction({
-    Key? key,
+    super.key,
     this.flex = _kFlex,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
@@ -143,8 +142,7 @@ class SlidableAction extends StatelessWidget {
     this.borderRadius = BorderRadius.zero,
     this.padding,
   })  : assert(flex > 0),
-        assert(icon != null || label != null),
-        super(key: key);
+        assert(icon != null || label != null);
 
   /// {@macro slidable.actions.flex}
   final int flex;

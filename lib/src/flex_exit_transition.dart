@@ -1,18 +1,18 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 // INTERNAL USE
 // ignore_for_file: public_member_api_docs
 
 class FlexExitTransition extends MultiChildRenderObjectWidget {
-  FlexExitTransition({
-    Key? key,
+  const FlexExitTransition({
+    super.key,
     required this.mainAxisExtent,
     required this.direction,
     required this.startToEnd,
     required this.initialExtentRatio,
-    required List<Widget> children,
-  }) : super(key: key, children: children);
+    required super.children,
+  });
 
   /// The direction to use as the main axis.
   final Axis direction;

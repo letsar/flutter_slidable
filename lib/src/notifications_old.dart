@@ -98,15 +98,14 @@ class SlidableRatioNotification extends SlidableNotification {
 class SlidableNotificationListener extends StatefulWidget {
   /// Creates a [SlidableNotificationListener].
   const SlidableNotificationListener({
-    Key? key,
+    super.key,
     this.onNotification,
     this.autoClose = true,
     required this.child,
-  })  : assert(
+  }) : assert(
           autoClose || onNotification != null,
           'Either autoClose or onNotification must be set.',
-        ),
-        super(key: key);
+        );
 
   /// The widget directly below this widget in the tree.
   ///
@@ -173,10 +172,9 @@ class _SlidableNotificationListenerState
 
 class _SlidableNotificationListenerScope extends InheritedWidget {
   const _SlidableNotificationListenerScope({
-    Key? key,
     required this.state,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   final _SlidableNotificationListenerState state;
 
@@ -192,11 +190,11 @@ class _SlidableNotificationListenerScope extends InheritedWidget {
 @Deprecated('Use SlidableAutoCloseNotificationSender instead')
 class SlidableNotificationSender extends StatefulWidget {
   const SlidableNotificationSender({
-    Key? key,
+    super.key,
     required this.tag,
     required this.controller,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Object? tag;
   final SlidableController controller;

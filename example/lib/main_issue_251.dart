@@ -193,8 +193,8 @@ class Item extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: Text(title, style: textTheme.bodyText1)),
-          Expanded(child: Text(subtitle, style: textTheme.bodyText2)),
+          Expanded(child: Text(title, style: textTheme.bodySmall)),
+          Expanded(child: Text(subtitle, style: textTheme.bodyMedium)),
         ],
       ),
     );

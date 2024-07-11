@@ -8,13 +8,13 @@ import 'controller.dart';
 
 class SlidableGestureDetector extends StatefulWidget {
   const SlidableGestureDetector({
-    Key? key,
+    super.key,
     this.enabled = true,
     required this.controller,
     required this.direction,
     required this.child,
     this.dragStartBehavior = DragStartBehavior.start,
-  }) : super(key: key);
+  });
 
   final SlidableController controller;
   final Widget child;

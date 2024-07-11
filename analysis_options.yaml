@@ -17,9 +17,6 @@ linter:
     # We prefer having parameters in the same order as fields https://github.com/flutter/flutter/issues/10219
     always_put_required_named_parameters_first: false
 
-    # Depends on your needs
-    always_require_non_null_named_parameters: false
-
     # Conflicts with `omit_local_variable_types` and other rules.
     # As per Dart guidelines, we want to avoid unnecessary types to make the code
     # more readable.
@@ -48,9 +45,6 @@ linter:
     # We prefer having typedef (discussion in https://github.com/flutter/flutter/pull/16356)
     avoid_private_typedef_functions: false
 
-    # Useful in a  lot of cases
-    avoid_returning_null: false
-
     # Can be useful to have a more readable code
     avoid_types_on_closure_parameters: false
 
@@ -72,9 +66,6 @@ linter:
 
     # This project doesn't use Flutter-style todos
     flutter_style_todos: false
-    
-    # Experimental: Too many false positives: https://github.com/dart-lang/linter/issues/811
-    invariant_booleans: false
 
     # Can be useful to have a more readable code
     join_return_with_assignment: false
@@ -114,9 +105,6 @@ linter:
     # Not quite suitable for Flutter, which may have a `build` method with a single
     # return, but that return is still complex enough that a "body" is worth it.
     prefer_expression_function_bodies: false
-
-    # False positives
-    top_level_function_literal_block: false
 
     # We don't want to enforce this rule now.
     sort_pub_dependencies: false

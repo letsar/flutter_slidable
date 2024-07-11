@@ -5,13 +5,13 @@ import 'package:flutter/widgets.dart';
 // ignore_for_file: public_member_api_docs
 
 class FlexEntranceTransition extends MultiChildRenderObjectWidget {
-  FlexEntranceTransition({
-    Key? key,
+  const FlexEntranceTransition({
+    super.key,
     required this.mainAxisPosition,
     required this.direction,
     required this.startToEnd,
-    required List<Widget> children,
-  }) : super(key: key, children: children);
+    required super.children,
+  });
 
   /// The direction to use as the main axis.
   final Axis direction;

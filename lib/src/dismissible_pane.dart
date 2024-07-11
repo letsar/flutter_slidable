@@ -26,7 +26,7 @@ class DismissiblePane extends StatefulWidget {
   ///
   /// You must set the key of the enclosing [Slidable] to use this widget.
   const DismissiblePane({
-    Key? key,
+    super.key,
     required this.onDismissed,
     this.dismissThreshold = _kDismissThreshold,
     this.dismissalDuration = _kDismissalDuration,
@@ -34,8 +34,7 @@ class DismissiblePane extends StatefulWidget {
     this.confirmDismiss,
     this.closeOnCancel = false,
     this.motion = const InversedDrawerMotion(),
-  })  : assert(dismissThreshold > 0 && dismissThreshold < 1),
-        super(key: key);
+  }) : assert(dismissThreshold > 0 && dismissThreshold < 1);
 
   /// The threshold from which a dismiss will be triggered if the user stops
   /// to drag the [Slidable].

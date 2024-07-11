@@ -225,6 +225,21 @@ class SlidableController {
   /// Dispatches a new [EndGesture] determined by the given [velocity] and
   /// [direction].
   void dispatchEndGesture(double? velocity, GestureDirection direction) {
+    final isScrollingIntoDisabledEndActionPane = enableStartActionPane &&
+        !enableEndActionPane &&
+        this.direction.value == 0 &&
+        direction == GestureDirection.closing;
+    final isScrollingIntoDisabledStartActionPane = !enableStartActionPane &&
+        enableEndActionPane &&
+        this.direction.value == 0 &&
+        direction == GestureDirection.opening;
+    final isScrollingIntoDisabledPane = isScrollingIntoDisabledEndActionPane ||
+        isScrollingIntoDisabledStartActionPane;
+
+    if (isScrollingIntoDisabledPane) {
+      return;
+    }
+
     if (velocity == 0 || velocity == null) {
       endGesture.value = StillGesture(direction);
     } else if (velocity.sign == this.direction.value) {

@@ -85,7 +85,7 @@ class SlidableRatioNotification extends SlidableNotification {
   }
 
   @override
-  int get hashCode => hashValues(tag, ratio);
+  int get hashCode => Object.hash(tag, ratio);
 
   @override
   String toString() => 'SlidableRatioNotification(tag: $tag, ratio: $ratio)';

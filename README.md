@@ -1,8 +1,8 @@
 <!-- [![Build][github_action_badge]][github_action] -->
+
 [![Pub][pub_badge]][pub] [![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
 
 [<img src="https://raw.githubusercontent.com/letsar/flutter_slidable/assets/flutter_favorite.png" width="100" />][flutter_favorite] **Slidable is a [Flutter Favorite][flutter_favorite] package!**
-
 
 # flutter_slidable
 
@@ -12,12 +12,12 @@ A Flutter implementation of slidable list item with directional slide actions th
 
 Our top sponsors are shown below! [[Become a Sponsor](https://github.com/sponsors/letsar)]
 
-<table>    
+<table>
     <tbody>
         <tr>
             <td align="center">
                 <a href="https://getstream.io/chat/flutter/tutorial/?utm_source=PubDev&utm_medium=Github_Repo_Content_Ad&utm_content=Developer&utm_campaign=PubDev_Jan2022_FlutterChat&utm_term=slidable" target="_blank"><img width="250px" src="https://stream-blog.s3.amazonaws.com/blog/wp-content/uploads/fc148f0fc75d02841d017bb36e14e388/Stream-logo-with-background-.png"/></a><br/><span><a href="https://getstream.io/chat/flutter/tutorial/?utm_source=PubDev&utm_medium=Github_Repo_Content_Ad&utm_content=Developer&utm_campaign=PubDev_Jan2022_FlutterChat&utm_term=slidable" target="_blank">Try the Flutter Chat Tutorial &nbsp💬</a></span>
-            </td>            
+            </td>
         </tr>
     </tbody>
 </table>
@@ -28,16 +28,16 @@ You can read this small guide to migrate from the 0.6 to the 1.0 version: https:
 
 ## Features
 
-* Accepts start (left/top) and end (right/bottom) action panes.
-* Can be dismissed.
-* 4 built-in action panes.
-* 2 built-in slide action widgets.
-* 1 built-in dismiss animation.
-* You can easily create custom layouts and animations.
-* You can use a builder to create your slide actions if you want special effects during animation.
-* Closes when a slide action has been tapped (overridable).
-* Closes when the nearest `Scrollable` starts to scroll (overridable).
-* Option to disable the slide effect easily.
+- Accepts start (left/top) and end (right/bottom) action panes.
+- Can be dismissed.
+- 4 built-in action panes.
+- 2 built-in slide action widgets.
+- 1 built-in dismiss animation.
+- You can easily create custom layouts and animations.
+- You can use a builder to create your slide actions if you want special effects during animation.
+- Closes when a slide action has been tapped (overridable).
+- Closes when the nearest `Scrollable` starts to scroll (overridable).
+- Option to disable the slide effect easily.
 
 ## Install
 
@@ -78,14 +78,14 @@ Slidable(
         onPressed: doNothing,
         backgroundColor: Color(0xFFFE4A49),
         foregroundColor: Colors.white,
-        icon: Icons.delete,
+        icon: const Icon(Icons.delete),
         label: 'Delete',
       ),
       SlidableAction(
         onPressed: doNothing,
         backgroundColor: Color(0xFF21B7CA),
         foregroundColor: Colors.white,
-        icon: Icons.share,
+        icon: const Icon(Icons.share),
         label: 'Share',
       ),
     ],
@@ -101,14 +101,14 @@ Slidable(
         onPressed: doNothing,
         backgroundColor: Color(0xFF7BC043),
         foregroundColor: Colors.white,
-        icon: Icons.archive,
+        icon: const Icon(Icons.archive),
         label: 'Archive',
       ),
       SlidableAction(
         onPressed: doNothing,
         backgroundColor: Color(0xFF0392CF),
         foregroundColor: Colors.white,
-        icon: Icons.save,
+        icon: const Icon(Icons.save),
         label: 'Save',
       ),
     ],
@@ -188,10 +188,11 @@ I'm working on my packages on my free-time, but I don't have as much time as I w
 
 Feel free to contribute to this project.
 
-If you find a bug or want a feature, but don't know how to fix/implement it, please fill an [issue][issue].  
+If you find a bug or want a feature, but don't know how to fix/implement it, please fill an [issue][issue].
 If you fixed a bug or implemented a feature, please send a [pull request][pr].
 
 <!-- Links -->
+
 [github_action_badge]: https://github.com/letsar/flutter_slidable/workflows/Build/badge.svg
 [github_action]: https://github.com/letsar/flutter_slidable/actions
 [pub_badge]: https://img.shields.io/pub/v/flutter_slidable.svg

@@ -269,7 +269,7 @@ class SlideAction extends StatelessWidget {
       onPressed: (_) {
         print(icon);
       },
-      icon: icon,
+      icon: Icon(icon),
       label: 'hello',
     );
   }
@@ -291,7 +291,7 @@ class Tile extends StatelessWidget {
     return ActionTypeListener(
       child: GestureDetector(
         onTap: () {
-          print('$text');
+          print(text);
         },
         onLongPress: () => Slidable.of(context)!.openEndActionPane(),
         child: Container(

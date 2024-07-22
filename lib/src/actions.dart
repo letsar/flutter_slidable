@@ -139,6 +139,8 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
+    this.widget,
+    this.labelStyle,
     this.borderRadius = BorderRadius.zero,
     this.padding,
   })  : assert(flex > 0),
@@ -162,6 +164,9 @@ class SlidableAction extends StatelessWidget {
   /// An icon to display above the [label].
   final IconData? icon;
 
+  ///Custom Icon "widget" instead of icon
+  final Widget? widget;
+
   /// The space between [icon] and [label] if both set.
   ///
   /// Defaults to 4.
@@ -169,6 +174,9 @@ class SlidableAction extends StatelessWidget {
 
   /// A label to display below the [icon].
   final String? label;
+
+  /// label style
+  final TextStyle? labelStyle;
 
   /// Padding of the OutlinedButton
   final BorderRadius borderRadius;
@@ -196,9 +204,13 @@ class SlidableAction extends StatelessWidget {
       children.add(
         Text(
           label!,
+          style: labelStyle,
           overflow: TextOverflow.ellipsis,
         ),
       );
+    }
+    if (widget != null) {
+      children.add(widget!);
     }
 
     final child = children.length == 1

@@ -56,16 +56,18 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   Widget build(BuildContext context) {
     final canDragHorizontally = directionIsXAxis && widget.enabled;
     final canDragVertically = !directionIsXAxis && widget.enabled;
-    return GestureDetector(
-      onHorizontalDragStart: canDragHorizontally ? handleDragStart : null,
-      onHorizontalDragUpdate: canDragHorizontally ? handleDragUpdate : null,
-      onHorizontalDragEnd: canDragHorizontally ? handleDragEnd : null,
-      onVerticalDragStart: canDragVertically ? handleDragStart : null,
-      onVerticalDragUpdate: canDragVertically ? handleDragUpdate : null,
-      onVerticalDragEnd: canDragVertically ? handleDragEnd : null,
-      behavior: HitTestBehavior.opaque,
-      dragStartBehavior: widget.dragStartBehavior,
-      child: widget.child,
+    return ClipRRect(
+      child: GestureDetector(
+        onHorizontalDragStart: canDragHorizontally ? handleDragStart : null,
+        onHorizontalDragUpdate: canDragHorizontally ? handleDragUpdate : null,
+        onHorizontalDragEnd: canDragHorizontally ? handleDragEnd : null,
+        onVerticalDragStart: canDragVertically ? handleDragStart : null,
+        onVerticalDragUpdate: canDragVertically ? handleDragUpdate : null,
+        onVerticalDragEnd: canDragVertically ? handleDragEnd : null,
+        behavior: HitTestBehavior.opaque,
+        dragStartBehavior: widget.dragStartBehavior,
+        child: widget.child,
+      ),
     );
   }
 

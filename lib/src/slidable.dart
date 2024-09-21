@@ -37,7 +37,7 @@ class Slidable extends StatefulWidget {
   /// You can find out if the item is being [swapped] or not
   ///
   /// You also have the [DragUpdateDetails] value
-  final Function(DragUpdateDetails detail)? onSwap;
+  final void Function(DragUpdateDetails detail)? onSwap;
 
   /// The Slidable widget controller.
   final SlidableController? controller;

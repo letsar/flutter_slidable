@@ -18,7 +18,7 @@ class SlidableGestureDetector extends StatefulWidget {
   });
 
   final SlidableController controller;
-  final Function(DragUpdateDetails detail)? onSwap;
+  final void Function(DragUpdateDetails detail)? onSwap;
   final Widget child;
   final Axis direction;
   final bool enabled;

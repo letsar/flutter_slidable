@@ -282,7 +282,7 @@ class _SlidableState extends State<Slidable>
       controller: controller,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
-      
+      onSwap: widget.onSwap,
       child: SlidableNotificationSender(
         tag: widget.groupTag,
         controller: controller,

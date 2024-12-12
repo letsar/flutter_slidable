@@ -56,6 +56,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 
               // The end action pane is the one at the right or the bottom side.
               endActionPane: ActionPane(
+                 dismissible: DismissiblePane(onDismissed: () {}),
                 motion: const ScrollMotion(),
                 children: [
                   SlidableAction(

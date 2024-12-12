@@ -1,3 +1,8 @@
+## 3.1.2
+
+### Fixed
+* Use Object.hash instead of hashValues.
+
 ## 3.1.1
 
 ### Fixed

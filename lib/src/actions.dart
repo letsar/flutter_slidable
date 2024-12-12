@@ -134,6 +134,7 @@ class SlidableAction extends StatelessWidget {
     this.flex = _kFlex,
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
+    this.iconSize = 25,
     this.autoClose = _kAutoClose,
     required this.onPressed,
     this.icon,
@@ -162,6 +163,9 @@ class SlidableAction extends StatelessWidget {
   /// An icon to display above the [label].
   final IconData? icon;
 
+  /// The size of the icon, if present.
+  final double? iconSize;
+
   /// The space between [icon] and [label] if both set.
   ///
   /// Defaults to 4.
@@ -182,7 +186,11 @@ class SlidableAction extends StatelessWidget {
 
     if (icon != null) {
       children.add(
-        Icon(icon),
+        Icon(
+          icon,
+          color: foregroundColor,
+          size: iconSize,
+        ),
       );
     }
 

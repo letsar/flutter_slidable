@@ -33,8 +33,8 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.share)),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.delete)),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -76,8 +76,8 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.share)),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.delete)),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -123,8 +123,8 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.share)),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.delete)),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -148,9 +148,7 @@ void main() {
       expect(dismissed, isTrue);
     });
 
-    testWidgets(
-        'startActionPane cannot be drag dismissed if dragDismissible is false',
-        (tester) async {
+    testWidgets('startActionPane cannot be drag dismissed if dragDismissible is false', (tester) async {
       bool dismissed = false;
       void handleDismissed() {
         dismissed = true;
@@ -173,8 +171,8 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.share)),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.delete)),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -198,9 +196,7 @@ void main() {
       expect(dismissed, isFalse);
     });
 
-    testWidgets(
-        'when the drag is not past the dismissThreshold, the Slidable stays open',
-        (tester) async {
+    testWidgets('when the drag is not past the dismissThreshold, the Slidable stays open', (tester) async {
       bool dismissed = false;
       void handleDismissed() {
         dismissed = true;
@@ -225,8 +221,8 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.share)),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.delete)),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -281,8 +277,8 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.share)),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.delete)),
                   ],
                 ),
                 child: const SizedBox.expand(),
@@ -339,8 +335,8 @@ void main() {
                   ),
                   motion: const BehindMotion(),
                   children: [
-                    SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                    SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.share)),
+                    SlidableAction(onPressed: (_) {}, icon: const Icon(Icons.delete)),
                   ],
                 ),
                 child: Builder(

@@ -182,7 +182,7 @@ class SlidableAction extends StatelessWidget {
 
     if (icon != null) {
       children.add(
-        Icon(icon, , color: foregroundColor),
+        Icon(icon, color: foregroundColor),
       );
     }
 

@@ -282,7 +282,7 @@ class _SlidableState extends State<Slidable>
           closeOnScroll: widget.closeOnScroll,
           child: SlidableDismissal(
             axis: flipAxis(widget.direction),
-              controller: controller,
+            controller: controller,
             child: ActionPaneConfiguration(
               alignment: actionPaneAlignment,
               direction: widget.direction,

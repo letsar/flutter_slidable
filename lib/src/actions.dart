@@ -8,6 +8,11 @@ typedef SlidableActionCallback = void Function(BuildContext context);
 const int _kFlex = 1;
 const Color _kBackgroundColor = Colors.white;
 const bool _kAutoClose = true;
+const TextStyle _kDefaultlabelTextStyle = TextStyle(
+  color: Colors.white,
+  fontSize: 13,
+  fontWeight: FontWeight.w500,
+);
 
 /// Represents an action of an [ActionPane].
 class CustomSlidableAction extends StatelessWidget {
@@ -138,6 +143,7 @@ class SlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
+    this.labelTextStyle = _kDefaultlabelTextStyle,
     required this.onPressed,
     this.icon,
     this.spacing = 4,
@@ -170,6 +176,11 @@ class SlidableAction extends StatelessWidget {
   /// Defaults to 4.
   final double spacing;
 
+  /// The default text style for the label.
+  ///
+  /// Defaults to [ThemeData.textTheme.bodyText1].
+  final TextStyle? labelTextStyle;
+
   /// A label to display below the [icon].
   final String? label;
 
@@ -200,6 +211,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
+          style: labelTextStyle,
         ),
       );
     }

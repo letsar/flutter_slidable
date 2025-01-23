@@ -1,3 +1,12 @@
+## 4.0.0
+
+### Changed
+* Minimum version of Flutter (3.27.0 now)
+
+### Fixed
+* Icon color in actions [#512](https://github.com/letsar/flutter_slidable/issues/512)
+* Use withValues instead of withOpacity
+
 ## 3.1.2
 
 ### Fixed
@@ -16,7 +25,7 @@
   
 ## 3.0.1
 
-## Changed
+### Changed
 * Remove deprecation use of `primary` and `surface` parameters from OutlinedButton.styleFrom method. (See https://github.com/letsar/flutter_slidable/pull/443)
 
 ## 3.0.0

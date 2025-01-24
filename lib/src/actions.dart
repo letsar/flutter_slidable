@@ -96,6 +96,7 @@ class CustomSlidableAction extends StatelessWidget {
         child: OutlinedButton(
           onPressed: () => _handleTap(context),
           style: OutlinedButton.styleFrom(
+            foregroundColor: effectiveForegroundColor,
             padding: padding,
             backgroundColor: backgroundColor,
             disabledForegroundColor: effectiveForegroundColor.withValues(
@@ -103,6 +104,7 @@ class CustomSlidableAction extends StatelessWidget {
             ),
             iconColor: effectiveForegroundColor,
             foregroundColor: effectiveForegroundColor,
+
             shape: RoundedRectangleBorder(
               borderRadius: borderRadius,
             ),
@@ -139,7 +141,7 @@ class SlidableAction extends StatelessWidget {
     this.foregroundColor,
     this.autoClose = _kAutoClose,
     required this.onPressed,
-    this.icon,
+    required this.icon,
     this.spacing = 4,
     this.label,
     this.borderRadius = BorderRadius.zero,
@@ -163,7 +165,7 @@ class SlidableAction extends StatelessWidget {
   final SlidableActionCallback? onPressed;
 
   /// An icon to display above the [label].
-  final IconData? icon;
+  final Widget icon;
 
   /// The space between [icon] and [label] if both set.
   ///
@@ -183,11 +185,7 @@ class SlidableAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final children = <Widget>[];
 
-    if (icon != null) {
-      children.add(
-        Icon(icon),
-      );
-    }
+    children.add(icon);
 
     if (label != null) {
       if (children.isNotEmpty) {

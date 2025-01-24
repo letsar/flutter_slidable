@@ -41,14 +41,18 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                     onPressed: doNothing,
                     backgroundColor: Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
-                    icon: Icons.delete,
+                    icon: SizedBox(
+                      child: Icon(Icons.delete),
+                    ),
                     label: 'Delete',
                   ),
                   SlidableAction(
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
-                    icon: Icons.share,
+                    icon: SizedBox(
+                      child: Icon(Icons.share),
+                    ),
                     label: 'Share',
                   ),
                 ],
@@ -64,14 +68,18 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                     onPressed: (_) => controller.openEndActionPane(),
                     backgroundColor: const Color(0xFF7BC043),
                     foregroundColor: Colors.white,
-                    icon: Icons.archive,
+                    icon: SizedBox(
+                      child: Icon(Icons.archive),
+                    ),
                     label: 'Archive',
                   ),
                   SlidableAction(
                     onPressed: (_) => controller.close(),
                     backgroundColor: const Color(0xFF0392CF),
                     foregroundColor: Colors.white,
-                    icon: Icons.save,
+                    icon: SizedBox(
+                      child: Icon(Icons.save),
+                    ),
                     label: 'Save',
                   ),
                 ],
@@ -98,14 +106,18 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                     onPressed: doNothing,
                     backgroundColor: Color(0xFFFE4A49),
                     foregroundColor: Colors.white,
-                    icon: Icons.delete,
+                    icon: SizedBox(
+                      child: Icon(Icons.delete),
+                    ),
                     label: 'Delete',
                   ),
                   SlidableAction(
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF21B7CA),
                     foregroundColor: Colors.white,
-                    icon: Icons.share,
+                    icon: SizedBox(
+                      child: Icon(Icons.share),
+                    ),
                     label: 'Share',
                   ),
                 ],
@@ -122,14 +134,18 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF7BC043),
                     foregroundColor: Colors.white,
-                    icon: Icons.archive,
+                    icon: SizedBox(
+                      child: Icon(Icons.archive),
+                    ),
                     label: 'Archive',
                   ),
                   SlidableAction(
                     onPressed: doNothing,
                     backgroundColor: Color(0xFF0392CF),
                     foregroundColor: Colors.white,
-                    icon: Icons.save,
+                    icon: SizedBox(
+                      child: Icon(Icons.save),
+                    ),
                     label: 'Save',
                   ),
                 ],

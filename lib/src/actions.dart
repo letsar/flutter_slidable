@@ -23,7 +23,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
-    this.borderRadius = BorderRadius.zero,
+    this.borderRadius = BorderRadiusDirectional.zero,
     this.padding,
     required this.onPressed,
     required this.child,
@@ -72,7 +72,7 @@ class CustomSlidableAction extends StatelessWidget {
   ///
   /// Defaults to [BorderRadius.zero].
   /// {@endtemplate}
-  final BorderRadius borderRadius;
+  final BorderRadiusDirectional borderRadius;
 
   /// {@template slidable.actions.padding}
   /// The padding of the OutlinedButton
@@ -142,7 +142,7 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
-    this.borderRadius = BorderRadius.zero,
+    this.borderRadius = BorderRadiusDirectional.zero,
     this.padding,
   })  : assert(flex > 0),
         assert(icon != null || label != null);
@@ -174,7 +174,7 @@ class SlidableAction extends StatelessWidget {
   final String? label;
 
   /// Padding of the OutlinedButton
-  final BorderRadius borderRadius;
+  final BorderRadiusDirectional borderRadius;
 
   /// Padding of the OutlinedButton
   final EdgeInsets? padding;

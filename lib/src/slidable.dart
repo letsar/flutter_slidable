@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/auto_close_behavior.dart';
 import 'package:flutter_slidable/src/notifications_old.dart';
@@ -10,6 +12,7 @@ import 'gesture_detector.dart';
 import 'scrolling_behavior.dart';
 
 part 'action_pane.dart';
+part 'fuzzy_action_pane.dart';
 
 /// A widget which can be dragged to reveal contextual actions.
 class Slidable extends StatefulWidget {

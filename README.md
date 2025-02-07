@@ -1,12 +1,14 @@
 <!-- [![Build][github_action_badge]][github_action] -->
+
 [![Pub][pub_badge]][pub] [![BuyMeACoffee][buy_me_a_coffee_badge]][buy_me_a_coffee]
 
 [<img src="https://raw.githubusercontent.com/letsar/flutter_slidable/assets/flutter_favorite.png" width="100" />][flutter_favorite] **Slidable is a [Flutter Favorite][flutter_favorite] package!**
 
-
 # flutter_slidable
 
 A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
+
+[![flutter_slidable](https://res.cloudinary.com/marcomontalbano/image/upload/v1632666370/video_to_markdown/images/youtube--QFcFEpFmNJ8-c05b58ac6eb4c4700831b2b3070cd403.jpg)](https://www.youtube.com/watch?v=QFcFEpFmNJ8 "flutter_slidable")
 
 ## Sponsors
 
@@ -33,16 +35,16 @@ You can read this small guide to migrate from the 0.6 to the 1.0 version: https:
 
 ## Features
 
-* Accepts start (left/top) and end (right/bottom) action panes.
-* Can be dismissed.
-* 4 built-in action panes.
-* 2 built-in slide action widgets.
-* 1 built-in dismiss animation.
-* You can easily create custom layouts and animations.
-* You can use a builder to create your slide actions if you want special effects during animation.
-* Closes when a slide action has been tapped (overridable).
-* Closes when the nearest `Scrollable` starts to scroll (overridable).
-* Option to disable the slide effect easily.
+- Accepts start (left/top) and end (right/bottom) action panes.
+- Can be dismissed.
+- 4 built-in action panes.
+- 2 built-in slide action widgets.
+- 1 built-in dismiss animation.
+- You can easily create custom layouts and animations.
+- You can use a builder to create your slide actions if you want special effects during animation.
+- Closes when a slide action has been tapped (overridable).
+- Closes when the nearest `Scrollable` starts to scroll (overridable).
+- Option to disable the slide effect easily.
 
 ## Install
 
@@ -197,6 +199,7 @@ If you find a bug or want a feature, but don't know how to fix/implement it, ple
 If you fixed a bug or implemented a feature, please send a [pull request][pr].
 
 <!-- Links -->
+
 [github_action_badge]: https://github.com/letsar/flutter_slidable/workflows/Build/badge.svg
 [github_action]: https://github.com/letsar/flutter_slidable/actions
 [pub_badge]: https://img.shields.io/pub/v/flutter_slidable.svg

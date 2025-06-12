@@ -144,8 +144,10 @@ class SlidableAction extends StatelessWidget {
     this.label,
     this.borderRadius = BorderRadius.zero,
     this.padding,
+    this.iconSize
   })  : assert(flex > 0),
-        assert(icon != null || label != null);
+        assert(icon != null || label != null),
+        assert(iconSize != null ? icon != null : icon == null);
 
   /// {@macro slidable.actions.flex}
   final int flex;
@@ -164,6 +166,9 @@ class SlidableAction extends StatelessWidget {
 
   /// An icon to display above the [label].
   final IconData? icon;
+
+  ///icon size for the above [icon]
+  final double? iconSize;
 
   /// The space between [icon] and [label] if both set.
   ///
@@ -185,7 +190,7 @@ class SlidableAction extends StatelessWidget {
 
     if (icon != null) {
       children.add(
-        Icon(icon),
+        Icon(icon,size: iconSize ?? 24,),
       );
     }
 

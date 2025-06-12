@@ -147,7 +147,7 @@ class SlidableAction extends StatelessWidget {
     this.iconSize
   })  : assert(flex > 0),
         assert(icon != null || label != null),
-        assert(iconSize != null ? icon != null : icon == null);
+        assert(iconSize == null || icon != null);
 
   /// {@macro slidable.actions.flex}
   final int flex;

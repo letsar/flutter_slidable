@@ -37,6 +37,7 @@ void main() {
           child: Row(
             children: [
               SlidableAction(
+                icon: const Icon(Icons.save),
                 onPressed: (_) => logs.add('pressed'),
                 label: 'label',
               )
@@ -60,6 +61,7 @@ void main() {
           child: Row(
             children: [
               SlidableAction(
+                icon: const Icon(Icons.save),
                 onPressed: (_) => logs.add('pressed'),
                 label: 'my_label',
               )
@@ -80,7 +82,7 @@ void main() {
             children: [
               SlidableAction(
                 onPressed: (_) => logs.add('pressed'),
-                icon: Icons.ac_unit,
+                icon: Container(),
               )
             ],
           ),
@@ -99,7 +101,7 @@ void main() {
             children: [
               SlidableAction(
                 onPressed: (_) => logs.add('pressed'),
-                icon: Icons.ac_unit,
+                icon: Container(),
                 label: 'my_label',
               )
             ],

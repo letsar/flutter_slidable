@@ -32,8 +32,7 @@ class SlidableAutoCloseBehavior extends StatefulWidget {
   final Widget child;
 
   @override
-  State<SlidableAutoCloseBehavior> createState() =>
-      _SlidableAutoCloseBehaviorState();
+  State<SlidableAutoCloseBehavior> createState() => _SlidableAutoCloseBehaviorState();
 }
 
 class _SlidableAutoCloseBehaviorState extends State<SlidableAutoCloseBehavior> {
@@ -48,10 +47,8 @@ class _SlidableAutoCloseBehaviorState extends State<SlidableAutoCloseBehavior> {
         child: SlidableGroupBehavior<SlidableAutoCloseBarrierNotification>(
           onNotification: (notification) {
             final key = notification.groupTag;
-            final previousOpenForThatTag =
-                openSlidables.putIfAbsent(key, () => 0);
-            final openForThatTag =
-                previousOpenForThatTag + (notification.enabled ? 1 : -1);
+            final previousOpenForThatTag = openSlidables.putIfAbsent(key, () => 0);
+            final openForThatTag = previousOpenForThatTag + (notification.enabled ? 1 : -1);
             openSlidables[key] = openForThatTag;
             if (openForThatTag == 0 || previousOpenForThatTag == 0) {
               return notification;
@@ -77,8 +74,7 @@ class _SlidableAutoCloseData extends InheritedWidget {
 
   @override
   bool updateShouldNotify(_SlidableAutoCloseData oldWidget) {
-    return oldWidget.closeWhenOpened != closeWhenOpened ||
-        oldWidget.closeWhenTapped != closeWhenTapped;
+    return oldWidget.closeWhenOpened != closeWhenOpened || oldWidget.closeWhenTapped != closeWhenTapped;
   }
 
   static _SlidableAutoCloseData? of(BuildContext context) {
@@ -205,9 +201,7 @@ class SlidableAutoCloseBehaviorListener extends StatelessWidget {
   Widget build(BuildContext context) {
     return SlidableGroupBehaviorListener<SlidableAutoCloseNotification>(
       onNotification: (SlidableAutoCloseNotification notification) {
-        if (groupTag == notification.groupTag &&
-            (notification.closeSelf || notification.controller != controller) &&
-            !controller.closing) {
+        if (groupTag == notification.groupTag && (notification.closeSelf || notification.controller != controller) && !controller.closing) {
           controller.close();
         }
       },
@@ -238,8 +232,7 @@ class SlidableAutoCloseNotificationSender extends StatelessWidget {
   final Widget child;
 
   void _handleStatusChanged(BuildContext context, AnimationStatus status) {
-    final moving =
-        status == AnimationStatus.forward || status == AnimationStatus.reverse;
+    final moving = status == AnimationStatus.forward || status == AnimationStatus.reverse;
     if (moving && !controller.closing) {
       SlidableGroupNotification.dispatch(
         context,
@@ -343,12 +336,10 @@ class SlidableAutoCloseBarrierNotificationSender extends StatefulWidget {
   final Widget child;
 
   @override
-  State<SlidableAutoCloseBarrierNotificationSender> createState() =>
-      _SlidableAutoCloseBarrierNotificationSenderState();
+  State<SlidableAutoCloseBarrierNotificationSender> createState() => _SlidableAutoCloseBarrierNotificationSenderState();
 }
 
-class _SlidableAutoCloseBarrierNotificationSenderState
-    extends State<SlidableAutoCloseBarrierNotificationSender> {
+class _SlidableAutoCloseBarrierNotificationSenderState extends State<SlidableAutoCloseBarrierNotificationSender> {
   SlidableGroupNotificationDispatcher? dispatcher;
 
   void _handleStatusChanged(AnimationStatus status) {
@@ -356,8 +347,7 @@ class _SlidableAutoCloseBarrierNotificationSenderState
     final willBarrierBeEnabled = status != AnimationStatus.dismissed;
     final barrierEnabled = dispatcher != null;
     if (willBarrierBeEnabled != barrierEnabled) {
-      dispatcher = SlidableGroupNotification.createDispatcher<
-          SlidableAutoCloseBarrierNotification>(
+      dispatcher = SlidableGroupNotification.createDispatcher<SlidableAutoCloseBarrierNotification>(
         context,
         assertParentExists: false,
       );
@@ -434,12 +424,10 @@ class SlidableAutoCloseBarrierBehaviorListener extends StatefulWidget {
   final Widget child;
 
   @override
-  _SlidableAutoCloseBarrierBehaviorListenerState createState() =>
-      _SlidableAutoCloseBarrierBehaviorListenerState();
+  _SlidableAutoCloseBarrierBehaviorListenerState createState() => _SlidableAutoCloseBarrierBehaviorListenerState();
 }
 
-class _SlidableAutoCloseBarrierBehaviorListenerState
-    extends State<SlidableAutoCloseBarrierBehaviorListener> {
+class _SlidableAutoCloseBarrierBehaviorListenerState extends State<SlidableAutoCloseBarrierBehaviorListener> {
   bool absorbing = false;
 
   void handleOnTap() {
@@ -498,12 +486,10 @@ class _SlidableNotificationSender extends StatefulWidget {
   final bool enabled;
 
   @override
-  _SlidableNotificationSenderState createState() =>
-      _SlidableNotificationSenderState();
+  _SlidableNotificationSenderState createState() => _SlidableNotificationSenderState();
 }
 
-class _SlidableNotificationSenderState
-    extends State<_SlidableNotificationSender> {
+class _SlidableNotificationSenderState extends State<_SlidableNotificationSender> {
   @override
   void initState() {
     super.initState();
@@ -513,8 +499,7 @@ class _SlidableNotificationSenderState
   @override
   void didUpdateWidget(_SlidableNotificationSender oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller ||
-        oldWidget.onStatusChanged != widget.onStatusChanged) {
+    if (oldWidget.controller != widget.controller || oldWidget.onStatusChanged != widget.onStatusChanged) {
       removeListeners(oldWidget);
       addListeners(widget);
     }

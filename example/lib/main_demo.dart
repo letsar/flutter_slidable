@@ -267,7 +267,7 @@ class SlideAction extends StatelessWidget {
       backgroundColor: color,
       foregroundColor: Colors.white,
       onPressed: (_) {
-        print(icon);
+        debugPrint(icon.toString());
       },
       icon: icon,
       label: 'hello',
@@ -291,7 +291,7 @@ class Tile extends StatelessWidget {
     return ActionTypeListener(
       child: GestureDetector(
         onTap: () {
-          print('$text');
+          debugPrint('Tile tapped: $text');
         },
         onLongPress: () => Slidable.of(context)!.openEndActionPane(),
         child: Container(

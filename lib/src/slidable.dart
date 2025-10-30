@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/src/auto_close_behavior.dart';
@@ -28,8 +30,14 @@ class Slidable extends StatefulWidget {
     this.direction = Axis.horizontal,
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
+    this.onSwap,
     required this.child,
   });
+
+  /// You can find out if the item is being [swapped] or not
+  ///
+  /// You also have the [DragUpdateDetails] value
+  final void Function(DragUpdateDetails detail)? onSwap;
 
   /// The Slidable widget controller.
   final SlidableController? controller;
@@ -274,6 +282,7 @@ class _SlidableState extends State<Slidable>
       controller: controller,
       direction: widget.direction,
       dragStartBehavior: widget.dragStartBehavior,
+      onSwap: widget.onSwap,
       child: SlidableNotificationSender(
         tag: widget.groupTag,
         controller: controller,

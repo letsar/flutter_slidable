@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 // ignore_for_file: public_member_api_docs
 
 class FlexEntranceTransition extends MultiChildRenderObjectWidget {
-  const FlexEntranceTransition({
+  FlexEntranceTransition({
     super.key,
     required this.mainAxisPosition,
     required this.direction,

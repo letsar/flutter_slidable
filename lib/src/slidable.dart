@@ -22,6 +22,7 @@ class Slidable extends StatefulWidget {
     this.controller,
     this.groupTag,
     this.enabled = true,
+    this.onOpen,
     this.closeOnScroll = true,
     this.startActionPane,
     this.endActionPane,
@@ -40,6 +41,9 @@ class Slidable extends StatefulWidget {
   ///
   /// Defaults to true.
   final bool enabled;
+
+  /// Notify when slide open or close
+  final ValueChanged<bool>? onOpen;
 
   /// Specifies to close this [Slidable] after the closest [Scrollable]'s
   /// position changed.
@@ -193,6 +197,7 @@ class _SlidableState extends State<Slidable>
   }
 
   void handleActionPanelTypeChanged() {
+    widget.onOpen?.call(!controller.closing);
     setState(() {
       updateMoveAnimation();
     });

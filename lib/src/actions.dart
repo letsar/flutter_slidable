@@ -153,8 +153,10 @@ class SlidableAction extends StatelessWidget {
     this.autoClose = _kAutoClose,
     required this.onPressed,
     this.icon,
+    this.iconWidget,
     this.spacing = 4,
     this.label,
+    this.style,
     this.borderRadius = BorderRadius.zero,
     this.padding,
     this.alignment,
@@ -178,6 +180,7 @@ class SlidableAction extends StatelessWidget {
 
   /// An icon to display above the [label].
   final IconData? icon;
+  final Widget? iconWidget;
 
   /// The space between [icon] and [label] if both set.
   ///
@@ -186,6 +189,7 @@ class SlidableAction extends StatelessWidget {
 
   /// A label to display below the [icon].
   final String? label;
+  final TextStyle? style;
 
   /// Padding of the OutlinedButton
   final BorderRadius borderRadius;
@@ -205,6 +209,11 @@ class SlidableAction extends StatelessWidget {
         Icon(icon),
       );
     }
+    if (iconWidget != null) {
+      children.add(
+        iconWidget,
+      );
+    }
 
     if (label != null) {
       if (children.isNotEmpty) {
@@ -216,6 +225,7 @@ class SlidableAction extends StatelessWidget {
       children.add(
         Text(
           label!,
+          style: style,
           overflow: TextOverflow.ellipsis,
         ),
       );

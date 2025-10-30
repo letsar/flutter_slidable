@@ -23,7 +23,7 @@ class CustomSlidableAction extends StatelessWidget {
     this.backgroundColor = _kBackgroundColor,
     this.foregroundColor,
     this.autoClose = _kAutoClose,
-    this.borderRadius = BorderRadius.zero,
+    this.borderRadius = BorderRadiusDirectional.zero,
     this.padding,
     this.alignment,
     required this.onPressed,
@@ -73,7 +73,7 @@ class CustomSlidableAction extends StatelessWidget {
   ///
   /// Defaults to [BorderRadius.zero].
   /// {@endtemplate}
-  final BorderRadius borderRadius;
+  final BorderRadiusDirectional borderRadius;
 
   /// {@template slidable.actions.padding}
   /// The padding of the OutlinedButton
@@ -155,7 +155,8 @@ class SlidableAction extends StatelessWidget {
     this.icon,
     this.spacing = 4,
     this.label,
-    this.borderRadius = BorderRadius.zero,
+    this.style,
+    this.borderRadius = BorderRadiusDirectional.zero,
     this.padding,
     this.alignment,
   })  : assert(flex > 0),
@@ -187,8 +188,11 @@ class SlidableAction extends StatelessWidget {
   /// A label to display below the [icon].
   final String? label;
 
+  /// A style for the label [label].
+  final TextStyle? style;
+
   /// Padding of the OutlinedButton
-  final BorderRadius borderRadius;
+  final BorderRadiusDirectional borderRadius;
 
   /// Padding of the OutlinedButton
   final EdgeInsets? padding;
@@ -217,6 +221,7 @@ class SlidableAction extends StatelessWidget {
         Text(
           label!,
           overflow: TextOverflow.ellipsis,
+          style: style,
         ),
       );
     }

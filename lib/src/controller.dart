@@ -355,6 +355,7 @@ class SlidableController {
   }
 
   /// Dismisses the [Slidable].
+  /// When used inside a [SlidableAction], [autoClose] needs to be set to false
   Future<void> dismiss(
     ResizeRequest request, {
     Duration duration = _defaultMovementDuration,

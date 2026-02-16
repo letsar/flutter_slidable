@@ -28,11 +28,15 @@ class Slidable extends StatefulWidget {
     this.direction = Axis.horizontal,
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
+    this.onSlideAnimationChanged,
     required this.child,
   });
 
   /// The Slidable widget controller.
   final SlidableController? controller;
+
+  /// A callback that is called when the slide animation changes.
+  final Function(Animation<Offset> animation)? onSlideAnimationChanged;
 
   /// Whether this slidable is interactive.
   ///
@@ -214,6 +218,9 @@ class _SlidableState extends State<Slidable>
             : Offset(0, end),
       ),
     );
+    if (widget.onSlideAnimationChanged != null) {
+      widget.onSlideAnimationChanged!(moveAnimation);
+    }
   }
 
   Widget? get actionPane {

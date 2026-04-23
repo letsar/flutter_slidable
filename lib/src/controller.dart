@@ -1,7 +1,12 @@
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/widgets.dart';
 
 const _defaultMovementDuration = Duration(milliseconds: 200);
 const _defaultCurve = Curves.ease;
+const _lockedOppositeDragResistance = 0.2;
+const _lockedOppositeDragLimit = 0.08;
+
+/// The default ratio of a slidable occupied by an action pane.
 const kDefaultExtentRatio = 0.5;
 
 /// The different kinds of action panes.
@@ -102,16 +107,26 @@ class SlidableController {
   /// Creates a [SlidableController].
   SlidableController(TickerProvider vsync)
       : _animationController = AnimationController(vsync: vsync),
+        _movementAnimationController = AnimationController.unbounded(
+          vsync: vsync,
+        ),
         endGesture = ValueNotifier(null),
         _dismissGesture = _ValueNotifier(null),
         resizeRequest = ValueNotifier(null),
         actionPaneType = ValueNotifier(ActionPaneType.none),
+        _movementRatio = ValueNotifier(0),
         direction = ValueNotifier(0) {
+    _animationController.addListener(_handleAnimationChanged);
+    _movementAnimationController.addListener(_handleMovementAnimationChanged);
     direction.addListener(_onDirectionChanged);
   }
 
   final AnimationController _animationController;
+  final AnimationController _movementAnimationController;
   final _ValueNotifier<DismissGesture?> _dismissGesture;
+  final ValueNotifier<double> _movementRatio;
+  int? _lockedDragDirection;
+  bool _hasMovementRatioOverride = false;
 
   /// Whether the start action pane is enabled.
   bool enableStartActionPane = true;
@@ -167,6 +182,15 @@ class SlidableController {
   /// The value of the ratio over time.
   Animation<double> get animation => _animationController.view;
 
+  /// The visual movement ratio for the slidable child.
+  ///
+  /// This normally matches [ratio]. During a locked drag, it can briefly show
+  /// a resisted offset past neutral without activating the opposite pane.
+  ValueListenable<double> get movement => _movementRatio;
+
+  /// The current visual movement ratio for the slidable child.
+  double get movementRatio => _movementRatio.value;
+
   /// Track the end gestures.
   final ValueNotifier<EndGesture?> endGesture;
 
@@ -211,9 +235,15 @@ class SlidableController {
   double get ratio => _animationController.value * direction.value;
   set ratio(double value) {
     final newRatio = actionPaneConfigurator?.normalizeRatio(value) ?? value;
-    if (_acceptRatio(newRatio) && newRatio != ratio) {
-      direction.value = newRatio.sign.toInt();
-      _animationController.value = newRatio.abs();
+    if (_acceptRatio(newRatio)) {
+      _movementAnimationController.stop();
+      _hasMovementRatioOverride = false;
+      if (newRatio != ratio) {
+        direction.value = newRatio.sign.toInt();
+        _animationController.value = newRatio.abs();
+      } else {
+        _syncMovementRatio();
+      }
     }
   }
 
@@ -221,6 +251,104 @@ class SlidableController {
     final mulitiplier = isLeftToRight ? 1 : -1;
     final index = (direction.value * mulitiplier) + 1;
     actionPaneType.value = ActionPaneType.values[index];
+    _syncMovementRatio();
+  }
+
+  void _handleAnimationChanged() {
+    _syncMovementRatio();
+  }
+
+  void _handleMovementAnimationChanged() {
+    _setMovementRatio(_movementAnimationController.value);
+  }
+
+  Future<void> _animateMovementRatioTo(
+    double target, {
+    required Duration duration,
+    required Curve curve,
+  }) async {
+    _movementAnimationController
+      ..stop()
+      ..value = _movementRatio.value;
+
+    await _movementAnimationController.animateTo(
+      target,
+      duration: duration,
+      curve: curve,
+    );
+    _setMovementRatio(target);
+  }
+
+  void _syncMovementRatio() {
+    if (!_hasMovementRatioOverride) {
+      _setMovementRatio(ratio);
+    }
+  }
+
+  void _setMovementRatio(double value) {
+    if (_movementRatio.value != value) {
+      _movementRatio.value = value;
+    }
+  }
+
+  /// Starts an interactive drag sequence.
+  void beginDrag() {
+    _movementAnimationController.stop();
+    _lockedDragDirection = direction.value == 0 ? null : direction.value;
+    _hasMovementRatioOverride = false;
+    _syncMovementRatio();
+  }
+
+  /// Updates the interactive drag ratio while keeping the first drawer intent.
+  void dragTo(double value) {
+    var dragDirection = _lockedDragDirection;
+    if (dragDirection == null) {
+      dragDirection = value.sign.toInt();
+      if (dragDirection == 0 || !_acceptRatio(dragDirection.toDouble())) {
+        return;
+      }
+      _lockedDragDirection = dragDirection;
+      direction.value = dragDirection;
+    }
+
+    final distanceInLockedDirection = value * dragDirection;
+    if (distanceInLockedDirection >= 0) {
+      ratio = dragDirection * distanceInLockedDirection;
+      return;
+    }
+
+    _animationController.value = 0;
+    _hasMovementRatioOverride = true;
+    final resistedDistance =
+        (-distanceInLockedDirection * _lockedOppositeDragResistance).clamp(
+      0.0,
+      _lockedOppositeDragLimit,
+    );
+    _setMovementRatio(-dragDirection * resistedDistance);
+  }
+
+  /// Ends an interactive drag sequence.
+  void endDrag(double? velocity, GestureDirection direction) {
+    final hadMovementRatioOverride = _hasMovementRatioOverride;
+    dispatchEndGesture(velocity, direction);
+    _lockedDragDirection = null;
+    if (hadMovementRatioOverride && !_closing) {
+      _restoreMovementRatio();
+    }
+  }
+
+  void _restoreMovementRatio({
+    Duration duration = _defaultMovementDuration,
+    Curve curve = _defaultCurve,
+  }) {
+    _animateMovementRatioTo(
+      ratio,
+      duration: duration,
+      curve: curve,
+    ).whenComplete(() {
+      _hasMovementRatioOverride = false;
+      _syncMovementRatio();
+    });
   }
 
   /// Dispatches a new [EndGesture] determined by the given [velocity] and
@@ -261,13 +389,28 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
+    final shouldAnimateMovementRatio = _hasMovementRatioOverride;
     _closing = true;
-    await _animationController.animateBack(
+    if (!shouldAnimateMovementRatio) {
+      _movementAnimationController.stop();
+    }
+    final animation = _animationController.animateBack(
       0,
       duration: duration,
       curve: curve,
     );
+    if (shouldAnimateMovementRatio) {
+      await Future.wait([
+        animation,
+        _animateMovementRatioTo(0, duration: duration, curve: curve),
+      ]);
+    } else {
+      await animation;
+    }
     direction.value = 0;
+    _lockedDragDirection = null;
+    _hasMovementRatioOverride = false;
+    _syncMovementRatio();
     _closing = false;
   }
 
@@ -284,11 +427,7 @@ class SlidableController {
     final extentRatio =
         actionPaneConfigurator?.extentRatio ?? defaultExtentRatio;
 
-    return openTo(
-      extentRatio,
-      duration: duration,
-      curve: curve,
-    );
+    return openTo(extentRatio, duration: duration, curve: curve);
   }
 
   /// Opens the [Slidable.startActionPane].
@@ -301,11 +440,7 @@ class SlidableController {
       ratio = 0;
     }
 
-    return openTo(
-      startActionPaneExtentRatio,
-      duration: duration,
-      curve: curve,
-    );
+    return openTo(startActionPaneExtentRatio, duration: duration, curve: curve);
   }
 
   /// Opens the [Slidable.endActionPane].
@@ -318,11 +453,7 @@ class SlidableController {
       ratio = 0;
     }
 
-    return openTo(
-      -endActionPaneExtentRatio,
-      duration: duration,
-      curve: curve,
-    );
+    return openTo(-endActionPaneExtentRatio, duration: duration, curve: curve);
   }
 
   /// Opens the [Slidable] to the given [ratio].
@@ -341,6 +472,8 @@ class SlidableController {
     if (_closing) {
       return;
     }
+    _movementAnimationController.stop();
+    _hasMovementRatioOverride = false;
 
     // Edge case: to be able to correctly set the sign when the value is zero,
     // we have to manually set the ratio to a tiny amount.
@@ -360,6 +493,8 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
+    _movementAnimationController.stop();
+    _hasMovementRatioOverride = false;
     await _animationController.animateTo(
       1,
       duration: _defaultMovementDuration,
@@ -371,7 +506,13 @@ class SlidableController {
   /// Disposes the controller.
   void dispose() {
     _animationController.stop();
+    _animationController.removeListener(_handleAnimationChanged);
     _animationController.dispose();
+    _movementAnimationController.removeListener(
+      _handleMovementAnimationChanged,
+    );
+    _movementAnimationController.dispose();
+    _movementRatio.dispose();
     direction.removeListener(_onDirectionChanged);
     direction.dispose();
   }

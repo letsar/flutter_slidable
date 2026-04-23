@@ -7,55 +7,59 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('Slidable', () {
     testWidgets(
-        'child should be able to open the horitzontal start action pane',
-        (tester) async {
-      const gestureDetectorKey = ValueKey('gesture_detector');
-      const startActionPaneKey = ValueKey('start');
-      const endActionPaneKey = ValueKey('end');
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: Slidable(
-            startActionPane: ActionPane(
-              key: startActionPaneKey,
-              motion: const BehindMotion(),
-              children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
-              ],
-            ),
-            endActionPane: ActionPane(
-              key: endActionPaneKey,
-              motion: const ScrollMotion(),
-              children: [
-                SlidableAction(onPressed: (_) {}, icon: Icons.share),
-                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
-              ],
-            ),
-            child: Builder(builder: (context) {
-              return GestureDetector(
-                key: gestureDetectorKey,
-                onTap: () {
-                  Slidable.of(context)!.openStartActionPane();
+      'child should be able to open the horitzontal start action pane',
+      (tester) async {
+        const gestureDetectorKey = ValueKey('gesture_detector');
+        const startActionPaneKey = ValueKey('start');
+        const endActionPaneKey = ValueKey('end');
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Slidable(
+              startActionPane: ActionPane(
+                key: startActionPaneKey,
+                motion: const BehindMotion(),
+                children: [
+                  SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                  SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                ],
+              ),
+              endActionPane: ActionPane(
+                key: endActionPaneKey,
+                motion: const ScrollMotion(),
+                children: [
+                  SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                  SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+                ],
+              ),
+              child: Builder(
+                builder: (context) {
+                  return GestureDetector(
+                    key: gestureDetectorKey,
+                    onTap: () {
+                      Slidable.of(context)!.openStartActionPane();
+                    },
+                  );
                 },
-              );
-            }),
+              ),
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byKey(startActionPaneKey), findsNothing);
-      expect(find.byKey(endActionPaneKey), findsNothing);
+        expect(find.byKey(startActionPaneKey), findsNothing);
+        expect(find.byKey(endActionPaneKey), findsNothing);
 
-      await tester.tap(find.byKey(gestureDetectorKey));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byKey(gestureDetectorKey));
+        await tester.pumpAndSettle();
 
-      expect(find.byKey(startActionPaneKey), findsOneWidget);
-      expect(find.byKey(endActionPaneKey), findsNothing);
-    });
+        expect(find.byKey(startActionPaneKey), findsOneWidget);
+        expect(find.byKey(endActionPaneKey), findsNothing);
+      },
+    );
 
-    testWidgets('child should be able to open the horizontal end action pane',
-        (tester) async {
+    testWidgets('child should be able to open the horizontal end action pane', (
+      tester,
+    ) async {
       const gestureDetectorKey = ValueKey('gesture_detector');
       const startActionPaneKey = ValueKey('start');
       const endActionPaneKey = ValueKey('end');
@@ -79,14 +83,16 @@ void main() {
                 SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
-            child: Builder(builder: (context) {
-              return GestureDetector(
-                key: gestureDetectorKey,
-                onTap: () {
-                  Slidable.of(context)!.openEndActionPane();
-                },
-              );
-            }),
+            child: Builder(
+              builder: (context) {
+                return GestureDetector(
+                  key: gestureDetectorKey,
+                  onTap: () {
+                    Slidable.of(context)!.openEndActionPane();
+                  },
+                );
+              },
+            ),
           ),
         ),
       );
@@ -101,8 +107,9 @@ void main() {
       expect(find.byKey(endActionPaneKey), findsOneWidget);
     });
 
-    testWidgets('child should be able to open the vertical start action pane',
-        (tester) async {
+    testWidgets('child should be able to open the vertical start action pane', (
+      tester,
+    ) async {
       const gestureDetectorKey = ValueKey('gesture_detector');
       const startActionPaneKey = ValueKey('start');
       const endActionPaneKey = ValueKey('end');
@@ -127,14 +134,16 @@ void main() {
                 SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
-            child: Builder(builder: (context) {
-              return GestureDetector(
-                key: gestureDetectorKey,
-                onTap: () {
-                  Slidable.of(context)!.openStartActionPane();
-                },
-              );
-            }),
+            child: Builder(
+              builder: (context) {
+                return GestureDetector(
+                  key: gestureDetectorKey,
+                  onTap: () {
+                    Slidable.of(context)!.openStartActionPane();
+                  },
+                );
+              },
+            ),
           ),
         ),
       );
@@ -149,8 +158,9 @@ void main() {
       expect(find.byKey(endActionPaneKey), findsNothing);
     });
 
-    testWidgets('child should be able to open the vertical end action pane',
-        (tester) async {
+    testWidgets('child should be able to open the vertical end action pane', (
+      tester,
+    ) async {
       const gestureDetectorKey = ValueKey('gesture_detector');
       const startActionPaneKey = ValueKey('start');
       const endActionPaneKey = ValueKey('end');
@@ -175,14 +185,16 @@ void main() {
                 SlidableAction(onPressed: (_) {}, icon: Icons.delete),
               ],
             ),
-            child: Builder(builder: (context) {
-              return GestureDetector(
-                key: gestureDetectorKey,
-                onTap: () {
-                  Slidable.of(context)!.openEndActionPane();
-                },
-              );
-            }),
+            child: Builder(
+              builder: (context) {
+                return GestureDetector(
+                  key: gestureDetectorKey,
+                  onTap: () {
+                    Slidable.of(context)!.openEndActionPane();
+                  },
+                );
+              },
+            ),
           ),
         ),
       );
@@ -279,81 +291,272 @@ void main() {
   });
 
   testWidgets(
-      'should work if TextDirection.rtl and only startActionPane is set',
-      (tester) async {
-    const gestureDetectorKey = ValueKey('gesture_detector');
-    const actionPaneKey = ValueKey('action_pane');
-    final actionPane = ActionPane(
-      key: actionPaneKey,
-      motion: const BehindMotion(),
-      children: [
-        SlidableAction(onPressed: (_) {}, icon: Icons.share),
-        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
-      ],
-    );
+    'locks drawer direction and rubber bands during one horizontal drag',
+    (tester) async {
+      await _pumpDirectionalLockSlidable(tester);
+      final child = find.byKey(_childKey);
+      final initialLeft = tester.getTopLeft(child).dx;
 
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.rtl,
-        child: Slidable(
-          startActionPane: actionPane,
-          child: Builder(builder: (context) {
-            return GestureDetector(
-              key: gestureDetectorKey,
-              onTap: () {
-                Slidable.of(context)!.openStartActionPane();
-              },
-            );
-          }),
-        ),
-      ),
-    );
+      final gesture = await tester.startGesture(tester.getCenter(child));
+      await gesture.moveBy(const Offset(-160, 0));
+      await tester.pump();
 
-    expect(find.byKey(actionPaneKey), findsNothing);
+      expect(find.byKey(_endPaneKey), findsOneWidget);
+      expect(find.byKey(_startPaneKey), findsNothing);
 
-    await tester.tap(find.byKey(gestureDetectorKey));
+      await gesture.moveBy(const Offset(220, 0));
+      await tester.pump();
+
+      final overdrag = tester.getTopLeft(child).dx - initialLeft;
+      expect(find.byKey(_endPaneKey), findsOneWidget);
+      expect(find.byKey(_startPaneKey), findsNothing);
+      expect(overdrag, greaterThan(0));
+      expect(overdrag, lessThanOrEqualTo(_maxRubberBandExtent));
+
+      await gesture.up();
+      expect(tester.getTopLeft(child).dx - initialLeft, closeTo(overdrag, 0.1));
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      final settlingOverdrag = tester.getTopLeft(child).dx - initialLeft;
+      expect(settlingOverdrag, greaterThan(0));
+      expect(settlingOverdrag, lessThan(overdrag));
+
+      await tester.pumpAndSettle();
+
+      expect(tester.getTopLeft(child).dx, closeTo(initialLeft, 0.1));
+      expect(find.byKey(_endPaneKey), findsNothing);
+      expect(find.byKey(_startPaneKey), findsNothing);
+    },
+  );
+
+  testWidgets('can infer the opposite drawer after settling neutral', (
+    tester,
+  ) async {
+    await _pumpDirectionalLockSlidable(tester);
+    final child = find.byKey(_childKey);
+    final initialLeft = tester.getTopLeft(child).dx;
+
+    final firstGesture = await tester.startGesture(tester.getCenter(child));
+    await firstGesture.moveBy(const Offset(-160, 0));
+    await tester.pump();
+    await firstGesture.moveBy(const Offset(220, 0));
+    await tester.pump();
+    await firstGesture.up();
     await tester.pumpAndSettle();
 
-    expect(find.byKey(actionPaneKey), findsOneWidget);
+    final secondGesture = await tester.startGesture(tester.getCenter(child));
+    await secondGesture.moveBy(const Offset(120, 0));
+    await tester.pump();
+
+    expect(find.byKey(_startPaneKey), findsOneWidget);
+    expect(find.byKey(_endPaneKey), findsNothing);
+    expect(tester.getTopLeft(child).dx, greaterThan(initialLeft));
+
+    await secondGesture.up();
+    await tester.pumpAndSettle();
   });
 
-  testWidgets('should work if TextDirection.rtl and only endActionPane is set',
-      (tester) async {
-    const gestureDetectorKey = ValueKey('gesture_detector');
-    const actionPaneKey = ValueKey('action_pane');
-    final actionPane = ActionPane(
-      key: actionPaneKey,
-      motion: const BehindMotion(),
-      children: [
-        SlidableAction(onPressed: (_) {}, icon: Icons.share),
-        SlidableAction(onPressed: (_) {}, icon: Icons.delete),
-      ],
-    );
+  testWidgets('keeps an already-open drawer locked while dragging closed', (
+    tester,
+  ) async {
+    await _pumpDirectionalLockSlidable(tester, childOpensEndPane: true);
+    final child = find.byKey(_childKey);
+    final initialLeft = tester.getTopLeft(child).dx;
 
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.rtl,
-        child: Slidable(
-          endActionPane: actionPane,
-          child: Builder(builder: (context) {
-            return GestureDetector(
-              key: gestureDetectorKey,
-              onTap: () {
-                Slidable.of(context)!.openEndActionPane();
+    await tester.tap(child);
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(child).dx, lessThan(initialLeft));
+    expect(find.byKey(_endPaneKey), findsOneWidget);
+
+    final gesture = await tester.startGesture(tester.getCenter(child));
+    await gesture.moveBy(const Offset(260, 0));
+    await tester.pump();
+
+    final overdrag = tester.getTopLeft(child).dx - initialLeft;
+    expect(find.byKey(_endPaneKey), findsOneWidget);
+    expect(find.byKey(_startPaneKey), findsNothing);
+    expect(overdrag, greaterThan(0));
+    expect(overdrag, lessThanOrEqualTo(_maxRubberBandExtent));
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('locks drawer intent using text direction in RTL', (
+    tester,
+  ) async {
+    await _pumpDirectionalLockSlidable(
+      tester,
+      textDirection: TextDirection.rtl,
+    );
+    final child = find.byKey(_childKey);
+    final initialLeft = tester.getTopLeft(child).dx;
+
+    final gesture = await tester.startGesture(tester.getCenter(child));
+    await gesture.moveBy(const Offset(-160, 0));
+    await tester.pump();
+
+    expect(find.byKey(_startPaneKey), findsOneWidget);
+    expect(find.byKey(_endPaneKey), findsNothing);
+
+    await gesture.moveBy(const Offset(220, 0));
+    await tester.pump();
+
+    final overdrag = tester.getTopLeft(child).dx - initialLeft;
+    expect(find.byKey(_startPaneKey), findsOneWidget);
+    expect(find.byKey(_endPaneKey), findsNothing);
+    expect(overdrag, greaterThan(0));
+    expect(overdrag, lessThanOrEqualTo(_maxRubberBandExtent));
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets(
+    'should work if TextDirection.rtl and only startActionPane is set',
+    (tester) async {
+      const gestureDetectorKey = ValueKey('gesture_detector');
+      const actionPaneKey = ValueKey('action_pane');
+      final actionPane = ActionPane(
+        key: actionPaneKey,
+        motion: const BehindMotion(),
+        children: [
+          SlidableAction(onPressed: (_) {}, icon: Icons.share),
+          SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+        ],
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: Slidable(
+            startActionPane: actionPane,
+            child: Builder(
+              builder: (context) {
+                return GestureDetector(
+                  key: gestureDetectorKey,
+                  onTap: () {
+                    Slidable.of(context)!.openStartActionPane();
+                  },
+                );
               },
-            );
-          }),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byKey(actionPaneKey), findsNothing);
+
+      await tester.tap(find.byKey(gestureDetectorKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(actionPaneKey), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'should work if TextDirection.rtl and only endActionPane is set',
+    (tester) async {
+      const gestureDetectorKey = ValueKey('gesture_detector');
+      const actionPaneKey = ValueKey('action_pane');
+      final actionPane = ActionPane(
+        key: actionPaneKey,
+        motion: const BehindMotion(),
+        children: [
+          SlidableAction(onPressed: (_) {}, icon: Icons.share),
+          SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+        ],
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: Slidable(
+            endActionPane: actionPane,
+            child: Builder(
+              builder: (context) {
+                return GestureDetector(
+                  key: gestureDetectorKey,
+                  onTap: () {
+                    Slidable.of(context)!.openEndActionPane();
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byKey(actionPaneKey), findsNothing);
+
+      await tester.tap(find.byKey(gestureDetectorKey));
+      await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(actionPaneKey), findsOneWidget);
+    },
+  );
+}
+
+const _childKey = ValueKey('direction_lock_child');
+const _startPaneKey = ValueKey('direction_lock_start_pane');
+const _endPaneKey = ValueKey('direction_lock_end_pane');
+const _slidableWidth = 400.0;
+const _slidableHeight = 80.0;
+const _maxRubberBandExtent = _slidableWidth * 0.08;
+
+Future<void> _pumpDirectionalLockSlidable(
+  WidgetTester tester, {
+  TextDirection textDirection = TextDirection.ltr,
+  bool childOpensEndPane = false,
+}) async {
+  await tester.pumpWidget(
+    Directionality(
+      textDirection: textDirection,
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          width: _slidableWidth,
+          height: _slidableHeight,
+          child: Slidable(
+            startActionPane: ActionPane(
+              key: _startPaneKey,
+              motion: const BehindMotion(),
+              children: [
+                SlidableAction(onPressed: (_) {}, icon: Icons.archive),
+              ],
+            ),
+            endActionPane: ActionPane(
+              key: _endPaneKey,
+              motion: const BehindMotion(),
+              children: [SlidableAction(onPressed: (_) {}, icon: Icons.delete)],
+            ),
+            child: Builder(
+              builder: (context) {
+                const content = ColoredBox(
+                  color: Colors.white,
+                  child: SizedBox.expand(child: Text('Slide me')),
+                );
+                if (childOpensEndPane) {
+                  return GestureDetector(
+                    key: _childKey,
+                    onTap: () {
+                      Slidable.of(
+                        context,
+                      )!
+                          .openEndActionPane(duration: Duration.zero);
+                    },
+                    child: content,
+                  );
+                }
+                return const SizedBox.expand(key: _childKey, child: content);
+              },
+            ),
+          ),
         ),
       ),
-    );
-
-    expect(find.byKey(actionPaneKey), findsNothing);
-
-    await tester.tap(find.byKey(gestureDetectorKey));
-    await tester.pumpAndSettle();
-    await tester.pumpAndSettle();
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(actionPaneKey), findsOneWidget);
-  });
+    ),
+  );
 }

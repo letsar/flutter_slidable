@@ -129,7 +129,6 @@ class Slidable extends StatefulWidget {
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final SlidableController controller;
-  late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
 
   @override
@@ -147,7 +146,6 @@ class _SlidableState extends State<Slidable>
     super.didChangeDependencies();
     updateIsLeftToRight();
     updateController();
-    updateMoveAnimation();
   }
 
   @override
@@ -193,27 +191,13 @@ class _SlidableState extends State<Slidable>
   }
 
   void handleActionPanelTypeChanged() {
-    setState(() {
-      updateMoveAnimation();
-    });
+    setState(() {});
   }
 
   void handleDismissing() {
     if (controller.resizeRequest.value != null) {
       setState(() {});
     }
-  }
-
-  void updateMoveAnimation() {
-    final double end = controller.direction.value.toDouble();
-    moveAnimation = controller.animation.drive(
-      Tween<Offset>(
-        begin: Offset.zero,
-        end: widget.direction == Axis.horizontal
-            ? Offset(end, 0)
-            : Offset(0, end),
-      ),
-    );
   }
 
   Widget? get actionPane {
@@ -244,13 +228,21 @@ class _SlidableState extends State<Slidable>
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
-    Widget content = SlideTransition(
-      position: moveAnimation,
+    Widget content = ValueListenableBuilder<double>(
+      valueListenable: controller.movement,
       child: SlidableAutoCloseBehaviorInteractor(
         groupTag: widget.groupTag,
         controller: controller,
         child: widget.child,
       ),
+      builder: (context, ratio, child) {
+        return FractionalTranslation(
+          translation: widget.direction == Axis.horizontal
+              ? Offset(ratio, 0)
+              : Offset(0, ratio),
+          child: child,
+        );
+      },
     );
 
     content = Stack(

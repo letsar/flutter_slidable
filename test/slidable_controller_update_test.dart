@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_slidable/src/controller.dart' show GestureDirection;
 import 'package:flutter_test/flutter_test.dart';
 
 const _childKey = ValueKey('content');
@@ -33,6 +34,26 @@ Widget _buildSlidable({
 }
 
 void main() {
+  testWidgets('replacing an open controller rebinds the action pane',
+      (tester) async {
+    final first = SlidableController(const TestVSync())..ratio = 0.5;
+    final second = SlidableController(const TestVSync())..ratio = 0.3;
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+
+    await tester.pumpWidget(_buildSlidable(controller: first));
+    expect(first.actionPaneConfigurator, isNotNull);
+    await tester.pumpWidget(_buildSlidable(controller: second));
+
+    expect(tester.takeException(), isNull);
+    expect(first.actionPaneConfigurator, isNull);
+    expect(second.actionPaneConfigurator, isNotNull);
+    second.dispatchEndGesture(0, GestureDirection.opening);
+    await tester.pumpAndSettle();
+    expect(second.ratio, 0.5);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('replacing an external controller updates the slide animation',
       (tester) async {
     final first = SlidableController(const TestVSync());

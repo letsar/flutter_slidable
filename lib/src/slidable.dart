@@ -262,6 +262,7 @@ class _SlidableState extends State<Slidable>
         if (actionPane != null)
           Positioned.fill(
             child: ClipRect(
+              key: ObjectKey(controller),
               clipper: _SlidableClipper(
                 axis: widget.direction,
                 controller: controller,

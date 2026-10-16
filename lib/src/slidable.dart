@@ -128,7 +128,7 @@ class Slidable extends StatefulWidget {
 
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late final SlidableController controller;
+  late SlidableController controller;
   late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
 
@@ -156,9 +156,13 @@ class _SlidableState extends State<Slidable>
 
     if (oldWidget.controller != widget.controller) {
       controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
+      if (oldWidget.controller == null) {
+        controller.dispose();
+      }
 
       controller = (widget.controller ?? SlidableController(this))
         ..actionPaneType.addListener(handleActionPanelTypeChanged);
+      updateMoveAnimation();
     }
 
     updateIsLeftToRight();

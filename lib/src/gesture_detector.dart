@@ -56,15 +56,44 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   Widget build(BuildContext context) {
     final canDragHorizontally = directionIsXAxis && widget.enabled;
     final canDragVertically = !directionIsXAxis && widget.enabled;
-    return GestureDetector(
-      onHorizontalDragStart: canDragHorizontally ? handleDragStart : null,
-      onHorizontalDragUpdate: canDragHorizontally ? handleDragUpdate : null,
-      onHorizontalDragEnd: canDragHorizontally ? handleDragEnd : null,
-      onVerticalDragStart: canDragVertically ? handleDragStart : null,
-      onVerticalDragUpdate: canDragVertically ? handleDragUpdate : null,
-      onVerticalDragEnd: canDragVertically ? handleDragEnd : null,
+
+    final gestures = <Type, GestureRecognizerFactory>{};
+
+    if (canDragHorizontally) {
+      gestures[_SlidableHorizontalDragGestureRecognizer] =
+          GestureRecognizerFactoryWithHandlers<
+              _SlidableHorizontalDragGestureRecognizer>(
+        () => _SlidableHorizontalDragGestureRecognizer(debugOwner: this),
+        (_SlidableHorizontalDragGestureRecognizer instance) {
+          instance
+            ..onStart = handleDragStart
+            ..onUpdate = handleDragUpdate
+            ..onEnd = handleDragEnd
+            ..dragStartBehavior = widget.dragStartBehavior
+            ..gestureSettings = MediaQuery.maybeGestureSettingsOf(context);
+        },
+      );
+    }
+
+    if (canDragVertically) {
+      gestures[_SlidableVerticalDragGestureRecognizer] =
+          GestureRecognizerFactoryWithHandlers<
+              _SlidableVerticalDragGestureRecognizer>(
+        () => _SlidableVerticalDragGestureRecognizer(debugOwner: this),
+        (_SlidableVerticalDragGestureRecognizer instance) {
+          instance
+            ..onStart = handleDragStart
+            ..onUpdate = handleDragUpdate
+            ..onEnd = handleDragEnd
+            ..dragStartBehavior = widget.dragStartBehavior
+            ..gestureSettings = MediaQuery.maybeGestureSettingsOf(context);
+        },
+      );
+    }
+
+    return RawGestureDetector(
       behavior: HitTestBehavior.opaque,
-      dragStartBehavior: widget.dragStartBehavior,
+      gestures: gestures,
       child: widget.child,
     );
   }
@@ -99,6 +128,129 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
     widget.controller.dispatchEndGesture(
       details.primaryVelocity,
       gestureDirection,
+    );
+  }
+}
+
+mixin _SlidableDragGestureRecognizerMixin on OneSequenceGestureRecognizer {
+  final Map<int, Offset> _pointerOffsets = <int, Offset>{};
+  bool _dragStarted = false;
+  bool _canAcceptGesture = true;
+
+  bool get isHorizontal;
+
+  @override
+  void addAllowedPointer(PointerDownEvent event) {
+    _pointerOffsets[event.pointer] = event.position;
+    _dragStarted = false;
+    _canAcceptGesture = true;
+    super.addAllowedPointer(event);
+  }
+
+  @override
+  void addAllowedPointerPanZoom(PointerPanZoomStartEvent event) {
+    _pointerOffsets[event.pointer] = Offset.zero;
+    _dragStarted = false;
+    _canAcceptGesture = true;
+    super.addAllowedPointerPanZoom(event);
+  }
+
+  @override
+  void handleEvent(PointerEvent event) {
+    if (!_dragStarted) {
+      if (event is PointerMoveEvent || event is PointerPanZoomUpdateEvent) {
+        final Offset? startPosition = _pointerOffsets[event.pointer];
+        if (startPosition != null) {
+          final Offset totalOffset = event is PointerMoveEvent
+              ? event.position - startPosition
+              : (event as PointerPanZoomUpdateEvent).pan - startPosition;
+          final double primaryAxisDelta =
+              isHorizontal ? totalOffset.dx.abs() : totalOffset.dy.abs();
+          final double crossAxisDelta =
+              isHorizontal ? totalOffset.dy.abs() : totalOffset.dx.abs();
+
+          final double touchSlop = computeHitSlop(event.kind, gestureSettings);
+          if (crossAxisDelta > touchSlop &&
+              crossAxisDelta >= primaryAxisDelta) {
+            _canAcceptGesture = false;
+            resolvePointer(event.pointer, GestureDisposition.rejected);
+            stopTrackingPointer(event.pointer);
+            return;
+          }
+
+          if (primaryAxisDelta > touchSlop &&
+              primaryAxisDelta > crossAxisDelta) {
+            _dragStarted = true;
+          }
+        }
+      }
+    }
+    super.handleEvent(event);
+  }
+
+  @override
+  void rejectGesture(int pointer) {
+    _pointerOffsets.remove(pointer);
+    super.rejectGesture(pointer);
+  }
+
+  @override
+  void didStopTrackingLastPointer(int pointer) {
+    _pointerOffsets.clear();
+    _dragStarted = false;
+    _canAcceptGesture = true;
+    super.didStopTrackingLastPointer(pointer);
+  }
+
+  @override
+  void dispose() {
+    _pointerOffsets.clear();
+    super.dispose();
+  }
+}
+
+class _SlidableHorizontalDragGestureRecognizer
+    extends HorizontalDragGestureRecognizer
+    with _SlidableDragGestureRecognizerMixin {
+  _SlidableHorizontalDragGestureRecognizer({super.debugOwner});
+
+  @override
+  bool get isHorizontal => true;
+
+  @override
+  bool hasSufficientGlobalDistanceToAccept(
+    PointerDeviceKind pointerDeviceKind,
+    double? deviceTouchSlop,
+  ) {
+    if (!_canAcceptGesture) {
+      return false;
+    }
+    return super.hasSufficientGlobalDistanceToAccept(
+      pointerDeviceKind,
+      deviceTouchSlop,
+    );
+  }
+}
+
+class _SlidableVerticalDragGestureRecognizer
+    extends VerticalDragGestureRecognizer
+    with _SlidableDragGestureRecognizerMixin {
+  _SlidableVerticalDragGestureRecognizer({super.debugOwner});
+
+  @override
+  bool get isHorizontal => false;
+
+  @override
+  bool hasSufficientGlobalDistanceToAccept(
+    PointerDeviceKind pointerDeviceKind,
+    double? deviceTouchSlop,
+  ) {
+    if (!_canAcceptGesture) {
+      return false;
+    }
+    return super.hasSufficientGlobalDistanceToAccept(
+      pointerDeviceKind,
+      deviceTouchSlop,
     );
   }
 }

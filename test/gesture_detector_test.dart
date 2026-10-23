@@ -177,5 +177,107 @@ void main() {
         ),
       );
     });
+
+    testWidgets('cannot slide horizontally when drag is predominantly vertical',
+        (tester) async {
+      final slidableController = SlidableController(const TestVSync());
+
+      await tester.pumpWidget(Center(
+        child: SizedBox(
+          height: 200,
+          width: 100,
+          child: SlidableGestureDetector(
+            controller: slidableController,
+            direction: Axis.horizontal,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ));
+
+      final gesture = await tester.startGesture(tester.getCenter(finder));
+      await gesture.moveBy(const Offset(20, 30));
+      await tester.pump();
+      expect(slidableController.ratio, 0);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(slidableController.ratio, 0);
+    });
+
+    testWidgets('can slide horizontally when drag is predominantly horizontal',
+        (tester) async {
+      final slidableController = SlidableController(const TestVSync());
+
+      await tester.pumpWidget(Center(
+        child: SizedBox(
+          height: 200,
+          width: 100,
+          child: SlidableGestureDetector(
+            controller: slidableController,
+            direction: Axis.horizontal,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ));
+
+      final gesture = await tester.startGesture(tester.getCenter(finder));
+      await gesture.moveBy(const Offset(30, 10));
+      await tester.pump();
+      expect(slidableController.ratio, 0.3);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('cannot slide vertically when drag is predominantly horizontal',
+        (tester) async {
+      final slidableController = SlidableController(const TestVSync());
+
+      await tester.pumpWidget(Center(
+        child: SizedBox(
+          height: 100,
+          width: 200,
+          child: SlidableGestureDetector(
+            controller: slidableController,
+            direction: Axis.vertical,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ));
+
+      final gesture = await tester.startGesture(tester.getCenter(finder));
+      await gesture.moveBy(const Offset(30, 20));
+      await tester.pump();
+      expect(slidableController.ratio, 0);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(slidableController.ratio, 0);
+    });
+
+    testWidgets('can slide vertically when drag is predominantly vertical',
+        (tester) async {
+      final slidableController = SlidableController(const TestVSync());
+
+      await tester.pumpWidget(Center(
+        child: SizedBox(
+          height: 100,
+          width: 200,
+          child: SlidableGestureDetector(
+            controller: slidableController,
+            direction: Axis.vertical,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ));
+
+      final gesture = await tester.startGesture(tester.getCenter(finder));
+      await gesture.moveBy(const Offset(10, 30));
+      await tester.pump();
+      expect(slidableController.ratio, 0.3);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+    });
   });
 }

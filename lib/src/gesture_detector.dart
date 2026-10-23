@@ -133,54 +133,94 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
 }
 
 mixin _SlidableDragGestureRecognizerMixin on OneSequenceGestureRecognizer {
-  final Map<int, Offset> _pointerOffsets = <int, Offset>{};
-  bool _dragStarted = false;
-  bool _canAcceptGesture = true;
+  final Map<int, Offset> _pointerInitialPositions = <int, Offset>{};
+  final Set<int> _dragActivePointers = <int>{};
 
   bool get isHorizontal;
 
+  static Offset _getLocalPosition(PointerEvent event) {
+    if (event is PointerPanZoomUpdateEvent) {
+      return event.localPan;
+    }
+    return event.localPosition;
+  }
+
   @override
   void addAllowedPointer(PointerDownEvent event) {
-    _pointerOffsets[event.pointer] = event.position;
-    _dragStarted = false;
-    _canAcceptGesture = true;
+    _pointerInitialPositions[event.pointer] = event.localPosition;
     super.addAllowedPointer(event);
   }
 
   @override
   void addAllowedPointerPanZoom(PointerPanZoomStartEvent event) {
-    _pointerOffsets[event.pointer] = Offset.zero;
-    _dragStarted = false;
-    _canAcceptGesture = true;
+    _pointerInitialPositions[event.pointer] = Offset.zero;
     super.addAllowedPointerPanZoom(event);
   }
 
   @override
   void handleEvent(PointerEvent event) {
-    if (!_dragStarted) {
+    if (event is PointerDownEvent) {
+      _pointerInitialPositions[event.pointer] = event.localPosition;
+    } else if (event is PointerPanZoomStartEvent) {
+      _pointerInitialPositions[event.pointer] = Offset.zero;
+    }
+
+    if (!_dragActivePointers.contains(event.pointer)) {
       if (event is PointerMoveEvent || event is PointerPanZoomUpdateEvent) {
-        final Offset? startPosition = _pointerOffsets[event.pointer];
+        final Offset? startPosition = _pointerInitialPositions[event.pointer];
         if (startPosition != null) {
-          final Offset totalOffset = event is PointerMoveEvent
-              ? event.position - startPosition
-              : (event as PointerPanZoomUpdateEvent).pan - startPosition;
-          final double primaryAxisDelta =
-              isHorizontal ? totalOffset.dx.abs() : totalOffset.dy.abs();
-          final double crossAxisDelta =
-              isHorizontal ? totalOffset.dy.abs() : totalOffset.dx.abs();
+          final Offset localPosition = _getLocalPosition(event);
+          final Offset totalLocalDelta = event is PointerPanZoomUpdateEvent
+              ? (event.localPan -
+                  PointerEvent.transformPosition(event.transform, Offset.zero))
+              : (localPosition - startPosition);
+          final double primaryDelta = isHorizontal
+              ? totalLocalDelta.dx.abs()
+              : totalLocalDelta.dy.abs();
+          final double crossDelta = isHorizontal
+              ? totalLocalDelta.dy.abs()
+              : totalLocalDelta.dx.abs();
+
+          final Matrix4? localToGlobalTransform = event.transform == null
+              ? null
+              : Matrix4.tryInvert(event.transform!);
+
+          final Offset untransformedEndPosition =
+              event is PointerPanZoomUpdateEvent
+                  ? event.localPosition + event.localPan
+                  : localPosition;
+
+          final Offset localCrossVector = isHorizontal
+              ? Offset(0, totalLocalDelta.dy)
+              : Offset(totalLocalDelta.dx, 0);
+
+          final double globalCrossDistance =
+              PointerEvent.transformDeltaViaPositions(
+            transform: localToGlobalTransform,
+            untransformedDelta: localCrossVector,
+            untransformedEndPosition: untransformedEndPosition,
+          ).distance;
 
           final double touchSlop = computeHitSlop(event.kind, gestureSettings);
-          if (crossAxisDelta > touchSlop &&
-              crossAxisDelta >= primaryAxisDelta) {
-            _canAcceptGesture = false;
-            resolvePointer(event.pointer, GestureDisposition.rejected);
-            stopTrackingPointer(event.pointer);
+
+          if (globalCrossDistance > touchSlop && crossDelta >= primaryDelta) {
+            rejectGesture(event.pointer);
             return;
           }
 
-          if (primaryAxisDelta > touchSlop &&
-              primaryAxisDelta > crossAxisDelta) {
-            _dragStarted = true;
+          final Offset localPrimaryVector = isHorizontal
+              ? Offset(totalLocalDelta.dx, 0)
+              : Offset(0, totalLocalDelta.dy);
+
+          final double globalPrimaryDistance =
+              PointerEvent.transformDeltaViaPositions(
+            transform: localToGlobalTransform,
+            untransformedDelta: localPrimaryVector,
+            untransformedEndPosition: untransformedEndPosition,
+          ).distance;
+
+          if (globalPrimaryDistance > touchSlop && primaryDelta > crossDelta) {
+            _dragActivePointers.add(event.pointer);
           }
         }
       }
@@ -189,22 +229,30 @@ mixin _SlidableDragGestureRecognizerMixin on OneSequenceGestureRecognizer {
   }
 
   @override
+  void stopTrackingPointer(int pointer) {
+    _pointerInitialPositions.remove(pointer);
+    _dragActivePointers.remove(pointer);
+    super.stopTrackingPointer(pointer);
+  }
+
+  @override
   void rejectGesture(int pointer) {
-    _pointerOffsets.remove(pointer);
+    _pointerInitialPositions.remove(pointer);
+    _dragActivePointers.remove(pointer);
     super.rejectGesture(pointer);
   }
 
   @override
   void didStopTrackingLastPointer(int pointer) {
-    _pointerOffsets.clear();
-    _dragStarted = false;
-    _canAcceptGesture = true;
+    _pointerInitialPositions.clear();
+    _dragActivePointers.clear();
     super.didStopTrackingLastPointer(pointer);
   }
 
   @override
   void dispose() {
-    _pointerOffsets.clear();
+    _pointerInitialPositions.clear();
+    _dragActivePointers.clear();
     super.dispose();
   }
 }
@@ -216,20 +264,6 @@ class _SlidableHorizontalDragGestureRecognizer
 
   @override
   bool get isHorizontal => true;
-
-  @override
-  bool hasSufficientGlobalDistanceToAccept(
-    PointerDeviceKind pointerDeviceKind,
-    double? deviceTouchSlop,
-  ) {
-    if (!_canAcceptGesture) {
-      return false;
-    }
-    return super.hasSufficientGlobalDistanceToAccept(
-      pointerDeviceKind,
-      deviceTouchSlop,
-    );
-  }
 }
 
 class _SlidableVerticalDragGestureRecognizer
@@ -239,18 +273,4 @@ class _SlidableVerticalDragGestureRecognizer
 
   @override
   bool get isHorizontal => false;
-
-  @override
-  bool hasSufficientGlobalDistanceToAccept(
-    PointerDeviceKind pointerDeviceKind,
-    double? deviceTouchSlop,
-  ) {
-    if (!_canAcceptGesture) {
-      return false;
-    }
-    return super.hasSufficientGlobalDistanceToAccept(
-      pointerDeviceKind,
-      deviceTouchSlop,
-    );
-  }
 }

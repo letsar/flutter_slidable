@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/action_pane_motions.dart';
 import 'package:flutter_slidable/src/actions.dart';
+import 'package:flutter_slidable/src/controller.dart';
 import 'package:flutter_slidable/src/slidable.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -355,5 +356,66 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(actionPaneKey), findsOneWidget);
+  });
+
+  testWidgets('controller can be replaced without throwing (#523)',
+      (tester) async {
+    final controllerA = SlidableController(const TestVSync());
+    final controllerB = SlidableController(const TestVSync());
+    addTearDown(controllerA.dispose);
+    addTearDown(controllerB.dispose);
+    const startActionPaneKey = ValueKey('start');
+
+    Widget build(SlidableController? controller) {
+      return Directionality(
+        textDirection: TextDirection.ltr,
+        child: Slidable(
+          controller: controller,
+          startActionPane: ActionPane(
+            key: startActionPaneKey,
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(onPressed: (_) {}, icon: Icons.share),
+            ],
+          ),
+          child: const SizedBox(width: 200, height: 50),
+        ),
+      );
+    }
+
+    // internal -> A -> B -> internal.
+    await tester.pumpWidget(build(null));
+    await tester.pumpWidget(build(controllerA));
+    expect(tester.takeException(), isNull);
+
+    controllerA.openStartActionPane();
+    await tester.pumpAndSettle();
+    expect(find.byKey(startActionPaneKey), findsOneWidget);
+
+    await tester.pumpWidget(build(controllerB));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(startActionPaneKey), findsNothing);
+
+    controllerB.openStartActionPane();
+    await tester.pumpAndSettle();
+    expect(find.byKey(startActionPaneKey), findsOneWidget);
+
+    controllerB.close();
+    await tester.pumpAndSettle();
+    expect(find.byKey(startActionPaneKey), findsNothing);
+
+    await tester.pumpWidget(build(null));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    // The new internal controller is used by the Slidable.
+    final context = tester.element(find.byType(SizedBox));
+    final controller = Slidable.of(context)!;
+    expect(controller, isNot(controllerA));
+    expect(controller, isNot(controllerB));
+    controller.openStartActionPane();
+    await tester.pumpAndSettle();
+    expect(find.byKey(startActionPaneKey), findsOneWidget);
   });
 }

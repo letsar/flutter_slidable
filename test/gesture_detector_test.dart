@@ -177,5 +177,63 @@ void main() {
         ),
       );
     });
+
+    group('inside a vertical scrollable -', () {
+      late SlidableController slidableController;
+      late ScrollController scrollController;
+
+      Future<void> pumpList(WidgetTester tester) async {
+        slidableController = SlidableController(const TestVSync());
+        scrollController = ScrollController();
+        addTearDown(slidableController.dispose);
+        addTearDown(scrollController.dispose);
+
+        await tester.pumpWidget(Directionality(
+          textDirection: TextDirection.ltr,
+          child: ListView(
+            controller: scrollController,
+            children: [
+              SizedBox(
+                height: 100,
+                child: SlidableGestureDetector(
+                  controller: slidableController,
+                  direction: Axis.horizontal,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+              const SizedBox(height: 2000),
+            ],
+          ),
+        ));
+      }
+
+      testWidgets('a mostly vertical diagonal drag scrolls the list',
+          (tester) async {
+        await pumpList(tester);
+
+        // Both components exceed the touch slop within the same event.
+        final gesture = await tester.startGesture(tester.getCenter(finder));
+        await gesture.moveBy(const Offset(30, -40));
+        await gesture.moveBy(const Offset(10, -20));
+        await gesture.up();
+        await tester.pump();
+
+        expect(slidableController.ratio, 0);
+        expect(scrollController.offset, greaterThan(0));
+      });
+
+      testWidgets('a mostly horizontal diagonal drag slides', (tester) async {
+        await pumpList(tester);
+
+        final gesture = await tester.startGesture(tester.getCenter(finder));
+        await gesture.moveBy(const Offset(40, -30));
+        await gesture.moveBy(const Offset(20, -10));
+        await gesture.up();
+        await tester.pump();
+
+        expect(slidableController.ratio, isNot(0));
+        expect(scrollController.offset, 0);
+      });
+    });
   });
 }

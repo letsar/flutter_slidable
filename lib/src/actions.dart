@@ -187,7 +187,7 @@ class SlidableAction extends StatelessWidget {
   /// A label to display below the [icon].
   final String? label;
 
-  /// Padding of the OutlinedButton
+  /// {@macro slidable.actions.borderRadius}
   final BorderRadius borderRadius;
 
   /// Padding of the OutlinedButton

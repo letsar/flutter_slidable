@@ -3,6 +3,7 @@
 ### Fixed
 * Diagonal scrolls triggering the slidable instead of the enclosing scrollable [#550](https://github.com/letsar/flutter_slidable/issues/550)
 * Exception when replacing the `controller` of a `Slidable` [#523](https://github.com/letsar/flutter_slidable/issues/523)
+* Jerky closing animation when only one action pane is set [#538](https://github.com/letsar/flutter_slidable/issues/538)
 
 ## 4.0.3
 

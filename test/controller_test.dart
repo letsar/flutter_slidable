@@ -21,6 +21,29 @@ void main() {
       expect(actionPaneType.value, ActionPaneType.end);
     });
 
+    test(
+        'Setting a ratio toward a disabled action pane, clamps the ratio to 0',
+        () {
+      final controller = SlidableController(const TestVSync())
+        ..enableStartActionPane = false;
+
+      controller.ratio = -0.3;
+      expect(controller.ratio, -0.3);
+      controller.ratio = 0.1;
+      expect(controller.ratio, 0);
+      expect(controller.actionPaneType.value, ActionPaneType.none);
+
+      controller
+        ..enableStartActionPane = true
+        ..enableEndActionPane = false;
+
+      controller.ratio = 0.3;
+      expect(controller.ratio, 0.3);
+      controller.ratio = -0.1;
+      expect(controller.ratio, 0);
+      expect(controller.actionPaneType.value, ActionPaneType.none);
+    });
+
     testWidgets('Acting on the animation, changes action pane type',
         (tester) async {
       TestWidgetsFlutterBinding.ensureInitialized();

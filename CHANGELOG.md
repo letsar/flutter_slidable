@@ -1,4 +1,8 @@
-## Unreleased
+## 5.0.0
+
+### Breaking
+* Migrates to the decoupled `material_ui` package [#548](https://github.com/letsar/flutter_slidable/issues/548). The built-in actions now read their theme from `material_ui`, so your app must be migrated to `material_ui` as well. See the [migration guide](https://github.com/letsar/flutter_slidable/blob/master/MIGRATION.md).
+* Minimum version of Flutter (3.47.0 now) and Dart (3.13.0 now).
 
 ### Fixed
 * Diagonal scrolls triggering the slidable instead of the enclosing scrollable [#550](https://github.com/letsar/flutter_slidable/issues/550)

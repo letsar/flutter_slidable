@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/actions.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   group('CustomSlidableAction', () {
@@ -29,6 +29,39 @@ void main() {
   });
 
   group('SlidableAction', () {
+    testWidgets('uses the material_ui theme', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            textTheme: const TextTheme(labelLarge: TextStyle(fontSize: 33)),
+          ),
+          home: Scaffold(
+            body: Row(
+              children: [
+                SlidableAction(
+                  onPressed: (_) {},
+                  label: 'label',
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+
+      final textStyle = tester
+          .widget<DefaultTextStyle>(
+            find
+                .ancestor(
+                  of: find.text('label'),
+                  matching: find.byType(DefaultTextStyle),
+                )
+                .first,
+          )
+          .style;
+
+      expect(textStyle.fontSize, 33);
+    });
+
     testWidgets('can be pressed', (tester) async {
       final logs = <String>[];
       await tester.pumpWidget(

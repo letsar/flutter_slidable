@@ -128,7 +128,7 @@ class Slidable extends StatefulWidget {
 
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late final SlidableController controller;
+  late SlidableController controller;
   late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
 
@@ -157,8 +157,14 @@ class _SlidableState extends State<Slidable>
     if (oldWidget.controller != widget.controller) {
       controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
 
+      // We only dispose the controller we created ourselves.
+      if (oldWidget.controller == null) {
+        controller.dispose();
+      }
+
       controller = (widget.controller ?? SlidableController(this))
         ..actionPaneType.addListener(handleActionPanelTypeChanged);
+      updateMoveAnimation();
     }
 
     updateIsLeftToRight();
@@ -255,14 +261,19 @@ class _SlidableState extends State<Slidable>
 
     content = Stack(
       children: <Widget>[
-        if (actionPane != null)
+        if (actionPane case final actionPane?)
           Positioned.fill(
             child: ClipRect(
               clipper: _SlidableClipper(
                 axis: widget.direction,
                 controller: controller,
               ),
-              child: actionPane,
+              // The action pane reads the controller once, so we need to
+              // recreate it when the controller changes.
+              child: KeyedSubtree(
+                key: ObjectKey(controller),
+                child: actionPane,
+              ),
             ),
           ),
         content,

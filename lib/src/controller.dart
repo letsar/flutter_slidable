@@ -193,11 +193,10 @@ class SlidableController {
   bool get closing => _closing;
   bool _closing = false;
 
-  bool _acceptRatio(double ratio) {
-    return !_closing &&
-        (ratio == 0 ||
-            ((ratio > 0 && enablePositiveActionPane) ||
-                (ratio < 0 && enableNegativeActionPane)));
+  bool _isRatioTowardEnabledPane(double ratio) {
+    return ratio == 0 ||
+        (ratio > 0 && enablePositiveActionPane) ||
+        (ratio < 0 && enableNegativeActionPane);
   }
 
   /// The current ratio of the full size of the [Slidable] that is already
@@ -210,8 +209,16 @@ class SlidableController {
   /// [ActionPaneType.start].
   double get ratio => _animationController.value * direction.value;
   set ratio(double value) {
-    final newRatio = actionPaneConfigurator?.normalizeRatio(value) ?? value;
-    if (_acceptRatio(newRatio) && newRatio != ratio) {
+    if (_closing) {
+      return;
+    }
+    var newRatio = actionPaneConfigurator?.normalizeRatio(value) ?? value;
+    // When dragging past 0 toward a disabled action pane, we stop at 0 instead
+    // of ignoring the value, otherwise the Slidable would not fully close.
+    if (!_isRatioTowardEnabledPane(newRatio)) {
+      newRatio = 0;
+    }
+    if (newRatio != ratio) {
       direction.value = newRatio.sign.toInt();
       _animationController.value = newRatio.abs();
     }

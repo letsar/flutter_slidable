@@ -8,6 +8,10 @@
 
 A Flutter implementation of slidable list item with directional slide actions that can be dismissed.
 
+## Migration to 5.0.0
+
+Version 5.0.0 migrates to the decoupled [`material_ui`](https://pub.dev/packages/material_ui) package and requires Flutter 3.47.0. Your app must use `material_ui` too, otherwise the built-in actions won't use its theme. Read the [migration guide](https://github.com/letsar/flutter_slidable/blob/master/MIGRATION.md) for the details.
+
 ## Migration from 0.6.0
 
 You can read this small guide to migrate from the 0.6 to the 1.0 version: https://github.com/letsar/flutter_slidable/wiki/Migration-from-version-0.6.0-to-version-1.0.0

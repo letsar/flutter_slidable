@@ -136,29 +136,39 @@ Animate the actions as if they were streched while the `Slidable` is moving:
 
 ### Controller
 
-You can use ```SlidableController``` to open or close the actions programmatically:
+You can use ```SlidableController``` to open or close the actions programmatically.
+The controller needs a `TickerProvider`, so create it in a `State` that mixes in `SingleTickerProviderStateMixin`:
 
 ```dart
-final controller = SlidableController();
+class _MyWidgetState extends State<MyWidget>
+    with SingleTickerProviderStateMixin {
+  late final controller = SlidableController(this);
 
-// ...
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
-Slidable(
-  controller: controller,
-  // ...
-);
+  @override
+  Widget build(BuildContext context) {
+    return Slidable(
+      controller: controller,
+      // ...
+    );
+  }
 
-// ...
+  // Open the actions
+  void _handleOpen() {
+    controller.openEndActionPane();
+    // OR
+    //controller.openStartActionPane();
+  }
 
-// Open the actions
-void _handleOpen() {
-  controller.openEndActionPane();
-  // OR
-  //controller.openStartActionPane();
-}
-
-void _handleOpen() {
-  controller.close();
+  // Close the actions
+  void _handleClose() {
+    controller.close();
+  }
 }
 ```
 

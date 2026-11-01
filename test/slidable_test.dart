@@ -1,6 +1,7 @@
 import 'package:flutter_slidable/src/action_pane_motions.dart';
 import 'package:flutter_slidable/src/actions.dart';
 import 'package:flutter_slidable/src/controller.dart';
+import 'package:flutter_slidable/src/dismissible_pane.dart';
 import 'package:flutter_slidable/src/slidable.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -459,5 +460,121 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(dismissed, isTrue);
+  });
+
+  group('onActionPaneChanged', () {
+    Widget build(
+      List<ActionPaneType> logs, {
+      SlidableController? controller,
+      VoidCallback? onDismissed,
+    }) {
+      return Directionality(
+        textDirection: TextDirection.ltr,
+        child: Slidable(
+          key: const ValueKey('slidable'),
+          controller: controller,
+          onActionPaneChanged: logs.add,
+          startActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(onPressed: (_) {}, icon: Icons.share),
+            ],
+          ),
+          endActionPane: ActionPane(
+            motion: const BehindMotion(),
+            dismissible: onDismissed == null
+                ? null
+                : DismissiblePane(onDismissed: onDismissed),
+            children: [
+              SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+            ],
+          ),
+          child: const SizedBox(height: 50),
+        ),
+      );
+    }
+
+    testWidgets('is called once the action pane is opened or closed by a drag',
+        (tester) async {
+      final logs = <ActionPaneType>[];
+      await tester.pumpWidget(build(logs));
+
+      await tester.drag(find.byType(Slidable), const Offset(-600, 0));
+      await tester.pumpAndSettle();
+      expect(logs, [ActionPaneType.end]);
+
+      await tester.drag(find.byType(Slidable), const Offset(300, 0));
+      await tester.pumpAndSettle();
+      expect(logs, [ActionPaneType.end, ActionPaneType.none]);
+    });
+
+    testWidgets('is not called when a drag does not open the action pane',
+        (tester) async {
+      final logs = <ActionPaneType>[];
+      await tester.pumpWidget(build(logs));
+
+      await tester.drag(find.byType(Slidable), const Offset(-100, 0));
+      await tester.pumpAndSettle();
+
+      expect(logs, isEmpty);
+    });
+
+    testWidgets('is called when the controller moves the Slidable',
+        (tester) async {
+      final controller = SlidableController(const TestVSync());
+      addTearDown(controller.dispose);
+      final logs = <ActionPaneType>[];
+      await tester.pumpWidget(build(logs, controller: controller));
+
+      controller.openEndActionPane();
+      await tester.pumpAndSettle();
+      controller.openEndActionPane();
+      await tester.pumpAndSettle();
+      expect(logs, [ActionPaneType.end]);
+
+      controller.close();
+      await tester.pumpAndSettle();
+      controller.openStartActionPane();
+      await tester.pumpAndSettle();
+      expect(logs, [
+        ActionPaneType.end,
+        ActionPaneType.none,
+        ActionPaneType.start,
+      ]);
+    });
+
+    testWidgets('reports the new action pane when dragged from one to another',
+        (tester) async {
+      final controller = SlidableController(const TestVSync());
+      addTearDown(controller.dispose);
+      final logs = <ActionPaneType>[];
+      await tester.pumpWidget(build(logs, controller: controller));
+
+      controller.openStartActionPane();
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(Slidable), const Offset(-800, 0));
+      await tester.pumpAndSettle();
+
+      expect(logs.first, ActionPaneType.start);
+      expect(logs.last, ActionPaneType.end);
+      expect(logs.where((type) => type == ActionPaneType.start), hasLength(1));
+    });
+
+    testWidgets('is not called when the Slidable is dismissed',
+        (tester) async {
+      final logs = <ActionPaneType>[];
+      var dismissed = false;
+      await tester.pumpWidget(build(logs, onDismissed: () => dismissed = true));
+
+      await tester.timedDrag(
+        find.byType(Slidable),
+        const Offset(-700, 0),
+        const Duration(milliseconds: 400),
+      );
+      await tester.pumpAndSettle();
+
+      expect(dismissed, isTrue);
+      expect(logs, isEmpty);
+    });
   });
 }

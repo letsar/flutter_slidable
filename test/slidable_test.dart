@@ -418,4 +418,46 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(startActionPaneKey), findsOneWidget);
   });
+
+  testWidgets(
+      'dismiss called from a SlidableAction with autoClose is not cancelled',
+      (tester) async {
+    final controller = SlidableController(const TestVSync());
+    addTearDown(controller.dispose);
+    var dismissed = false;
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Slidable(
+          controller: controller,
+          endActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) {
+                  Slidable.of(context)!.dismiss(
+                    ResizeRequest(
+                      const Duration(milliseconds: 300),
+                      () => dismissed = true,
+                    ),
+                  );
+                },
+                icon: Icons.delete,
+              ),
+            ],
+          ),
+          child: const SizedBox(width: 200, height: 50),
+        ),
+      ),
+    );
+
+    controller.openEndActionPane();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.delete));
+    await tester.pumpAndSettle();
+
+    expect(dismissed, isTrue);
+  });
 }

@@ -3,6 +3,9 @@
 ### Added
 * `labelStyle` and `iconSize` parameters to `SlidableAction`.
 
+### Fixed
+* Calling `dismiss` from an action with `autoClose` set to `true` no longer cancels the dismissal [#391](https://github.com/letsar/flutter_slidable/issues/391) [#326](https://github.com/letsar/flutter_slidable/issues/326)
+
 ## 5.0.0
 
 ### Breaking

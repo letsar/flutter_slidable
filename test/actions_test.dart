@@ -196,34 +196,5 @@ void main() {
 
       expect(tester.getSize(find.byIcon(Icons.ac_unit)), const Size(40, 40));
     });
-
-    testWidgets('accepts a BorderRadiusDirectional', (tester) async {
-      const borderRadius = BorderRadiusDirectional.only(
-        topStart: Radius.circular(8),
-      );
-
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.rtl,
-          child: Row(
-            children: [
-              SlidableAction(
-                onPressed: (_) {},
-                label: 'label',
-                borderRadius: borderRadius,
-              )
-            ],
-          ),
-        ),
-      );
-
-      final shape = tester
-          .widget<OutlinedButton>(find.byType(OutlinedButton))
-          .style!
-          .shape!
-          .resolve({})! as RoundedRectangleBorder;
-
-      expect(shape.borderRadius, borderRadius);
-    });
   });
 }

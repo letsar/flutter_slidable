@@ -71,11 +71,9 @@ class CustomSlidableAction extends StatelessWidget {
   /// {@template slidable.actions.borderRadius}
   /// The borderRadius of this action
   ///
-  /// Use a [BorderRadiusDirectional] to follow the ambient [TextDirection].
-  ///
   /// Defaults to [BorderRadius.zero].
   /// {@endtemplate}
-  final BorderRadiusGeometry borderRadius;
+  final BorderRadius borderRadius;
 
   /// {@template slidable.actions.padding}
   /// The padding of the OutlinedButton
@@ -203,7 +201,7 @@ class SlidableAction extends StatelessWidget {
   final TextStyle? labelStyle;
 
   /// {@macro slidable.actions.borderRadius}
-  final BorderRadiusGeometry borderRadius;
+  final BorderRadius borderRadius;
 
   /// Padding of the OutlinedButton
   final EdgeInsets? padding;

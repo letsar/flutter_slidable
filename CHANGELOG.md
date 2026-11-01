@@ -3,9 +3,6 @@
 ### Added
 * `labelStyle` and `iconSize` parameters to `SlidableAction`.
 
-### Changed
-* The `borderRadius` of `SlidableAction` and `CustomSlidableAction` is now a `BorderRadiusGeometry`, so a `BorderRadiusDirectional` can be used for RTL layouts.
-
 ## 5.0.0
 
 ### Breaking

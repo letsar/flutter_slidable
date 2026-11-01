@@ -56,17 +56,34 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
   Widget build(BuildContext context) {
     final canDragHorizontally = directionIsXAxis && widget.enabled;
     final canDragVertically = !directionIsXAxis && widget.enabled;
-    return GestureDetector(
-      onHorizontalDragStart: canDragHorizontally ? handleDragStart : null,
-      onHorizontalDragUpdate: canDragHorizontally ? handleDragUpdate : null,
-      onHorizontalDragEnd: canDragHorizontally ? handleDragEnd : null,
-      onVerticalDragStart: canDragVertically ? handleDragStart : null,
-      onVerticalDragUpdate: canDragVertically ? handleDragUpdate : null,
-      onVerticalDragEnd: canDragVertically ? handleDragEnd : null,
+    return RawGestureDetector(
+      gestures: <Type, GestureRecognizerFactory>{
+        if (canDragHorizontally)
+          _HorizontalDragGestureRecognizer:
+              GestureRecognizerFactoryWithHandlers<
+                  _HorizontalDragGestureRecognizer>(
+            () => _HorizontalDragGestureRecognizer(debugOwner: this),
+            _configureRecognizer,
+          ),
+        if (canDragVertically)
+          _VerticalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+              _VerticalDragGestureRecognizer>(
+            () => _VerticalDragGestureRecognizer(debugOwner: this),
+            _configureRecognizer,
+          ),
+      },
       behavior: HitTestBehavior.opaque,
-      dragStartBehavior: widget.dragStartBehavior,
       child: widget.child,
     );
+  }
+
+  void _configureRecognizer(DragGestureRecognizer instance) {
+    instance
+      ..onStart = handleDragStart
+      ..onUpdate = handleDragUpdate
+      ..onEnd = handleDragEnd
+      ..dragStartBehavior = widget.dragStartBehavior
+      ..gestureSettings = MediaQuery.maybeGestureSettingsOf(context);
   }
 
   double get overallDragAxisExtent {
@@ -98,5 +115,84 @@ class _SlidableGestureDetectorState extends State<SlidableGestureDetector> {
       details.primaryVelocity,
       gestureDirection,
     );
+  }
+}
+
+/// Only accepts the drag when the movement is predominantly along the main
+/// axis, so that diagonal scrolls are left to the enclosing [Scrollable].
+///
+/// The default drag recognizers only look at the main axis component of the
+/// movement. When both the main and cross axis components exceed the touch slop
+/// within the same pointer event (typically during a fast diagonal scroll),
+/// the slidable would win the arena because it is deeper in the hit test.
+mixin _DominantAxisDragGestureRecognizer on OneSequenceGestureRecognizer {
+  Offset _globalOffset = Offset.zero;
+
+  Axis get axis;
+
+  bool get isMovingAlongAxis {
+    final mainDistance = axis == Axis.horizontal
+        ? _globalOffset.dx.abs()
+        : _globalOffset.dy.abs();
+    final crossDistance = axis == Axis.horizontal
+        ? _globalOffset.dy.abs()
+        : _globalOffset.dx.abs();
+    return mainDistance > crossDistance;
+  }
+
+  @override
+  void handleEvent(PointerEvent event) {
+    if (event is PointerMoveEvent) {
+      _globalOffset += event.delta;
+    } else if (event is PointerPanZoomUpdateEvent) {
+      _globalOffset += event.panDelta;
+    }
+    super.handleEvent(event);
+  }
+
+  @override
+  void didStopTrackingLastPointer(int pointer) {
+    _globalOffset = Offset.zero;
+    super.didStopTrackingLastPointer(pointer);
+  }
+}
+
+class _HorizontalDragGestureRecognizer extends HorizontalDragGestureRecognizer
+    with _DominantAxisDragGestureRecognizer {
+  _HorizontalDragGestureRecognizer({super.debugOwner});
+
+  @override
+  Axis get axis => Axis.horizontal;
+
+  @override
+  bool hasSufficientGlobalDistanceToAccept(
+    PointerDeviceKind pointerDeviceKind,
+    double? deviceTouchSlop,
+  ) {
+    return isMovingAlongAxis &&
+        super.hasSufficientGlobalDistanceToAccept(
+          pointerDeviceKind,
+          deviceTouchSlop,
+        );
+  }
+}
+
+class _VerticalDragGestureRecognizer extends VerticalDragGestureRecognizer
+    with _DominantAxisDragGestureRecognizer {
+  _VerticalDragGestureRecognizer({super.debugOwner});
+
+  @override
+  Axis get axis => Axis.vertical;
+
+  @override
+  bool hasSufficientGlobalDistanceToAccept(
+    PointerDeviceKind pointerDeviceKind,
+    double? deviceTouchSlop,
+  ) {
+    return isMovingAlongAxis &&
+        super.hasSufficientGlobalDistanceToAccept(
+          pointerDeviceKind,
+          deviceTouchSlop,
+        );
   }
 }

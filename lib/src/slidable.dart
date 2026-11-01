@@ -28,6 +28,7 @@ class Slidable extends StatefulWidget {
     this.direction = Axis.horizontal,
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
+    this.onActionPaneChanged,
     required this.child,
   });
 
@@ -100,6 +101,20 @@ class Slidable extends StatefulWidget {
   ///  * [DragGestureRecognizer.dragStartBehavior], which gives an example for the different behaviors.
   final DragStartBehavior dragStartBehavior;
 
+  /// Called when this [Slidable] comes to rest with a different action pane
+  /// shown.
+  ///
+  /// The callback receives:
+  ///  * [ActionPaneType.start] or [ActionPaneType.end] when the corresponding
+  ///    action pane has been opened.
+  ///  * [ActionPaneType.none] when this [Slidable] has been closed.
+  ///
+  /// Unlike [SlidableController.actionPaneType], which changes as soon as the
+  /// [Slidable] starts to move, this callback is only called once the movement
+  /// has ended, whether it comes from a gesture or from the controller. It is
+  /// not called when this [Slidable] is dismissed.
+  final ValueChanged<ActionPaneType>? onActionPaneChanged;
+
   /// The widget below this widget in the tree.
   ///
   /// {@macro flutter.widgets.ProxyWidget.child}
@@ -119,17 +134,24 @@ class Slidable extends StatefulWidget {
   /// ```
   /// {@end-tool}
   static SlidableController? of(BuildContext context) {
-    final scope = context
-        .getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()
-        ?.widget as _SlidableControllerScope?;
+    final scope =
+        context
+                .getElementForInheritedWidgetOfExactType<
+                  _SlidableControllerScope
+                >()
+                ?.widget
+            as _SlidableControllerScope?;
     return scope?.controller;
   }
 }
 
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late final SlidableController controller;
+  late SlidableController controller;
   late bool keepPanesOrder;
+
+  // The action pane shown the last time this Slidable came to rest.
+  ActionPaneType settledActionPaneType = ActionPaneType.none;
 
   @override
   bool get wantKeepAlive => !widget.closeOnScroll;
@@ -138,7 +160,9 @@ class _SlidableState extends State<Slidable>
   void initState() {
     super.initState();
     controller = (widget.controller ?? SlidableController(this))
-      ..actionPaneType.addListener(handleActionPanelTypeChanged);
+      ..actionPaneType.addListener(handleActionPanelTypeChanged)
+      ..animation.addStatusListener(handleAnimationStatusChanged);
+    settledActionPaneType = currentActionPaneType;
   }
 
   @override
@@ -154,9 +178,17 @@ class _SlidableState extends State<Slidable>
 
     if (oldWidget.controller != widget.controller) {
       controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
+      controller.animation.removeStatusListener(handleAnimationStatusChanged);
+
+      // We only dispose the controller we created ourselves.
+      if (oldWidget.controller == null) {
+        controller.dispose();
+      }
 
       controller = (widget.controller ?? SlidableController(this))
-        ..actionPaneType.addListener(handleActionPanelTypeChanged);
+        ..actionPaneType.addListener(handleActionPanelTypeChanged)
+        ..animation.addStatusListener(handleAnimationStatusChanged);
+      settledActionPaneType = currentActionPaneType;
     }
 
     updateIsLeftToRight();
@@ -166,6 +198,7 @@ class _SlidableState extends State<Slidable>
   @override
   void dispose() {
     controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
+    controller.animation.removeStatusListener(handleAnimationStatusChanged);
 
     if (controller != widget.controller) {
       controller.dispose();
@@ -185,13 +218,32 @@ class _SlidableState extends State<Slidable>
 
   void updateIsLeftToRight() {
     final textDirection = Directionality.of(context);
-    controller.isLeftToRight = widget.direction == Axis.vertical ||
+    controller.isLeftToRight =
+        widget.direction == Axis.vertical ||
         !widget.useTextDirection ||
         textDirection == TextDirection.ltr;
   }
 
   void handleActionPanelTypeChanged() {
     setState(() {});
+  }
+
+  ActionPaneType get currentActionPaneType => controller.animation.value == 0
+      ? ActionPaneType.none
+      : controller.actionPaneType.value;
+
+  void handleAnimationStatusChanged(AnimationStatus status) {
+    // We only report the action pane once the Slidable is at rest, and not
+    // when it is dismissed since it will disappear.
+    if (status.isAnimating || controller.dismissing) {
+      return;
+    }
+
+    final actionPaneType = currentActionPaneType;
+    if (actionPaneType != settledActionPaneType) {
+      settledActionPaneType = actionPaneType;
+      widget.onActionPaneChanged?.call(actionPaneType);
+    }
   }
 
   void handleDismissing() {
@@ -247,14 +299,19 @@ class _SlidableState extends State<Slidable>
 
     content = Stack(
       children: <Widget>[
-        if (actionPane != null)
+        if (actionPane case final actionPane?)
           Positioned.fill(
             child: ClipRect(
               clipper: _SlidableClipper(
                 axis: widget.direction,
                 controller: controller,
               ),
-              child: actionPane,
+              // The action pane reads the controller once, so we need to
+              // recreate it when the controller changes.
+              child: KeyedSubtree(
+                key: ObjectKey(controller),
+                child: actionPane,
+              ),
             ),
           ),
         content,
@@ -307,10 +364,8 @@ class _SlidableControllerScope extends InheritedWidget {
 }
 
 class _SlidableClipper extends CustomClipper<Rect> {
-  _SlidableClipper({
-    required this.axis,
-    required this.controller,
-  }) : super(reclip: controller.animation);
+  _SlidableClipper({required this.axis, required this.controller})
+    : super(reclip: controller.animation);
 
   final Axis axis;
   final SlidableController controller;

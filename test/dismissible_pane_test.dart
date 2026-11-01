@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_slidable/src/action_pane_motions.dart';
 import 'package:flutter_slidable/src/actions.dart';
 import 'package:flutter_slidable/src/controller.dart';
@@ -6,6 +5,7 @@ import 'package:flutter_slidable/src/dismissible_pane.dart';
 import 'package:flutter_slidable/src/dismissible_pane_motions.dart';
 import 'package:flutter_slidable/src/slidable.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'common.dart';
 

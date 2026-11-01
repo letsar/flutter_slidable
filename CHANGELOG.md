@@ -1,3 +1,29 @@
+## 5.2.0
+
+### Added
+* `onActionPaneChanged` callback on `Slidable`, called once the `Slidable` comes to rest with a different action pane shown (`start`, `end`, or `none` when closed) [#273](https://github.com/letsar/flutter_slidable/issues/273)
+* `dismissing` getter on `SlidableController`.
+
+## 5.1.0
+
+### Added
+* `labelStyle` and `iconSize` parameters to `SlidableAction`.
+
+### Fixed
+* Calling `dismiss` from an action with `autoClose` set to `true` no longer cancels the dismissal [#391](https://github.com/letsar/flutter_slidable/issues/391) [#326](https://github.com/letsar/flutter_slidable/issues/326)
+* `dismiss` now uses its `duration` parameter. Thanks to @PurpleSwords.
+
+## 5.0.0
+
+### Breaking
+* Migrates to the decoupled `material_ui` package [#548](https://github.com/letsar/flutter_slidable/issues/548). The built-in actions now read their theme from `material_ui`, so your app must be migrated to `material_ui` as well. See the [migration guide](https://github.com/letsar/flutter_slidable/blob/master/MIGRATION.md).
+* Minimum version of Flutter (3.47.0 now) and Dart (3.13.0 now).
+
+### Fixed
+* Diagonal scrolls triggering the slidable instead of the enclosing scrollable [#550](https://github.com/letsar/flutter_slidable/issues/550)
+* Exception when replacing the `controller` of a `Slidable` [#523](https://github.com/letsar/flutter_slidable/issues/523)
+* Jerky closing animation when only one action pane is set [#538](https://github.com/letsar/flutter_slidable/issues/538)
+
 ## 4.0.3
 
 ### Fixed

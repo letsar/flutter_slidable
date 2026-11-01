@@ -106,16 +106,16 @@ class StillGesture extends EndGesture {
 class SlidableController {
   /// Creates a [SlidableController].
   SlidableController(TickerProvider vsync)
-      : _animationController = AnimationController(vsync: vsync),
-        _movementAnimationController = AnimationController.unbounded(
-          vsync: vsync,
-        ),
-        endGesture = ValueNotifier(null),
-        _dismissGesture = _ValueNotifier(null),
-        resizeRequest = ValueNotifier(null),
-        actionPaneType = ValueNotifier(ActionPaneType.none),
-        _movementRatio = ValueNotifier(0),
-        direction = ValueNotifier(0) {
+    : _animationController = AnimationController(vsync: vsync),
+      _movementAnimationController = AnimationController.unbounded(
+        vsync: vsync,
+      ),
+      endGesture = ValueNotifier(null),
+      _dismissGesture = _ValueNotifier(null),
+      resizeRequest = ValueNotifier(null),
+      actionPaneType = ValueNotifier(ActionPaneType.none),
+      _movementRatio = ValueNotifier(0),
+      direction = ValueNotifier(0) {
     _animationController.addListener(_handleAnimationChanged);
     _movementAnimationController.addListener(_handleMovementAnimationChanged);
     direction.addListener(_onDirectionChanged);
@@ -217,11 +217,14 @@ class SlidableController {
   bool get closing => _closing;
   bool _closing = false;
 
-  bool _acceptRatio(double ratio) {
-    return !_closing &&
-        (ratio == 0 ||
-            ((ratio > 0 && enablePositiveActionPane) ||
-                (ratio < 0 && enableNegativeActionPane)));
+  /// Whether this [dismiss()] method has been called and not finished.
+  bool get dismissing => _dismissing;
+  bool _dismissing = false;
+
+  bool _isRatioTowardEnabledPane(double ratio) {
+    return ratio == 0 ||
+        (ratio > 0 && enablePositiveActionPane) ||
+        (ratio < 0 && enableNegativeActionPane);
   }
 
   /// The current ratio of the full size of the [Slidable] that is already
@@ -234,16 +237,22 @@ class SlidableController {
   /// [ActionPaneType.start].
   double get ratio => _animationController.value * direction.value;
   set ratio(double value) {
-    final newRatio = actionPaneConfigurator?.normalizeRatio(value) ?? value;
-    if (_acceptRatio(newRatio)) {
-      _movementAnimationController.stop();
-      _hasMovementRatioOverride = false;
-      if (newRatio != ratio) {
-        direction.value = newRatio.sign.toInt();
-        _animationController.value = newRatio.abs();
-      } else {
-        _syncMovementRatio();
-      }
+    if (_closing) {
+      return;
+    }
+    var newRatio = actionPaneConfigurator?.normalizeRatio(value) ?? value;
+    // When dragging past 0 toward a disabled action pane, we stop at 0 instead
+    // of ignoring the value, otherwise the Slidable would not fully close.
+    if (!_isRatioTowardEnabledPane(newRatio)) {
+      newRatio = 0;
+    }
+    _movementAnimationController.stop();
+    _hasMovementRatioOverride = false;
+    if (newRatio != ratio) {
+      direction.value = newRatio.sign.toInt();
+      _animationController.value = newRatio.abs();
+    } else {
+      _syncMovementRatio();
     }
   }
 
@@ -304,7 +313,8 @@ class SlidableController {
     var dragDirection = _lockedDragDirection;
     if (dragDirection == null) {
       dragDirection = value.sign.toInt();
-      if (dragDirection == 0 || !_acceptRatio(dragDirection.toDouble())) {
+      if (dragDirection == 0 ||
+          !_isRatioTowardEnabledPane(dragDirection.toDouble())) {
         return;
       }
       _lockedDragDirection = dragDirection;
@@ -321,9 +331,9 @@ class SlidableController {
     _hasMovementRatioOverride = true;
     final resistedDistance =
         (-distanceInLockedDirection * _lockedOppositeDragResistance).clamp(
-      0.0,
-      _lockedOppositeDragLimit,
-    );
+          0.0,
+          _lockedOppositeDragLimit,
+        );
     _setMovementRatio(-dragDirection * resistedDistance);
   }
 
@@ -354,15 +364,18 @@ class SlidableController {
   /// Dispatches a new [EndGesture] determined by the given [velocity] and
   /// [direction].
   void dispatchEndGesture(double? velocity, GestureDirection direction) {
-    final isScrollingIntoDisabledEndActionPane = enableStartActionPane &&
+    final isScrollingIntoDisabledEndActionPane =
+        enableStartActionPane &&
         !enableEndActionPane &&
         this.direction.value == 0 &&
         direction == GestureDirection.closing;
-    final isScrollingIntoDisabledStartActionPane = !enableStartActionPane &&
+    final isScrollingIntoDisabledStartActionPane =
+        !enableStartActionPane &&
         enableEndActionPane &&
         this.direction.value == 0 &&
         direction == GestureDirection.opening;
-    final isScrollingIntoDisabledPane = isScrollingIntoDisabledEndActionPane ||
+    final isScrollingIntoDisabledPane =
+        isScrollingIntoDisabledEndActionPane ||
         isScrollingIntoDisabledStartActionPane;
 
     if (isScrollingIntoDisabledPane) {
@@ -385,10 +398,17 @@ class SlidableController {
   }
 
   /// Closes the [Slidable].
+  ///
+  /// Does nothing while the [Slidable] is being dismissed, so that closing it
+  /// (for example through the `autoClose` option of an action) does not cancel
+  /// the dismissal.
   Future<void> close({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
+    if (_dismissing) {
+      return;
+    }
     final shouldAnimateMovementRatio = _hasMovementRatioOverride;
     _closing = true;
     if (!shouldAnimateMovementRatio) {
@@ -495,11 +515,17 @@ class SlidableController {
   }) async {
     _movementAnimationController.stop();
     _hasMovementRatioOverride = false;
-    await _animationController.animateTo(
-      1,
-      duration: _defaultMovementDuration,
-      curve: curve,
-    );
+    _dismissing = true;
+    try {
+      await _animationController
+          .animateTo(1, duration: duration, curve: curve)
+          .orCancel;
+    } on TickerCanceled {
+      // Another animation took over, for example a new drag.
+      return;
+    } finally {
+      _dismissing = false;
+    }
     resizeRequest.value = request;
   }
 

@@ -193,7 +193,8 @@ class SlidableController {
   bool get closing => _closing;
   bool _closing = false;
 
-  // Whether the dismiss animation started by [dismiss] is running.
+  /// Whether this [dismiss()] method has been called and not finished.
+  bool get dismissing => _dismissing;
   bool _dismissing = false;
 
   bool _isRatioTowardEnabledPane(double ratio) {

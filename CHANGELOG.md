@@ -1,3 +1,9 @@
+## Unreleased
+
+### Added
+* `onActionPaneChanged` callback on `Slidable`, called once the `Slidable` comes to rest with a different action pane shown (`start`, `end`, or `none` when closed) [#273](https://github.com/letsar/flutter_slidable/issues/273)
+* `dismissing` getter on `SlidableController`.
+
 ## 5.1.0
 
 ### Added

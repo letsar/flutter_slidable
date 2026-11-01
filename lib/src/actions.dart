@@ -71,9 +71,11 @@ class CustomSlidableAction extends StatelessWidget {
   /// {@template slidable.actions.borderRadius}
   /// The borderRadius of this action
   ///
+  /// Use a [BorderRadiusDirectional] to follow the ambient [TextDirection].
+  ///
   /// Defaults to [BorderRadius.zero].
   /// {@endtemplate}
-  final BorderRadius borderRadius;
+  final BorderRadiusGeometry borderRadius;
 
   /// {@template slidable.actions.padding}
   /// The padding of the OutlinedButton
@@ -154,7 +156,9 @@ class SlidableAction extends StatelessWidget {
     required this.onPressed,
     this.icon,
     this.spacing = 4,
+    this.iconSize,
     this.label,
+    this.labelStyle,
     this.borderRadius = BorderRadius.zero,
     this.padding,
     this.alignment,
@@ -179,6 +183,11 @@ class SlidableAction extends StatelessWidget {
   /// An icon to display above the [label].
   final IconData? icon;
 
+  /// The size of the [icon].
+  ///
+  /// Defaults to the size of the ambient [IconTheme].
+  final double? iconSize;
+
   /// The space between [icon] and [label] if both set.
   ///
   /// Defaults to 4.
@@ -187,8 +196,14 @@ class SlidableAction extends StatelessWidget {
   /// A label to display below the [icon].
   final String? label;
 
+  /// The text style of the [label].
+  ///
+  /// It is merged with the ambient [DefaultTextStyle], so only the properties
+  /// that are set override the default ones.
+  final TextStyle? labelStyle;
+
   /// {@macro slidable.actions.borderRadius}
-  final BorderRadius borderRadius;
+  final BorderRadiusGeometry borderRadius;
 
   /// Padding of the OutlinedButton
   final EdgeInsets? padding;
@@ -202,7 +217,7 @@ class SlidableAction extends StatelessWidget {
 
     if (icon != null) {
       children.add(
-        Icon(icon),
+        Icon(icon, size: iconSize),
       );
     }
 
@@ -216,6 +231,7 @@ class SlidableAction extends StatelessWidget {
       children.add(
         Text(
           label!,
+          style: labelStyle,
           overflow: TextOverflow.ellipsis,
         ),
       );

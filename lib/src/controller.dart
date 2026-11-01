@@ -193,6 +193,9 @@ class SlidableController {
   bool get closing => _closing;
   bool _closing = false;
 
+  // Whether the dismiss animation started by [dismiss] is running.
+  bool _dismissing = false;
+
   bool _isRatioTowardEnabledPane(double ratio) {
     return ratio == 0 ||
         (ratio > 0 && enablePositiveActionPane) ||
@@ -264,10 +267,17 @@ class SlidableController {
   }
 
   /// Closes the [Slidable].
+  ///
+  /// Does nothing while the [Slidable] is being dismissed, so that closing it
+  /// (for example through the `autoClose` option of an action) does not cancel
+  /// the dismissal.
   Future<void> close({
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
+    if (_dismissing) {
+      return;
+    }
     _closing = true;
     await _animationController.animateBack(
       0,
@@ -367,11 +377,21 @@ class SlidableController {
     Duration duration = _defaultMovementDuration,
     Curve curve = _defaultCurve,
   }) async {
-    await _animationController.animateTo(
-      1,
-      duration: duration,
-      curve: curve,
-    );
+    _dismissing = true;
+    try {
+      await _animationController
+          .animateTo(
+            1,
+            duration: duration,
+            curve: curve,
+          )
+          .orCancel;
+    } on TickerCanceled {
+      // Another animation took over, for example a new drag.
+      return;
+    } finally {
+      _dismissing = false;
+    }
     resizeRequest.value = request;
   }
 

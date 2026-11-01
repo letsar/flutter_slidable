@@ -1,3 +1,8 @@
+## Unreleased
+
+### Added
+* `labelStyle` and `iconSize` parameters to `SlidableAction`.
+
 ## 5.0.0
 
 ### Breaking

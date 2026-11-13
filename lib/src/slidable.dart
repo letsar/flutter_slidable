@@ -28,7 +28,7 @@ class Slidable extends StatefulWidget {
     this.direction = Axis.horizontal,
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
-    this.onActionPaneChanged,
+    this.actionPaneShape,
     required this.child,
   });
 
@@ -84,6 +84,14 @@ class Slidable extends StatefulWidget {
   /// reading direction for [endActionPane]).
   final bool useTextDirection;
 
+  /// The shape used to clip the action panes.
+  ///
+  /// When null, the action panes are clipped to a plain rectangle
+  /// (the upstream behavior). Set it to the same shape as the tile
+  /// (for example a [RoundedSuperellipseBorder]) so the revealed
+  /// actions are cut by that shape instead of a straight line.
+  final ShapeBorder? actionPaneShape;
+
   /// Determines the way that drag start behavior is handled.
   ///
   /// If set to [DragStartBehavior.start], the drag gesture used to dismiss a
@@ -100,20 +108,6 @@ class Slidable extends StatefulWidget {
   ///
   ///  * [DragGestureRecognizer.dragStartBehavior], which gives an example for the different behaviors.
   final DragStartBehavior dragStartBehavior;
-
-  /// Called when this [Slidable] comes to rest with a different action pane
-  /// shown.
-  ///
-  /// The callback receives:
-  ///  * [ActionPaneType.start] or [ActionPaneType.end] when the corresponding
-  ///    action pane has been opened.
-  ///  * [ActionPaneType.none] when this [Slidable] has been closed.
-  ///
-  /// Unlike [SlidableController.actionPaneType], which changes as soon as the
-  /// [Slidable] starts to move, this callback is only called once the movement
-  /// has ended, whether it comes from a gesture or from the controller. It is
-  /// not called when this [Slidable] is dismissed.
-  final ValueChanged<ActionPaneType>? onActionPaneChanged;
 
   /// The widget below this widget in the tree.
   ///
@@ -143,12 +137,9 @@ class Slidable extends StatefulWidget {
 
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late SlidableController controller;
+  late final SlidableController controller;
   late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
-
-  // The action pane shown the last time this Slidable came to rest.
-  ActionPaneType settledActionPaneType = ActionPaneType.none;
 
   @override
   bool get wantKeepAlive => !widget.closeOnScroll;
@@ -157,9 +148,7 @@ class _SlidableState extends State<Slidable>
   void initState() {
     super.initState();
     controller = (widget.controller ?? SlidableController(this))
-      ..actionPaneType.addListener(handleActionPanelTypeChanged)
-      ..animation.addStatusListener(handleAnimationStatusChanged);
-    settledActionPaneType = currentActionPaneType;
+      ..actionPaneType.addListener(handleActionPanelTypeChanged);
   }
 
   @override
@@ -176,18 +165,9 @@ class _SlidableState extends State<Slidable>
 
     if (oldWidget.controller != widget.controller) {
       controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
-      controller.animation.removeStatusListener(handleAnimationStatusChanged);
-
-      // We only dispose the controller we created ourselves.
-      if (oldWidget.controller == null) {
-        controller.dispose();
-      }
 
       controller = (widget.controller ?? SlidableController(this))
-        ..actionPaneType.addListener(handleActionPanelTypeChanged)
-        ..animation.addStatusListener(handleAnimationStatusChanged);
-      settledActionPaneType = currentActionPaneType;
-      updateMoveAnimation();
+        ..actionPaneType.addListener(handleActionPanelTypeChanged);
     }
 
     updateIsLeftToRight();
@@ -197,7 +177,6 @@ class _SlidableState extends State<Slidable>
   @override
   void dispose() {
     controller.actionPaneType.removeListener(handleActionPanelTypeChanged);
-    controller.animation.removeStatusListener(handleAnimationStatusChanged);
 
     if (controller != widget.controller) {
       controller.dispose();
@@ -226,24 +205,6 @@ class _SlidableState extends State<Slidable>
     setState(() {
       updateMoveAnimation();
     });
-  }
-
-  ActionPaneType get currentActionPaneType => controller.animation.value == 0
-      ? ActionPaneType.none
-      : controller.actionPaneType.value;
-
-  void handleAnimationStatusChanged(AnimationStatus status) {
-    // We only report the action pane once the Slidable is at rest, and not
-    // when it is dismissed since it will disappear.
-    if (status.isAnimating || controller.dismissing) {
-      return;
-    }
-
-    final actionPaneType = currentActionPaneType;
-    if (actionPaneType != settledActionPaneType) {
-      settledActionPaneType = actionPaneType;
-      widget.onActionPaneChanged?.call(actionPaneType);
-    }
   }
 
   void handleDismissing() {
@@ -303,19 +264,15 @@ class _SlidableState extends State<Slidable>
 
     content = Stack(
       children: <Widget>[
-        if (actionPane case final actionPane?)
+        if (actionPane != null)
           Positioned.fill(
-            child: ClipRect(
+            child: ClipPath(
               clipper: _SlidableClipper(
                 axis: widget.direction,
                 controller: controller,
+                shape: widget.actionPaneShape,
               ),
-              // The action pane reads the controller once, so we need to
-              // recreate it when the controller changes.
-              child: KeyedSubtree(
-                key: ObjectKey(controller),
-                child: actionPane,
-              ),
+              child: actionPane,
             ),
           ),
         content,
@@ -367,17 +324,18 @@ class _SlidableControllerScope extends InheritedWidget {
   }
 }
 
-class _SlidableClipper extends CustomClipper<Rect> {
+class _SlidableClipper extends CustomClipper<Path> {
   _SlidableClipper({
     required this.axis,
     required this.controller,
+    this.shape,
   }) : super(reclip: controller.animation);
 
   final Axis axis;
   final SlidableController controller;
+  final ShapeBorder? shape;
 
-  @override
-  Rect getClip(Size size) {
+  Rect _revealedRect(Size size) {
     switch (axis) {
       case Axis.horizontal:
         final double offset = controller.ratio * size.width;
@@ -400,10 +358,27 @@ class _SlidableClipper extends CustomClipper<Rect> {
   }
 
   @override
-  Rect getApproximateClipRect(Size size) => getClip(size);
+  Path getClip(Size size) {
+    final rect = _revealedRect(size);
+    final shape = this.shape;
+    if (shape == null) {
+      return Path()..addRect(rect);
+    }
+    final shapePath = shape.getOuterPath(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+    );
+    final double offset = axis == Axis.horizontal
+        ? controller.ratio * size.width
+        : controller.ratio * size.height;
+    final shifted = shapePath.shift(
+      axis == Axis.horizontal ? Offset(offset, 0) : Offset(0, offset),
+    );
+    return Path.combine(PathOperation.difference, shapePath, shifted);
+  }
+
 
   @override
   bool shouldReclip(_SlidableClipper oldClipper) {
-    return oldClipper.axis != axis;
+    return oldClipper.axis != axis || oldClipper.shape != shape;
   }
 }

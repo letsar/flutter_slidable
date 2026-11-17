@@ -8,6 +8,119 @@ import 'package:material_ui/material_ui.dart';
 
 void main() {
   group('Slidable', () {
+    testWidgets('action pane is clipped to a rectangle by default',
+        (tester) async {
+      const gestureDetectorKey = ValueKey('gesture_detector');
+      const startActionPaneKey = ValueKey('start');
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Slidable(
+            startActionPane: ActionPane(
+              key: startActionPaneKey,
+              motion: const BehindMotion(),
+              children: [
+                SlidableAction(onPressed: (_) {}, icon: Icons.share),
+                SlidableAction(onPressed: (_) {}, icon: Icons.delete),
+              ],
+            ),
+            child: Builder(builder: (context) {
+              return GestureDetector(
+                key: gestureDetectorKey,
+                onTap: () {
+                  Slidable.of(context)!.openStartActionPane();
+                },
+              );
+            }),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(gestureDetectorKey));
+      await tester.pumpAndSettle();
+
+      // The dismissal also builds a ClipRect (with no clipper), so
+      // match only the ClipRect that carries our clipper.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is ClipRect && w.clipper != null,
+        ),
+        findsOneWidget,
+      );
+      expect(find.byType(ClipPath), findsNothing);
+    });
+
+    testWidgets('action pane is clipped by actionPaneShape when set',
+        (tester) async {
+      const gestureDetectorKey = ValueKey('gesture_detector');
+      const startActionPaneKey = ValueKey('start');
+      var tapped = false;
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Slidable(
+            actionPaneShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            startActionPane: ActionPane(
+              key: startActionPaneKey,
+              motion: const BehindMotion(),
+              children: [
+                SlidableAction(
+                  onPressed: (_) {
+                    tapped = true;
+                  },
+                  icon: Icons.share,
+                ),
+                SlidableAction(
+                  onPressed: (_) {
+                    tapped = true;
+                  },
+                  icon: Icons.delete,
+                ),
+              ],
+            ),
+            child: Builder(builder: (context) {
+              return GestureDetector(
+                key: gestureDetectorKey,
+                onTap: () {
+                  Slidable.of(context)!.openStartActionPane();
+                },
+              );
+            }),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(gestureDetectorKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ClipPath), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is ClipRect && w.clipper != null,
+        ),
+        findsNothing,
+      );
+
+      // Control: tap inside the revealed strip (left 5% of the pane,
+      // mid-height) — the pane widget is full-size but only the left
+      // extent is revealed, the rest is under the slid tile.
+      final paneRect = tester.getRect(find.byKey(startActionPaneKey));
+      final revealedPoint = paneRect.topLeft +
+          Offset(paneRect.width * 0.05, paneRect.height / 2);
+      await tester.tapAt(revealedPoint);
+      await tester.pump();
+      expect(tapped, isTrue);
+
+      // The top-left corner is inside the pane rect but outside the
+      // 20px rounded shape, so the tap must NOT reach the action.
+      tapped = false;
+      await tester.tapAt(paneRect.topLeft + const Offset(1, 1));
+      await tester.pump();
+      expect(tapped, isFalse);
+    });
+
     testWidgets(
         'child should be able to open the horitzontal start action pane',
         (tester) async {

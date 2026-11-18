@@ -11,6 +11,8 @@ analyzer:
     included_file_warning: ignore
     missing_required_param: error
     missing_return: error
+  exclude:
+    - build/**
 
 linter:
   rules:

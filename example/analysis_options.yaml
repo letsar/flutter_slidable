@@ -1,4 +1,13 @@
 # Enable all rules by default
+analyzer:
+  exclude:
+    - android/**
+    - ios/**
+    - build/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 include: ../analysis_options.yaml
 linter:
   rules:

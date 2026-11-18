@@ -11,6 +11,14 @@ analyzer:
     included_file_warning: ignore
     missing_required_param: error
     missing_return: error
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:
@@ -42,15 +50,8 @@ linter:
     # Only useful when targeting JS runtime
     avoid_js_rounded_ints: false
 
-    # We prefer having typedef (discussion in https://github.com/flutter/flutter/pull/16356)
-    avoid_private_typedef_functions: false
-
     # Can be useful to have a more readable code
     avoid_types_on_closure_parameters: false
-
-    # `as` is not that bad (especially with the upcoming non-nullable types).
-    # Explicit exceptions is better than implicit exceptions.
-    avoid_as: false
 
     # Can be difficult to read in some cases
     cascade_invocations: false
@@ -82,9 +83,6 @@ linter:
     # Can be useful to have a more readable code
     omit_local_variable_types: false
     
-    # Too many false positives
-    one_member_abstracts: false
-
     # Issue: https://github.com/flutter/flutter/issues/5792
     only_throw_errors: false
 

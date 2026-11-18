@@ -41,5 +41,8 @@ jobs:
       - name: Test
         run: flutter test
 
+      - name: Show the files changed by the Flutter tool
+        run: git status --short && git --no-pager diff
+
       - name: Check the package can be published
         run: flutter pub publish --dry-run

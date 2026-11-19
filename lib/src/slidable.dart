@@ -122,7 +122,7 @@ class Slidable extends StatefulWidget {
   /// (the default behavior). Set it to the same shape as the tile
   /// (for example a [RoundedSuperellipseBorder]) so the revealed
   /// actions are cut by that shape instead of a straight line.
-  final ShapeBorder? actionPaneShape; 
+  final ShapeBorder? actionPaneShape;
 
   /// The widget below this widget in the tree.
   ///
@@ -314,33 +314,29 @@ class _SlidableState extends State<Slidable>
       children: <Widget>[
         if (actionPane case final actionPane?)
           Positioned.fill(
-            child: widget.actionPaneShape == null
-                ? ClipRect(
+            // The action pane reads the controller once, so we need to
+            // recreate it when the controller changes.
+            child: KeyedSubtree(
+              key: ObjectKey(controller),
+              child: switch (widget.actionPaneShape) {
+                null => ClipRect(
                     clipper: _SlidableClipper(
                       axis: widget.direction,
                       controller: controller,
                     ),
-                    // The action pane reads the controller once, so we need to
-                    // recreate it when the controller changes.
-                    child: KeyedSubtree(
-                      key: ObjectKey(controller),
-                      child: actionPane,
-                    ),
-                  )
-                : ClipPath(
+                    child: actionPane,
+                  ),
+                final shape => ClipPath(
                     clipper: _SlidableShapeClipper(
                       axis: widget.direction,
                       controller: controller,
-                      shape: widget.actionPaneShape!,
+                      shape: shape,
                       textDirection: Directionality.of(context),
                     ),
-                    // The action pane reads the controller once, so we need to
-                    // recreate it when the controller changes.
-                    child: KeyedSubtree(
-                      key: ObjectKey(controller),
-                      child: actionPane,
-                    ),
+                    child: actionPane,
                   ),
+              },
+            ),
           ),
         content,
       ],

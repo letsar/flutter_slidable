@@ -1,3 +1,8 @@
+## Unreleased
+
+### Added
+* `actionPaneShape` parameter on `Slidable` to clip the action panes to a shape (for example a `RoundedSuperellipseBorder`) instead of a plain rectangle [#564](https://github.com/letsar/flutter_slidable/pull/564)
+
 ## 5.2.0
 
 ### Added

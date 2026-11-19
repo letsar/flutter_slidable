@@ -29,6 +29,7 @@ class Slidable extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.down,
     this.useTextDirection = true,
     this.onActionPaneChanged,
+    this.actionPaneShape,
     required this.child,
   });
 
@@ -114,6 +115,14 @@ class Slidable extends StatefulWidget {
   /// has ended, whether it comes from a gesture or from the controller. It is
   /// not called when this [Slidable] is dismissed.
   final ValueChanged<ActionPaneType>? onActionPaneChanged;
+
+  /// The shape used to clip the action panes.
+  ///
+  /// When null, the action panes are clipped to a plain rectangle
+  /// (the default behavior). Set it to the same shape as the tile
+  /// (for example a [RoundedSuperellipseBorder]) so the revealed
+  /// actions are cut by that shape instead of a straight line.
+  final ShapeBorder? actionPaneShape;
 
   /// The widget below this widget in the tree.
   ///
@@ -305,17 +314,28 @@ class _SlidableState extends State<Slidable>
       children: <Widget>[
         if (actionPane case final actionPane?)
           Positioned.fill(
-            child: ClipRect(
-              clipper: _SlidableClipper(
-                axis: widget.direction,
-                controller: controller,
-              ),
-              // The action pane reads the controller once, so we need to
-              // recreate it when the controller changes.
-              child: KeyedSubtree(
-                key: ObjectKey(controller),
-                child: actionPane,
-              ),
+            // The action pane reads the controller once, so we need to
+            // recreate it when the controller changes.
+            child: KeyedSubtree(
+              key: ObjectKey(controller),
+              child: switch (widget.actionPaneShape) {
+                null => ClipRect(
+                    clipper: _SlidableClipper(
+                      axis: widget.direction,
+                      controller: controller,
+                    ),
+                    child: actionPane,
+                  ),
+                final shape => ClipPath(
+                    clipper: _SlidableShapeClipper(
+                      axis: widget.direction,
+                      controller: controller,
+                      shape: shape,
+                      textDirection: Directionality.of(context),
+                    ),
+                    child: actionPane,
+                  ),
+              },
             ),
           ),
         content,
@@ -405,5 +425,41 @@ class _SlidableClipper extends CustomClipper<Rect> {
   @override
   bool shouldReclip(_SlidableClipper oldClipper) {
     return oldClipper.axis != axis;
+  }
+}
+
+class _SlidableShapeClipper extends CustomClipper<Path> {
+  _SlidableShapeClipper({
+    required this.axis,
+    required this.controller,
+    required this.shape,
+    required this.textDirection,
+  }) : super(reclip: controller.animation);
+
+  final Axis axis;
+  final SlidableController controller;
+  final ShapeBorder shape;
+  final TextDirection textDirection;
+
+  @override
+  Path getClip(Size size) {
+    final shapePath = shape.getOuterPath(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      textDirection: textDirection,
+    );
+    final double offset = axis == Axis.horizontal
+        ? controller.ratio * size.width
+        : controller.ratio * size.height;
+    final shifted = shapePath.shift(
+      axis == Axis.horizontal ? Offset(offset, 0) : Offset(0, offset),
+    );
+    return Path.combine(PathOperation.difference, shapePath, shifted);
+  }
+
+  @override
+  bool shouldReclip(_SlidableShapeClipper oldClipper) {
+    return oldClipper.axis != axis ||
+        oldClipper.shape != shape ||
+        oldClipper.textDirection != textDirection;
   }
 }

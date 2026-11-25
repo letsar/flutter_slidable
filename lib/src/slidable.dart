@@ -143,9 +143,13 @@ class Slidable extends StatefulWidget {
   /// ```
   /// {@end-tool}
   static SlidableController? of(BuildContext context) {
-    final scope = context
-        .getElementForInheritedWidgetOfExactType<_SlidableControllerScope>()
-        ?.widget as _SlidableControllerScope?;
+    final scope =
+        context
+                .getElementForInheritedWidgetOfExactType<
+                  _SlidableControllerScope
+                >()
+                ?.widget
+            as _SlidableControllerScope?;
     return scope?.controller;
   }
 }
@@ -153,7 +157,6 @@ class Slidable extends StatefulWidget {
 class _SlidableState extends State<Slidable>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late SlidableController controller;
-  late Animation<Offset> moveAnimation;
   late bool keepPanesOrder;
 
   // The action pane shown the last time this Slidable came to rest.
@@ -176,7 +179,6 @@ class _SlidableState extends State<Slidable>
     super.didChangeDependencies();
     updateIsLeftToRight();
     updateController();
-    updateMoveAnimation();
   }
 
   @override
@@ -196,7 +198,6 @@ class _SlidableState extends State<Slidable>
         ..actionPaneType.addListener(handleActionPanelTypeChanged)
         ..animation.addStatusListener(handleAnimationStatusChanged);
       settledActionPaneType = currentActionPaneType;
-      updateMoveAnimation();
     }
 
     updateIsLeftToRight();
@@ -226,15 +227,14 @@ class _SlidableState extends State<Slidable>
 
   void updateIsLeftToRight() {
     final textDirection = Directionality.of(context);
-    controller.isLeftToRight = widget.direction == Axis.vertical ||
+    controller.isLeftToRight =
+        widget.direction == Axis.vertical ||
         !widget.useTextDirection ||
         textDirection == TextDirection.ltr;
   }
 
   void handleActionPanelTypeChanged() {
-    setState(() {
-      updateMoveAnimation();
-    });
+    setState(() {});
   }
 
   ActionPaneType get currentActionPaneType => controller.animation.value == 0
@@ -259,18 +259,6 @@ class _SlidableState extends State<Slidable>
     if (controller.resizeRequest.value != null) {
       setState(() {});
     }
-  }
-
-  void updateMoveAnimation() {
-    final double end = controller.direction.value.toDouble();
-    moveAnimation = controller.animation.drive(
-      Tween<Offset>(
-        begin: Offset.zero,
-        end: widget.direction == Axis.horizontal
-            ? Offset(end, 0)
-            : Offset(0, end),
-      ),
-    );
   }
 
   Widget? get actionPane {
@@ -301,13 +289,21 @@ class _SlidableState extends State<Slidable>
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
-    Widget content = SlideTransition(
-      position: moveAnimation,
+    Widget content = ValueListenableBuilder<double>(
+      valueListenable: controller.movement,
       child: SlidableAutoCloseBehaviorInteractor(
         groupTag: widget.groupTag,
         controller: controller,
         child: widget.child,
       ),
+      builder: (context, ratio, child) {
+        return FractionalTranslation(
+          translation: widget.direction == Axis.horizontal
+              ? Offset(ratio, 0)
+              : Offset(0, ratio),
+          child: child,
+        );
+      },
     );
 
     content = Stack(
@@ -388,10 +384,8 @@ class _SlidableControllerScope extends InheritedWidget {
 }
 
 class _SlidableClipper extends CustomClipper<Rect> {
-  _SlidableClipper({
-    required this.axis,
-    required this.controller,
-  }) : super(reclip: controller.animation);
+  _SlidableClipper({required this.axis, required this.controller})
+    : super(reclip: controller.animation);
 
   final Axis axis;
   final SlidableController controller;

@@ -131,14 +131,7 @@ void main() {
 
     testWidgets('handleEndGesture should be called with the correct direction',
         (tester) async {
-      double? ratio = 0;
-      when(() => mockSlidableController.ratio)
-          .thenAnswer((realInvocation) => ratio!);
-      when(() => mockSlidableController.ratio = any())
-          .thenAnswer((realInvocation) {
-        ratio = realInvocation.positionalArguments[0] as double?;
-        return ratio!;
-      });
+      when(() => mockSlidableController.movementRatio).thenReturn(0);
 
       final mockDirection = ValueNotifier(0);
       when(() => mockSlidableController.direction).thenReturn(mockDirection);
@@ -162,7 +155,7 @@ void main() {
       await tester.fling(finder, posDelta, speed);
 
       verify(
-        () => mockSlidableController.dispatchEndGesture(
+        () => mockSlidableController.endDrag(
           any(),
           GestureDirection.opening,
         ),
@@ -171,7 +164,7 @@ void main() {
       await tester.fling(finder, negDelta, speed);
 
       verify(
-        () => mockSlidableController.dispatchEndGesture(
+        () => mockSlidableController.endDrag(
           any(),
           GestureDirection.closing,
         ),
